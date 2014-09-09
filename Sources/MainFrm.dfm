@@ -114,12 +114,12 @@ object MainForm: TMainForm
       Height = 15
       Caption = 'DevExpress VCL Components Automatic Installer'
     end
-    object Label3: TLabel
+    object LblVersion: TLabel
       Left = 203
       Top = 37
-      Width = 21
+      Width = 20
       Height = 15
-      Caption = 'v2.1'
+      Caption = 'v2.x'
     end
   end
   object PageFuns: TPageControl

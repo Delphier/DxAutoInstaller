@@ -25,6 +25,7 @@ type
   procedure CopyFile(const ExistingFileName, NewFileName: String; const ReplaceExisting: Boolean);
   procedure CopyFilesToDirectory(const FilePath, DirPath: String);
   function IsEmptyDirectory(const DirPath, ExcludeFile: String): Boolean;
+  function GetVersionStr(): String;
 
 const
   CRLF = #13#10;
@@ -84,6 +85,39 @@ begin
     Result := (List.Count = 0) or ((List.Count = 1) and (List.IndexOf(ExcludeTrailingPathDelimiter(ExcludeFile)) = 0));
   finally
     List.Free;
+  end;
+end;
+
+function GetVersionStr(): String;
+var
+  Major, Minor, Release: Cardinal;
+  RS: TResourceStream;
+  MS: TMemoryStream;
+  Buffer: PVSFIXEDFILEINFO;
+  BufferLen: Cardinal;
+begin
+  Result := '';
+  try
+    RS := TResourceStream.CreateFromID(HInstance, 1, RT_VERSION);
+  except
+    Exit;
+  end;
+
+  MS := TMemoryStream.Create;
+  try
+    MS.CopyFrom(RS, RS.Size);
+    if VerQueryValue(MS.Memory, '\', Pointer(Buffer), BufferLen) then begin
+      Major := Buffer.dwFileVersionMS shr 16;
+      Minor := Buffer.dwFileVersionMS and $FFFF;
+      Release := Buffer.dwFileVersionLS shr 16;
+      //Build := Buffer.dwFileVersionLS and $FFFF;
+
+      Result := Format('v%d.%d', [Major, Minor]);
+      if Release <> 0 then Result := Result + '.' + IntToStr(Release);
+    end;
+  finally
+    MS.Free;
+    RS.Free;
   end;
 end;
 

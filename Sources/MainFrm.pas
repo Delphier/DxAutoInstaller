@@ -24,7 +24,7 @@ type
     Image1: TImage;
     LblAppName: TLabel;
     Label2: TLabel;
-    Label3: TLabel;
+    LblVersion: TLabel;
     PageFuns: TPageControl;
     TabInstall: TTabSheet;
     TabUninstall: TTabSheet;
@@ -95,6 +95,7 @@ procedure TMainForm.FormCreate(Sender: TObject);
 begin
   Caption := Application.Title;
   LblAppName.Caption := Application.Title;
+  LblVersion.Caption := GetVersionStr();
   PageFuns.ActivePage := TabInstall;
 
   // Initial Install Page;
