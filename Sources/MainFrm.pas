@@ -58,6 +58,7 @@ type
     ProfileDelete: TAction;
     LblCustomProfile: TLinkLabel;
     Label1: TLabel;
+    MemoReadme: TMemo;
     procedure FormCreate(Sender: TObject);
     procedure URLLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
     procedure InstallExecute(Sender: TObject);
@@ -87,11 +88,13 @@ var
 implementation
 
 uses
-  ShellAPI, FileCtrl;
+  ShellAPI, FileCtrl, IOUtils;
 
 {$R *.dfm}
 
 procedure TMainForm.FormCreate(Sender: TObject);
+var
+  ReadmeFile: String;
 begin
   Caption := Application.Title;
   LblAppName.Caption := Application.Title;
@@ -117,6 +120,9 @@ begin
   LinkDownApp.Caption := Format('<a href="%s">%s</a>', [LinkDownApp.Caption, LinkDownApp.Caption]);
   LinkDownDoc.Caption := Format('<a href="%s">%s</a>', [LinkDownDoc.Caption, LinkDownDoc.Caption]);
   LinkEmail.Caption := Format('<a href="mailto:%s">%s</a>', [LinkEmail.Caption, LinkEmail.Caption]);
+  ReadmeFile := TPath.GetTempFileName;
+  ExportResourceToFile(ReadmeFile, 'Readme', 'TXT');
+  MemoReadme.Lines.LoadFromFile(ReadmeFile);
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);

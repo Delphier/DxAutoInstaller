@@ -26,6 +26,7 @@ type
   procedure CopyFilesToDirectory(const FilePath, DirPath: String);
   function IsEmptyDirectory(const DirPath, ExcludeFile: String): Boolean;
   function GetVersionStr(): String;
+  procedure ExportResourceToFile(const FileName, ResourceName, ResourceType: String);
 
 const
   CRLF = #13#10;
@@ -117,6 +118,18 @@ begin
     end;
   finally
     MS.Free;
+    RS.Free;
+  end;
+end;
+
+procedure ExportResourceToFile(const FileName, ResourceName, ResourceType: String);
+var
+  RS: TResourceStream;
+begin
+  RS := TResourceStream.Create(HInstance,ResourceName, PChar(ResourceType));
+  try
+    RS.SaveToFile(FileName);
+  finally
     RS.Free;
   end;
 end;

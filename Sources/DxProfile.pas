@@ -68,7 +68,7 @@ type
 implementation
 
 uses
-  IniFiles, IOUtils, Forms;
+  IniFiles, IOUtils, Forms, DxUtils;
 
 { TDxComponentProfile }
 
@@ -110,15 +110,8 @@ begin
 end;
 
 procedure TDxProfile.ExportBuiltInProfile(const FileName: String);
-var
-  RStream: TResourceStream;
 begin
-  RStream := TResourceStream.Create(HInstance, ProfileResourceName, ProfileResourceType);
-  try
-    RStream.SaveToFile(FileName);
-  finally
-    RStream.Free;
-  end;
+  ExportResourceToFile(FileName, ProfileResourceName, ProfileResourceType);
 end;
 
 function TDxProfile.IsCustomProfile: Boolean;

@@ -127,7 +127,7 @@ object MainForm: TMainForm
     Top = 109
     Width = 789
     Height = 436
-    ActivePage = TabTools
+    ActivePage = TabAbout
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
     OnChange = PageFunsChange
@@ -274,30 +274,33 @@ object MainForm: TMainForm
     object TabAbout: TTabSheet
       Caption = 'About'
       ImageIndex = 3
+      DesignSize = (
+        781
+        406)
       object Label4: TLabel
-        Left = 24
-        Top = 40
+        Left = 8
+        Top = 29
         Width = 133
         Height = 15
         Caption = 'Download Latest Version:'
       end
       object Label5: TLabel
-        Left = 24
-        Top = 184
+        Left = 8
+        Top = 127
         Width = 138
         Height = 15
         Caption = 'Feedback and Bug Report:'
       end
       object Label6: TLabel
-        Left = 24
-        Top = 113
+        Left = 8
+        Top = 77
         Width = 228
         Height = 15
         Caption = 'Download DevExpress VCL Documentation:'
       end
       object LinkDownApp: TLinkLabel
-        Left = 24
-        Top = 61
+        Left = 8
+        Top = 50
         Width = 224
         Height = 19
         Caption = 'http://www.delphier.com/DxAutoInstaller'
@@ -307,8 +310,8 @@ object MainForm: TMainForm
         OnLinkClick = URLLinkClick
       end
       object LinkDownDoc: TLinkLabel
-        Left = 24
-        Top = 134
+        Left = 8
+        Top = 97
         Width = 381
         Height = 19
         Caption = 'https://www.devexpress.com/ClientCenter/Downloads/Documentation'
@@ -318,8 +321,8 @@ object MainForm: TMainForm
         OnLinkClick = URLLinkClick
       end
       object LinkEmail: TLinkLabel
-        Left = 24
-        Top = 205
+        Left = 8
+        Top = 146
         Width = 110
         Height = 19
         Caption = 'faceker@gmail.com'
@@ -327,6 +330,15 @@ object MainForm: TMainForm
         ParentColor = False
         TabOrder = 2
         OnLinkClick = URLLinkClick
+      end
+      object MemoReadme: TMemo
+        Left = 8
+        Top = 172
+        Width = 763
+        Height = 225
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        ReadOnly = True
+        TabOrder = 3
       end
     end
   end
