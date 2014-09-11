@@ -113,7 +113,7 @@ begin
                    Close;
                    ShowModal;
                  end;
-    dxisError:   if Application.MessageBox(PChar(FTargetLogs.Text + CRLF + 'An error has occurred, Do you want to continue?'),
+    dxisError:   if Application.MessageBox(PChar(FTargetLogs.Text + CRLF + 'An error has occurred, do you want to continue?'),
                                            'Confirmation', MB_ICONQUESTION + MB_OKCANCEL) = IDCANCEL then ActionStop.Execute;
   end;
 end;

@@ -7,3 +7,5 @@ v2.1	2014/09/09
 
 v2.0 	2014/08/29 
 	Initial release.
+
+v1.0 	A long time ago.

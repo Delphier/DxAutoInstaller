@@ -127,7 +127,7 @@ object MainForm: TMainForm
     Top = 109
     Width = 789
     Height = 436
-    ActivePage = TabAbout
+    ActivePage = TabInstall
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
     OnChange = PageFunsChange
@@ -176,8 +176,8 @@ object MainForm: TMainForm
       object PanTreeList: TPanel
         Left = 8
         Top = 62
-        Width = 764
-        Height = 337
+        Width = 763
+        Height = 335
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelKind = bkTile
         BevelOuter = bvNone
@@ -201,7 +201,7 @@ object MainForm: TMainForm
         Left = 8
         Top = 30
         Width = 763
-        Height = 368
+        Height = 367
         Anchors = [akLeft, akTop, akRight, akBottom]
         Checkboxes = True
         Columns = <
@@ -279,28 +279,28 @@ object MainForm: TMainForm
         406)
       object Label4: TLabel
         Left = 8
-        Top = 29
+        Top = 21
         Width = 133
         Height = 15
         Caption = 'Download Latest Version:'
       end
       object Label5: TLabel
         Left = 8
-        Top = 127
+        Top = 119
         Width = 138
         Height = 15
         Caption = 'Feedback and Bug Report:'
       end
       object Label6: TLabel
         Left = 8
-        Top = 77
+        Top = 69
         Width = 228
         Height = 15
         Caption = 'Download DevExpress VCL Documentation:'
       end
       object LinkDownApp: TLinkLabel
         Left = 8
-        Top = 50
+        Top = 42
         Width = 224
         Height = 19
         Caption = 'http://www.delphier.com/DxAutoInstaller'
@@ -311,7 +311,7 @@ object MainForm: TMainForm
       end
       object LinkDownDoc: TLinkLabel
         Left = 8
-        Top = 97
+        Top = 89
         Width = 381
         Height = 19
         Caption = 'https://www.devexpress.com/ClientCenter/Downloads/Documentation'
@@ -322,7 +322,7 @@ object MainForm: TMainForm
       end
       object LinkEmail: TLinkLabel
         Left = 8
-        Top = 146
+        Top = 138
         Width = 110
         Height = 19
         Caption = 'faceker@gmail.com'
