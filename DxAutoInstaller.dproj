@@ -114,7 +114,6 @@
         </DCCReference>
         <DCCReference Include="Sources\DxComponent.pas"/>
         <DCCReference Include="Sources\DxComponentFactory.pas"/>
-        <DCCReference Include="Sources\DxCookies.pas"/>
         <DCCReference Include="Sources\DxIDE.pas"/>
         <DCCReference Include="Sources\DxInstaller.pas"/>
         <DCCReference Include="Sources\DxProfile.pas"/>
@@ -170,6 +169,24 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="Bin\DxAutoInstaller.exe" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>DxAutoInstaller.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Resources\Profile.ini" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win32\Debug\DxAutoInstaller.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>DxAutoInstaller.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="Resources\Readme.txt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
@@ -182,9 +199,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Win32\Debug\DxAutoInstaller.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Resources\Readme.txt" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win32">
-                        <RemoteName>DxAutoInstaller.exe</RemoteName>
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

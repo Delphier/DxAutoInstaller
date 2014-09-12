@@ -12,7 +12,7 @@ unit DxInstaller;
 interface
 
 uses
-  Forms, Classes, SysUtils, DxIDE, DxComponent, DxProfile, DxCookies;
+  Forms, Classes, SysUtils, DxIDE, DxComponent, DxProfile;
 
 type
   TDxInstallOption = (dxioAddBrowsingPath, dxioInstallIBXPackages, dxioInstallTeeChartPackages, dxioCompileWin64Library);
@@ -25,13 +25,14 @@ type
   TDxUpdateProgressStateEvent = procedure(const StateText: String) of object;
 
   TDxInstaller = class
+  const
+    DxEnvironmentVariableName = 'DXVCL';
   private
     FIDEs: TDxIDEs;
     FProfile: TDxProfile;
     FInstallFileDir: String;
     FComponents: array of TDxComponentList;
     FOptions: array of TDxInstallOptions;
-    FCookies: TDxCookies;
     FState: TDxInstallerState;
     FOnUpdateProgress: TDxUpdateProgressEvent;
     FOnUpdateProgressState: TDxUpdateProgressStateEvent;
@@ -47,7 +48,6 @@ type
     procedure UpdateProgress(IDE: TDxIDE; Component: TDxComponentProfile; const Task, Target: String);
     procedure UpdateProgressState(const StateText: String);
     procedure CheckStoppedState();
-    property Cookies: TDxCookies read FCookies;
   public
     constructor Create();
     destructor Destroy; override;
@@ -88,7 +88,6 @@ begin
   FInstallFileDir := EmptyStr;
   SetLength(FComponents, FIDEs.Count);
   SetLength(FOptions, FIDEs.Count);
-  FCookies := TDxCookies.Create;
   FState := dxisNormal;
 end;
 
@@ -99,7 +98,6 @@ begin
   for I := Low(FComponents) to High(FComponents) do FreeAndNil(FComponents[I]);
   FProfile.Free;
   FIDEs.Free;
-  FCookies.Free;
   inherited;
 end;
 
@@ -249,7 +247,7 @@ begin
     if dxioCompileWin64Library In Options[IDE] then IDE.AddToLibrarySearchPath(InstallSourcesDir, Win64)
   end;
 
-  Cookies.InstallFileDir := InstallFileDir;
+  SetIDEOverrideEnvironmentVariable(IDE, DxEnvironmentVariableName, InstallFileDir);
 end;
 
 procedure TDxInstaller.InstallPackage(IDE: TDxIDE; const IDEPlatform: TDxIDEPlatform; Component: TDxComponent; Package: TDxPackage);
@@ -314,7 +312,8 @@ end;
 procedure TDxInstaller.Uninstall(IDE: TDxIDE);
 var
   Comp: TDxComponentProfile;
-  InstallLibraryDir, InstallSourcesDir: String;
+  InstallFileDir, InstallLibraryDir, InstallSourcesDir: String;
+
   procedure UninstallPackages(List: TStringList);
   var
     Package: String;
@@ -331,9 +330,10 @@ begin
     UninstallPackages(Comp.OutdatedPackages);
   end;
 
-  if Cookies.InstallFileDir = EmptyStr then Exit;
-  InstallLibraryDir := GetInstallLibraryDir(Cookies.InstallFileDir, IDE);
-  InstallSourcesDir := GetInstallSourcesDir(Cookies.InstallFileDir);
+  InstallFileDir := GetIDEOverrideEnvironmentVariable(IDE, DxEnvironmentVariableName);
+  if InstallFileDir = EmptyStr then Exit;
+  InstallLibraryDir := GetInstallLibraryDir(InstallFileDir, IDE);
+  InstallSourcesDir := GetInstallSourcesDir(InstallFileDir);
   UpdateProgress(IDE, nil, 'Deleting', 'Installation Files');
   UpdateProgressState('Deleting Directory: ' + InstallLibraryDir);
   DxUtils.DeleteDirectory(InstallLibraryDir);
@@ -341,17 +341,19 @@ begin
   IDE.RemoveFromLibrarySearchPath(InstallSourcesDir, Win32);
   IDE.RemoveFromLibraryBrowsingPath(InstallSourcesDir, Win32);
   if IsSupportWin64(IDE) then begin
-    IDE.RemoveFromLibrarySearchPath(GetInstallLibraryDir(Cookies.InstallFileDir, IDE, Win64), Win64);
+    IDE.RemoveFromLibrarySearchPath(GetInstallLibraryDir(InstallFileDir, IDE, Win64), Win64);
     IDE.RemoveFromLibrarySearchPath(InstallSourcesDir, Win64);
     IDE.RemoveFromLibraryBrowsingPath(InstallSourcesDir, Win64);
   end;
 
-  InstallLibraryDir := GetInstallLibraryDir(Cookies.InstallFileDir, nil);
+  InstallLibraryDir := GetInstallLibraryDir(InstallFileDir, nil);
   if IsEmptyDirectory(InstallLibraryDir, InstallSourcesDir) then begin
     UpdateProgressState('Deleting Directory: ' + InstallSourcesDir);
     DxUtils.DeleteDirectory(InstallSourcesDir);
     RemoveDir(InstallLibraryDir);
   end;
+
+  SetIDEOverrideEnvironmentVariable(IDE, DxEnvironmentVariableName, EmptyStr);
 end;
 
 procedure TDxInstaller.UninstallPackage(IDE: TDxIDE; const IDEPlatform: TDxIDEPlatform; Component: TDxComponentProfile; const PackageBaseName: String);

@@ -7,7 +7,6 @@ uses
   MainFrm in 'Sources\MainFrm.pas' {MainForm},
   DxComponent in 'Sources\DxComponent.pas',
   DxComponentFactory in 'Sources\DxComponentFactory.pas',
-  DxCookies in 'Sources\DxCookies.pas',
   DxIDE in 'Sources\DxIDE.pas',
   DxInstaller in 'Sources\DxInstaller.pas',
   DxProfile in 'Sources\DxProfile.pas',

@@ -1,6 +1,9 @@
 Changelog
 --------------------------
 
+v2.1.1	2014/09/12
+	DevExpress Icon Library supported.
+
 v2.1	2014/09/09
 	Delphi XE7 supported;
 	Fixed: IBX, TeeChart packages compile error: IBX and VclTee has been added to namespace list.
