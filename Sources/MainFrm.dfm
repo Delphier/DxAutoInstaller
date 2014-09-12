@@ -127,7 +127,7 @@ object MainForm: TMainForm
     Top = 109
     Width = 789
     Height = 436
-    ActivePage = TabInstall
+    ActivePage = TabTools
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
     OnChange = PageFunsChange
@@ -264,8 +264,6 @@ object MainForm: TMainForm
           Anchors = [akLeft, akTop, akRight]
           AutoSize = False
           Caption = 'Custom Profile:'
-          Color = clWindow
-          ParentColor = False
           TabOrder = 1
           OnLinkClick = URLLinkClick
         end
@@ -304,8 +302,6 @@ object MainForm: TMainForm
         Width = 224
         Height = 19
         Caption = 'http://www.delphier.com/DxAutoInstaller'
-        Color = clWindow
-        ParentColor = False
         TabOrder = 0
         OnLinkClick = URLLinkClick
       end
@@ -315,8 +311,6 @@ object MainForm: TMainForm
         Width = 381
         Height = 19
         Caption = 'https://www.devexpress.com/ClientCenter/Downloads/Documentation'
-        Color = clWindow
-        ParentColor = False
         TabOrder = 1
         OnLinkClick = URLLinkClick
       end
@@ -326,8 +320,6 @@ object MainForm: TMainForm
         Width = 110
         Height = 19
         Caption = 'faceker@gmail.com'
-        Color = clWindow
-        ParentColor = False
         TabOrder = 2
         OnLinkClick = URLLinkClick
       end

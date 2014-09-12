@@ -98,7 +98,7 @@ begin
   FExists := FileExists(FullFileName);
   FRequired := True;
   FDependentComponents := TDxComponentList.Create(False);
-  if Exists then ReadOptions;
+  ReadOptions;
 end;
 
 destructor TDxPackage.Destroy;
@@ -114,6 +114,7 @@ var
   S: String;
   IsInRequiresPart: Boolean;
 begin
+  if not Exists then Exit;
   DPK := TStringList.Create;
   try
     DPK.LoadFromFile(FullFileName);
@@ -126,10 +127,10 @@ begin
         end;
       end else begin
         if Pos(DPKDescriptionOptionIdent, S) > 0 then
-          FDescription := Copy(S, Length(DPKDescriptionOptionIdent) + 1, Length(S) - Length(DPKDescriptionOptionIdent) - 2);
-        if Pos(DPKDesigntimeOnlyOptionIdent, S) > 0 then FUsage := dxpuDesigntimeOnly;
-        if Pos(DPKRuntimeOnlyOptionIdent, S) > 0 then FUsage := dxpuRuntimeOnly;
-        if Trim(S) = DPKRequiresOptionIdent then IsInRequiresPart := True;
+          FDescription := Copy(S, Length(DPKDescriptionOptionIdent) + 1, Length(S) - Length(DPKDescriptionOptionIdent) - 2)
+        else if Pos(DPKDesigntimeOnlyOptionIdent, S) > 0 then FUsage := dxpuDesigntimeOnly
+        else if Pos(DPKRuntimeOnlyOptionIdent, S) > 0 then FUsage := dxpuRuntimeOnly
+        else if Trim(S) = DPKRequiresOptionIdent then IsInRequiresPart := True;
       end;
     end;
   finally

@@ -3,16 +3,16 @@ program DxAutoInstaller;
 {$R *.dres}
 
 uses
-  Forms,
+  Vcl.Forms,
   MainFrm in 'Sources\MainFrm.pas' {MainForm},
-  DxProfile in 'Sources\DxProfile.pas',
   DxComponent in 'Sources\DxComponent.pas',
   DxComponentFactory in 'Sources\DxComponentFactory.pas',
-  DxInstaller in 'Sources\DxInstaller.pas',
-  DxIDE in 'Sources\DxIDE.pas',
-  DxQuantumTreeList in 'Sources\DxQuantumTreeList.pas' {DxResourceModule: TDataModule},
   DxCookies in 'Sources\DxCookies.pas',
+  DxIDE in 'Sources\DxIDE.pas',
+  DxInstaller in 'Sources\DxInstaller.pas',
+  DxProfile in 'Sources\DxProfile.pas',
   DxProgress in 'Sources\DxProgress.pas' {DxProgressForm},
+  DxQuantumTreeList in 'Sources\DxQuantumTreeList.pas' {DxResourceModule: TDataModule},
   DxUtils in 'Sources\DxUtils.pas';
 
 {$R *.res}
