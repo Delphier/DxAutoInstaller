@@ -63,6 +63,7 @@ type
     procedure Uninstall(const IDEArray: TDxIDEArray); overload;
     procedure Stop();
     function GetInstallComponentCount(IDE: TDxIDE): Integer;
+    procedure SearchNewPackages(List: TStringList);
     class function GetInstallLibraryDir(const InstallFileDir: String; IDE: TDxIDE; const IDEPlatform: TDxIDEPlatform = Win32): String;
     class function GetInstallSourcesDir(const InstallFileDir: String): String;
   end;
@@ -140,6 +141,38 @@ begin
   Options := Value;
   if (dxioCompileWin64Library in Options) and (not IsSupportWin64(IDE)) then Exclude(Options, dxioCompileWin64Library);
   FOptions[IDEs.IndexOf(IDE)] := Options;
+end;
+
+procedure TDxInstaller.SearchNewPackages(List: TStringList);
+var
+  Packages, DPKFileList: TStringList;
+  Component: TDxComponentProfile;
+  S, FileName: String;
+  I: Integer;
+begin
+  List.Clear;
+  if InstallFileDir = EmptyStr then Exit;
+
+  Packages := TStringList.Create;
+  DPKFileList := TStringList.Create;
+  try
+    for Component in Profile.Components do begin
+      Packages.AddStrings(Component.RequiredPackages);
+      Packages.AddStrings(Component.OptionalPackages);
+      Packages.AddStrings(Component.OutdatedPackages);
+    end;
+    BuildFileList(IncludeTrailingPathDelimiter(InstallFileDir) + '*.dpk', DPKFileList, faAnyFile, True, True);
+    for S in DPKFileList do begin
+      FileName := ChangeFileExt(ExtractFileName(S), '');
+      for I := Length(FileName) downto 1 do if CharInSet(FileName[I], ['0'..'9']) then Delete(FileName, I, 1) else Break;
+      if SameText(FileName[Length(FileName)], 'D') then FileName := Copy(FileName, 1, Length(FileName) - 1)
+      else if SameText(Copy(FileName, Length(FileName) - 1, 2), 'RS') then FileName := Copy(FileName, 1, Length(FileName) - 2);
+      if Packages.IndexOf(FileName) < 0 then List.Add(S);
+    end;
+  finally
+    Packages.Free;
+    DPKFileList.Free;
+  end;
 end;
 
 procedure TDxInstaller.SetInstallFileDir(const Value: String);

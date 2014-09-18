@@ -60,6 +60,9 @@ type
     LblCustomProfile: TLinkLabel;
     Label1: TLabel;
     MemoReadme: TMemo;
+    GroupBox2: TGroupBox;
+    Button1: TButton;
+    SearchNewPackages: TAction;
     procedure FormCreate(Sender: TObject);
     procedure URLLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
     procedure InstallExecute(Sender: TObject);
@@ -73,6 +76,7 @@ type
     procedure RefreshTreeList(Sender: TObject);
     procedure ProfileExportExecute(Sender: TObject);
     procedure ProfileDeleteExecute(Sender: TObject);
+    procedure SearchNewPackagesExecute(Sender: TObject);
   private
     { Private declarations }
     FInstaller: TDxInstaller;
@@ -185,7 +189,7 @@ end;
 procedure TMainForm.RunInstaller(Action: TDxInstallerAction; const IDEArray: TDxIDEArray);
 begin
   if FInstaller.IDEs.AnyInstanceRunning then begin
-    Application.MessageBox('Please close all running IDEs.', 'Information', MB_ICONINFORMATION);
+    ShowInformation('Please close all running IDEs.');
     Exit;
   end;
   Hide;
@@ -194,6 +198,21 @@ begin
     Action(IDEArray);
   finally
     Show;
+  end;
+end;
+
+procedure TMainForm.SearchNewPackagesExecute(Sender: TObject);
+var
+  List: TStringList;
+begin
+  Screen.Cursor := crHourGlass;
+  List := TStringList.Create;
+  try
+    FInstaller.SearchNewPackages(List);
+    if List.Count > 0 then ShowInformation(List.Text);
+  finally
+    List.Free;
+    Screen.Cursor := crDefault;
   end;
 end;
 

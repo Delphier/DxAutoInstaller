@@ -20,6 +20,8 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
+  function BuildFileList(const Path: String; const List: TStrings; const Attr: Integer;
+    const FullFileName: Boolean; const Recursive: Boolean): Boolean;
   procedure DeleteFiles(const FilePath: String);
   procedure DeleteDirectory(const DirPath: String);
   procedure CopyFile(const ExistingFileName, NewFileName: String; const ReplaceExisting: Boolean);
@@ -27,6 +29,7 @@ type
   function IsEmptyDirectory(const DirPath, ExcludeFile: String): Boolean;
   function GetVersionStr(): String;
   procedure ExportResourceToFile(const FileName, ResourceName, ResourceType: String);
+  procedure ShowInformation(const Text: String);
 
 const
   CRLF = #13#10;
@@ -36,7 +39,23 @@ implementation
 uses
   JclFileUtils;
 
-// Example: C:\Windows\System32\*.exe;*.dll
+// function parameter Path can include multiple FileMasks as:
+// C:\Windows\System32\*.exe;*.dll
+// FileMask Seperator = ';'
+
+function BuildFileList(const Path: String; const List: TStrings; const Attr: Integer;
+  const FullFileName: Boolean; const Recursive: Boolean): Boolean;
+var
+  Options: TFileListOptions;
+begin
+  if Recursive then begin
+    Options := [flRecursive];
+    if FullFileName then Include(Options, flFullNames);
+    Result := JclFileUtils.AdvBuildFileList(Path, Attr, List, amSuperSetOf, Options);
+  end else
+    Result := JclFileUtils.BuildFileList(Path, Attr, List, FullFileName);
+end;
+
 procedure DeleteFiles(const FilePath: String);
 var
   List: TStringList;
@@ -44,7 +63,7 @@ var
 begin
   List := TStringList.Create;
   try
-    BuildFileList(FilePath, faAnyFile, List, True);
+    BuildFileList(FilePath, List, faAnyFile, True, False);
     for S in List do Windows.DeleteFile(PChar(S));
   finally
     List.Free;
@@ -68,7 +87,7 @@ var
 begin
   List := TStringList.Create;
   try
-    BuildFileList(FilePath, faAnyFile, List, True);
+    BuildFileList(FilePath, List, faAnyFile, True, False);
     ForceDirectories(DirPath);
     for S in List do CopyFile(S, IncludeTrailingPathDelimiter(DirPath) + ExtractFileName(S), True);
   finally
@@ -82,7 +101,7 @@ var
 begin
   List := TStringList.Create;
   try
-    BuildFileList(IncludeTrailingPathDelimiter(DirPath) + '*.*', faAnyFile, List, True);
+    BuildFileList(IncludeTrailingPathDelimiter(DirPath) + '*.*', List, faAnyFile, True, False);
     Result := (List.Count = 0) or ((List.Count = 1) and (List.IndexOf(ExcludeTrailingPathDelimiter(ExcludeFile)) = 0));
   finally
     List.Free;
@@ -132,6 +151,11 @@ begin
   finally
     RS.Free;
   end;
+end;
+
+procedure ShowInformation(const Text: String);
+begin
+  Application.MessageBox(PChar(Text), 'Information', MB_ICONINFORMATION);
 end;
 
 { TDxForm }
