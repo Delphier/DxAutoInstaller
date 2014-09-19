@@ -18,7 +18,7 @@ type
   TDxComponent = class;
   TDxComponentList = TObjectList<TDxComponent>;
 
-  TDxPackageCategory = (dxpcNormal, dxpcIBX, dxpcTeeChart, dxpcBDE);
+  TDxPackageCategory = (dxpcNormal, dxpcIBX, dxpcTeeChart, dxpcFireDAC, dxpcBDE);
   TDxPackageUsage = (dxpuDesigntimeOnly, dxpuRuntimeOnly, dxpuDesigntimeAndRuntime);
 
   TDxPackage = class
@@ -90,6 +90,7 @@ begin
   FName := ChangeFileExt(ExtractFileName(FullFileName), '');
   if Pos('IBX', FName) > 0 then FCategory := dxpcIBX
     else if Pos('TeeChart', FName)> 0 then FCategory := dxpcTeeChart
+    else if Pos('FireDAC', FName) > 0 then FCategory := dxpcFireDAC
     else if Pos('BDE', FName) > 0 then FCategory := dxpcBDE
     else FCategory := dxpcNormal;
   FDescription := '';

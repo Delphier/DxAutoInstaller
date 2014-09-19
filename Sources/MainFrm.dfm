@@ -273,6 +273,7 @@ object MainForm: TMainForm
         Top = 10
         Width = 763
         Height = 79
+        Anchors = [akLeft, akTop, akRight]
         Caption = 'Packages'
         TabOrder = 1
         object Button1: TButton

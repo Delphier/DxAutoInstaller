@@ -15,8 +15,11 @@ uses
   Forms, Classes, SysUtils, DxIDE, DxComponent, DxProfile;
 
 type
-  TDxInstallOption = (dxioAddBrowsingPath, dxioInstallIBXPackages, dxioInstallTeeChartPackages, dxioCompileWin64Library);
+  TDxInstallOption = (dxioAddBrowsingPath, dxioCompileWin64Library);
   TDxInstallOptions = set of TDxInstallOption;
+
+  TDxThirdPartyComponent = (dxtpcIBX, dxtpcTeeChart, dxtpcFireDAC, dxtpcBDE);
+  TDxThirdPartyComponents = set of TDxThirdPartyComponent;
 
   TDxInstallerState = (dxisNormal, dxisRunning, dxisStopped, dxisError);
   TDxInstallerAction = procedure(const IDEArray: TDxIDEArray) of object;
@@ -33,6 +36,7 @@ type
     FInstallFileDir: String;
     FComponents: array of TDxComponentList;
     FOptions: array of TDxInstallOptions;
+    FThirdPartyComponents: array of TDxThirdPartyComponents;
     FState: TDxInstallerState;
     FOnUpdateProgress: TDxUpdateProgressEvent;
     FOnUpdateProgressState: TDxUpdateProgressStateEvent;
@@ -40,6 +44,9 @@ type
     function GetComponents(IDE: TDxIDE): TDxComponentList;
     function GetOptions(IDE: TDxIDE): TDxInstallOptions;
     procedure SetOptions(IDE: TDxIDE; const Value: TDxInstallOptions);
+    function GetThirdPartyComponents(IDE: TDxIDE): TDxThirdPartyComponents;
+    procedure SetThirdPartyComponents(IDE: TDxIDE; const Value: TDxThirdPartyComponents);
+    procedure DetectionThirdPartyComponents(IDE: TDxIDE);
     procedure SetState(const Value: TDxInstallerState);
     procedure Install(IDE: TDxIDE); overload;
     procedure InstallPackage(IDE: TDxIDE; const IDEPlatform: TDxIDEPlatform; Component: TDxComponent; Package: TDxPackage);
@@ -56,6 +63,7 @@ type
     property InstallFileDir: String read FInstallFileDir write SetInstallFileDir;
     property Components[IDE: TDxIDE]: TDxComponentList read GetComponents;
     property Options[IDE: TDxIDE]: TDxInstallOptions read GetOptions write SetOptions;
+    property ThirdPartyComponents[IDE: TDxIDE]: TDxThirdPartyComponents read GetThirdPartyComponents write SetThirdPartyComponents;
     property State: TDxInstallerState read FState;
     property OnUpdateProgress: TDxUpdateProgressEvent read FOnUpdateProgress write FOnUpdateProgress;
     property OnUpdateProgressState: TDxUpdateProgressStateEvent read FOnUpdateProgressState write FOnUpdateProgressState;
@@ -69,7 +77,7 @@ type
   end;
 
 const
-  DxInstallOptionNames: array[TDxInstallOption] of String = ('Add Browsing Path', 'Install IBX Packages', 'Install TeeChart Packages', 'Compile Win64 Library');
+  DxInstallOptionNames: array[TDxInstallOption] of String = ('Add Browsing Path', 'Compile Win64 Library');
 
 implementation
 
@@ -89,6 +97,8 @@ begin
   FInstallFileDir := EmptyStr;
   SetLength(FComponents, FIDEs.Count);
   SetLength(FOptions, FIDEs.Count);
+  SetLength(FThirdPartyComponents, FIDEs.Count);
+  for I := 0 to FIDEs.Count - 1 do DetectionThirdPartyComponents(FIDEs[I]);
   FState := dxisNormal;
 end;
 
@@ -100,6 +110,23 @@ begin
   FProfile.Free;
   FIDEs.Free;
   inherited;
+end;
+
+procedure TDxInstaller.DetectionThirdPartyComponents(IDE: TDxIDE);
+var
+  I: Integer;
+  FileName: String;
+  Components: TDxThirdPartyComponents;
+begin
+  Components := [];
+  for I := 0 to IDE.IdePackages.Count - 1 do begin
+    FileName := IDE.IdePackages.PackageFileNames[I];
+    if (not(dxtpcIBX in Components)) and (Pos('\dclib', FileName) > 0) then Include(Components, dxtpcIBX)
+    else if (not(dxtpcTeeChart in Components)) and (Pos('\dcltee', FileName) > 0) then Include(Components, dxtpcTeeChart)
+    else if (not(dxtpcFireDAC in Components)) and ((Pos('\dclFireDAC', FileName) > 0) or (Pos('\AnyDAC_', FileName) > 0)) then Include(Components, dxtpcFireDAC)
+    else if (not(dxtpcBDE in Components)) and (Pos('\dclbde', FileName) > 0) then Include(Components, dxtpcBDE);
+  end;
+  ThirdPartyComponents[IDE] := Components;
 end;
 
 function TDxInstaller.GetInstallComponentCount(IDE: TDxIDE): Integer;
@@ -141,6 +168,17 @@ begin
   Options := Value;
   if (dxioCompileWin64Library in Options) and (not IsSupportWin64(IDE)) then Exclude(Options, dxioCompileWin64Library);
   FOptions[IDEs.IndexOf(IDE)] := Options;
+end;
+
+
+function TDxInstaller.GetThirdPartyComponents(IDE: TDxIDE): TDxThirdPartyComponents;
+begin
+  Result := FThirdPartyComponents[IDEs.IndexOf(IDE)];
+end;
+
+procedure TDxInstaller.SetThirdPartyComponents(IDE: TDxIDE; const Value: TDxThirdPartyComponents);
+begin
+  FThirdPartyComponents[IDEs.IndexOf(IDE)] := Value;
 end;
 
 procedure TDxInstaller.SearchNewPackages(List: TStringList);
@@ -293,9 +331,12 @@ var
 begin
   CheckStoppedState;
   if not Package.Exists then Exit;
-  if (Package.Category = dxpcIBX) and (not (dxioInstallIBXPackages in Options[IDE])) then Exit;
-  if (Package.Category = dxpcTeeChart) and (not (dxioInstallTeeChartPackages in Options[IDE])) then Exit;
-  if (Package.Category = dxpcBDE) and (IDEPlatform = Win64) then Exit;
+  case Package.Category of
+    dxpcIBX:      if not (dxtpcIBX in ThirdPartyComponents[IDE]) then Exit;
+    dxpcTeeChart: if not (dxtpcTeeChart in ThirdPartyComponents[IDE]) then Exit;
+    dxpcFireDAC:  if not (dxtpcFireDAC in ThirdPartyComponents[IDE]) then Exit;
+    dxpcBDE:      if not (dxtpcBDE in ThirdPartyComponents[IDE]) or (IDEPlatform = Win64) then Exit;
+  end;
   if (IDEPlatform = Win64) and (not (dxioCompileWin64Library in Options[IDE])) then Exit;
   if (IDEPlatform = Win64) and (Package.Usage = dxpuDesigntimeOnly) then Exit;
   if not Package.Required then
