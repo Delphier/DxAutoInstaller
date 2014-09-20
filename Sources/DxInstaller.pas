@@ -15,7 +15,7 @@ uses
   Forms, Classes, SysUtils, DxIDE, DxComponent, DxProfile;
 
 type
-  TDxInstallOption = (dxioAddBrowsingPath, dxioCompileWin64Library, dxioInstallToCppBuilder);
+  TDxInstallOption = (dxioAddBrowsingPath, dxioNativeLookAndFeel, dxioCompileWin64Library, dxioInstallToCppBuilder);
   TDxInstallOptions = set of TDxInstallOption;
 
   TDxThirdPartyComponent = (dxtpcIBX, dxtpcTeeChart, dxtpcFireDAC, dxtpcBDE);
@@ -77,7 +77,7 @@ type
   end;
 
 const
-  DxInstallOptionNames: array[TDxInstallOption] of String = ('Add Browsing Path', 'Compile Win64 Library', 'Install to C++Builder');
+  DxInstallOptionNames: array[TDxInstallOption] of String = ('Add Browsing Path', 'Use Native Look and Feel as Default', 'Compile Win64 Library', 'Install to C++Builder');
 
 implementation
 
@@ -229,7 +229,7 @@ begin
   finally
     Factory.Free;
   end;
-  for I := 0 to IDEs.Count - 1 do Options[IDEs[I]] := [dxioAddBrowsingPath];
+  for I := 0 to IDEs.Count - 1 do Options[IDEs[I]] := [dxioAddBrowsingPath, dxioNativeLookAndFeel];
 end;
 
 procedure TDxInstaller.SetState(const Value: TDxInstallerState);
@@ -376,6 +376,8 @@ begin
   // -A   Unit Alias;
   // -NS  Namespaces Search Paths;
 
+  // -D   Define Donditionals;
+
   // -JL  Generate package .lib, .bpi, and all .hpp files for C++;
   // -NB  Unit .bpi Output Directory - DCP Path;
   // -NH  Unit .hpp Output Directory;
@@ -386,6 +388,8 @@ begin
     Format(' -B -NU"%s" -N0"%s" ', [InstallLibraryDir, InstallLibraryDir]) +
     '-AWinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE ' +
     '-NSWinapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;IBX;VclTee; ';
+
+  if dxioNativeLookAndFeel in Options[IDE] then ExtraOptions := ExtraOptions + ' -DUSENATIVELOOKANDFEELASDEFAULT ';
   if dxioInstallToCppBuilder in Options[IDE] then
     ExtraOptions := ExtraOptions + Format(' -JL -NB"%s" -NH"%s" -NO"%s" ', [DCPPath, InstallLibraryDir, DCPPath]);
 
