@@ -26,6 +26,7 @@ type
   end;
 
   function IsSupportWin64(IDE: TDxIDE): Boolean;
+  function IsSupportCppBuilder(IDE: TDxIDE): Boolean;
   function IsRADStudio(IDE: TDxIDE): Boolean;
   function GetIDEOverrideEnvironmentVariable(IDE: TDxIDE; const Name: String): String;
   procedure SetIDEOverrideEnvironmentVariable(IDE: TDxIDE; const Name, Value: String);
@@ -57,6 +58,11 @@ end;
 function IsSupportWin64(IDE: TDxIDE): Boolean;
 begin
   Result := clDcc64 in IDE.CommandLineTools;
+end;
+
+function IsSupportCppBuilder(IDE: TDxIDE): Boolean;
+begin
+  Result := bpBCBuilder32 in IDE.Personalities;
 end;
 
 function IsRADStudio(IDE: TDxIDE): Boolean;

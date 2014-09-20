@@ -15,7 +15,7 @@ uses
   Forms, Classes, SysUtils, DxIDE, DxComponent, DxProfile;
 
 type
-  TDxInstallOption = (dxioAddBrowsingPath, dxioCompileWin64Library);
+  TDxInstallOption = (dxioAddBrowsingPath, dxioCompileWin64Library, dxioInstallToCppBuilder);
   TDxInstallOptions = set of TDxInstallOption;
 
   TDxThirdPartyComponent = (dxtpcIBX, dxtpcTeeChart, dxtpcFireDAC, dxtpcBDE);
@@ -77,7 +77,7 @@ type
   end;
 
 const
-  DxInstallOptionNames: array[TDxInstallOption] of String = ('Add Browsing Path', 'Compile Win64 Library');
+  DxInstallOptionNames: array[TDxInstallOption] of String = ('Add Browsing Path', 'Compile Win64 Library', 'Install to C++Builder');
 
 implementation
 
@@ -167,6 +167,7 @@ var
 begin
   Options := Value;
   if (dxioCompileWin64Library in Options) and (not IsSupportWin64(IDE)) then Exclude(Options, dxioCompileWin64Library);
+  if (dxioInstallToCppBuilder in Options) and (not IsSupportCppBuilder(IDE)) then Exclude(Options, dxioInstallToCppBuilder);
   FOptions[IDEs.IndexOf(IDE)] := Options;
 end;
 
@@ -228,7 +229,7 @@ begin
   finally
     Factory.Free;
   end;
-  for I := 0 to IDEs.Count - 1 do FOptions[I] := [dxioAddBrowsingPath];
+  for I := 0 to IDEs.Count - 1 do Options[IDEs[I]] := [dxioAddBrowsingPath];
 end;
 
 procedure TDxInstaller.SetState(const Value: TDxInstallerState);
@@ -281,6 +282,17 @@ var
   Comp: TDxComponent;
   Package: TDxPackage;
   SourcesFileDir, InstallSourcesDir: String;
+
+  procedure AddLibrarySearchPath(const Dir: String; const IDEPlatform: TDxIDEPlatform);
+  begin
+    IDE.AddToLibrarySearchPath(Dir, IDEPlatform);
+    if (dxioInstallToCppBuilder in Options[IDE]) and IsRADStudio(IDE) then TDxBDSIDE(IDE).AddToCppLibraryPath(Dir, IDEPlatform);
+  end;
+  procedure AddLibraryBrowsingPath(const Dir: String; const IDEPlatform: TDxIDEPlatform);
+  begin
+    IDE.AddToLibraryBrowsingPath(Dir, IDEPlatform);
+    if (dxioInstallToCppBuilder in Options[IDE]) and IsRADStudio(IDE) then TDxBDSIDE(IDE).AddToCppBrowsingPath(Dir, IDEPlatform);
+  end;
 begin
   Uninstall(IDE);
   InstallSourcesDir := GetInstallSourcesDir(InstallFileDir);
@@ -307,15 +319,14 @@ begin
     end;
   end;
 
-  IDE.AddToLibrarySearchPath(GetInstallLibraryDir(InstallFileDir, IDE, Win32), Win32);
-  if dxioCompileWin64Library in Options[IDE] then IDE.AddToLibrarySearchPath(GetInstallLibraryDir(InstallFileDir, IDE, Win64), Win64);
-
+  AddLibrarySearchPath(GetInstallLibraryDir(InstallFileDir, IDE, Win32), Win32);
+  if dxioCompileWin64Library in Options[IDE] then AddLibrarySearchPath(GetInstallLibraryDir(InstallFileDir, IDE, Win64), Win64);
   if dxioAddBrowsingPath in Options[IDE] then begin
-    IDE.AddToLibraryBrowsingPath(InstallSourcesDir, Win32);
-    if dxioCompileWin64Library in Options[IDE] then IDE.AddToLibraryBrowsingPath(InstallSourcesDir, Win64);
+    AddLibraryBrowsingPath(InstallSourcesDir, Win32);
+    if dxioCompileWin64Library in Options[IDE] then AddLibraryBrowsingPath(InstallSourcesDir, Win64);
   end else begin
-    IDE.AddToLibrarySearchPath(installSourcesDir, Win32);
-    if dxioCompileWin64Library In Options[IDE] then IDE.AddToLibrarySearchPath(InstallSourcesDir, Win64)
+    AddLibrarySearchPath(installSourcesDir, Win32);
+    if dxioCompileWin64Library In Options[IDE] then AddLibrarySearchPath(InstallSourcesDir, Win64)
   end;
 
   SetIDEOverrideEnvironmentVariable(IDE, DxEnvironmentVariableName, InstallFileDir);
@@ -362,15 +373,21 @@ begin
   // -B   Build All Units;
   // -NU  Unit .dcu Output Directory; XE2+
   // -N0  Unit .dcu Output Directory; XE2-
-  // -NO  Unit .obj Output Directory;
   // -A   Unit Alias;
   // -NS  Namespaces Search Paths;
+
+  // -JL  Generate package .lib, .bpi, and all .hpp files for C++;
+  // -NB  Unit .bpi Output Directory - DCP Path;
+  // -NH  Unit .hpp Output Directory;
+  // -NO  Unit .obj Output Directory - DCP Path;
   ExtraOptions :=
     ' -$D- -$L- -$Y- -Q ' +
     Format(' -U"%s" -U"%s" -R"%s" ', [DCPPath, InstallSourcesDir, InstallSourcesDir]) +
-    Format(' -B -NU"%s" -N0"%s" -NO"%s" ', [InstallLibraryDir, InstallLibraryDir, InstallLibraryDir]) +
+    Format(' -B -NU"%s" -N0"%s" ', [InstallLibraryDir, InstallLibraryDir]) +
     '-AWinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE ' +
     '-NSWinapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;IBX;VclTee; ';
+  if dxioInstallToCppBuilder in Options[IDE] then
+    ExtraOptions := ExtraOptions + Format(' -JL -NB"%s" -NH"%s" -NO"%s" ', [DCPPath, InstallLibraryDir, DCPPath]);
 
     // **NOTE** Editing JclIDEUtils: Move CompileDelphiPackage(..., ExtraOptions) from Protected to Public:
     // 1. TJclBorRADToolInstallation.CompileDelphiPackage(..., ExtraOptions)
@@ -387,6 +404,18 @@ procedure TDxInstaller.Uninstall(IDE: TDxIDE);
 var
   Comp: TDxComponentProfile;
   InstallFileDir, InstallLibraryDir, InstallSourcesDir: String;
+
+  procedure RemoveLibraryPath(const IDEPlatform: TDxIDEPlatform);
+  begin
+    IDE.RemoveFromLibrarySearchPath(InstallLibraryDir, IDEPlatform);
+    IDE.RemoveFromLibrarySearchPath(InstallSourcesDir, IDEPlatform);
+    IDE.RemoveFromLibraryBrowsingPath(InstallSourcesDir, IDEPlatform);
+    if IsRADStudio(IDE) and IsSupportCppBuilder(IDE) then begin
+      TDxBDSIDE(IDE).RemoveFromCppLibraryPath(InstallLibraryDir, IDEPlatform);
+      TDxBDSIDE(IDE).RemoveFromCppLibraryPath(InstallSourcesDir, IDEPlatform);
+      TDxBDSIDE(IDE).RemoveFromCppBrowsingPath(InstallSourcesDir, IDEPlatform);
+    end;
+  end;
 
   procedure UninstallPackages(List: TStringList);
   var
@@ -411,13 +440,11 @@ begin
   UpdateProgress(IDE, nil, 'Deleting', 'Installation Files');
   UpdateProgressState('Deleting Directory: ' + InstallLibraryDir);
   DxUtils.DeleteDirectory(InstallLibraryDir);
-  IDE.RemoveFromLibrarySearchPath(InstallLibraryDir, Win32);
-  IDE.RemoveFromLibrarySearchPath(InstallSourcesDir, Win32);
-  IDE.RemoveFromLibraryBrowsingPath(InstallSourcesDir, Win32);
+
+  RemoveLibraryPath(Win32);
   if IsSupportWin64(IDE) then begin
-    IDE.RemoveFromLibrarySearchPath(GetInstallLibraryDir(InstallFileDir, IDE, Win64), Win64);
-    IDE.RemoveFromLibrarySearchPath(InstallSourcesDir, Win64);
-    IDE.RemoveFromLibraryBrowsingPath(InstallSourcesDir, Win64);
+    InstallLibraryDir := GetInstallLibraryDir(InstallFileDir, IDE, Win64);
+    RemoveLibraryPath(Win64);
   end;
 
   InstallLibraryDir := GetInstallLibraryDir(InstallFileDir, nil);

@@ -1,5 +1,9 @@
 Changelog
 --------------------------
+v2.1.2 	2014/09/21
+	Install to C++Builder supported;
+	Automatic detection installation of IBX\TeeChart\AnyDAC\FireDAC\BDE;
+	Search new packages feature added.
 
 v2.1.1	2014/09/12
 	DevExpress Icon Library supported.

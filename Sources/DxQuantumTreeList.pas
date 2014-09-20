@@ -252,7 +252,8 @@ begin
         else             Column.Values[Node] := Null;
       end;
     end else if ParentNode = FOptionsNode then begin
-      if (TDxInstallOption(Node.Index) = dxioCompileWin64Library) and not IsSupportWin64(Installer.IDEs[Column.Tag]) then
+      if ( (TDxInstallOption(Node.Index) = dxioCompileWin64Library) and not IsSupportWin64(Installer.IDEs[Column.Tag]) ) or
+         ( (TDxInstallOption(Node.Index) = dxioInstallToCppBuilder) and not IsSupportCppBuilder(Installer.IDEs[Column.Tag]) ) then
         Column.Values[Node] := Null
       else if TDxInstallOption(Node.Index) in Installer.Options[Installer.IDEs[Column.Tag]] then
         Column.Values[Node] := True

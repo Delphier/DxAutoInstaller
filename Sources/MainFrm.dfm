@@ -127,7 +127,7 @@ object MainForm: TMainForm
     Top = 109
     Width = 789
     Height = 436
-    ActivePage = TabTools
+    ActivePage = TabAbout
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
     OnChange = PageFunsChange
@@ -350,6 +350,7 @@ object MainForm: TMainForm
         Height = 225
         Anchors = [akLeft, akTop, akRight, akBottom]
         ReadOnly = True
+        ScrollBars = ssVertical
         TabOrder = 3
       end
     end
