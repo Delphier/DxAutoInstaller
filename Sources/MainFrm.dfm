@@ -133,6 +133,10 @@ object MainForm: TMainForm
     OnChange = PageFunsChange
     object TabInstall: TTabSheet
       Caption = 'Install'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         781
         406)
@@ -187,6 +191,10 @@ object MainForm: TMainForm
     object TabUninstall: TTabSheet
       Caption = 'Uninstall'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         781
         406)
@@ -217,6 +225,10 @@ object MainForm: TMainForm
     object TabTools: TTabSheet
       Caption = 'Tools'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         781
         406)

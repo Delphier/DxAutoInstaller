@@ -1,5 +1,9 @@
 Changelog
 --------------------------
+v2.1.3	2015/01/25
+	Added Express RichEdit Control;
+	Added ExpressPrinting System ReportLink for ExpressGauge Control.
+
 v2.1.2 	2014/09/21
 	Install to C++Builder supported;
 	New install option: Use Native Look And Feel as Default;
