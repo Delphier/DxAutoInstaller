@@ -1,5 +1,8 @@
 Changelog
 --------------------------
+v2.1.4	2015/09/21
+	Delphi 10, Delphi XE8 supported.
+
 v2.1.3	2015/01/25
 	Added Express RichEdit Control;
 	Added ExpressPrinting System ReportLink for ExpressGauge Control.
