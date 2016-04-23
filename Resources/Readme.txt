@@ -1,5 +1,8 @@
 Changelog
 --------------------------
+v2.1.5	2016/02/02
+	Update profile to DevExpress VCL 15.2.2.
+
 v2.1.4	2015/09/21
 	Delphi 10, Delphi XE8 supported.
 
