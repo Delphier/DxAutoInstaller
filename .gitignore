@@ -11,10 +11,6 @@
 *.~*
 *.local
 *.identcache
+*.stat
 
-Config.ini
 Desktop.ini
-
-DB/*
-Docs/*
-Files/*

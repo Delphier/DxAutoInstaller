@@ -15,7 +15,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtCtrls, dxGDIPlusClasses, StdCtrls, ComCtrls, ImgList, cxGraphics,
   ActnList, Buttons, DxQuantumTreeList, DxInstaller, DxProgress, DxIDE, DxUtils,
-  System.Actions;
+  System.Actions, System.ImageList;
 
 {$WARN UNIT_PLATFORM OFF}
 
@@ -249,18 +249,17 @@ end;
 
 procedure TMainForm.EditInstallFileDirRightButtonClick(Sender: TObject);
 var
-  S: String;
+  S: TArray<String>;
   I: Integer;
 begin
-  S := EditInstallFileDir.Text;
-  if not SelectDirectory('Select Installation File Directory:', '', S, [sdNewUI], Self) then Exit;
-  if not SysUtils.DirectoryExists(S) then Exit;
-  EditInstallFileDir.Text := S;
-  I := FInstaller.Profile.GetDxBuildNumber(S);
+  if not SelectDirectory('', S) then Exit;
+  if not SysUtils.DirectoryExists(S[0]) then Exit;
+  EditInstallFileDir.Text := S[0];
+  I := FInstaller.Profile.GetDxBuildNumber(S[0]);
   EditVersion.Text := FInstaller.Profile.GetDxBuildNumberAsVersion(I);
   Screen.Cursor := crHourGlass;
   try
-    FInstaller.InstallFileDir := S;
+    FInstaller.InstallFileDir := S[0];
   finally
     Screen.Cursor := crDefault;
   end;
