@@ -1,5 +1,9 @@
 Changelog
 --------------------------
+v2.1.6	2016/06/30
+	Delphi 10.1 Berlin supported.
+	Update profile to DevExpress VCL 16.1.2.
+	
 v2.1.5	2016/02/02
 	Update profile to DevExpress VCL 15.2.2.
 
@@ -23,7 +27,7 @@ v2.1	2014/09/09
 	Delphi XE7 supported;
 	Fixed: IBX, TeeChart packages compile error: IBX and VclTee has been added to namespace list.
 
-v2.0 	2014/08/29 
+v2.0 	2014/08/29
 	Initial release.
 
 v1.0 	A long time ago.
