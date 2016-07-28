@@ -249,17 +249,23 @@ end;
 
 procedure TMainForm.EditInstallFileDirRightButtonClick(Sender: TObject);
 var
-  S: TArray<String>;
+  Arr: TArray<String>;
+  Dir: String;
   I: Integer;
 begin
-  if not SelectDirectory('', S) then Exit;
-  if not SysUtils.DirectoryExists(S[0]) then Exit;
-  EditInstallFileDir.Text := S[0];
-  I := FInstaller.Profile.GetDxBuildNumber(S[0]);
+  if Win32MajorVersion < 6 then begin
+    if not SelectDirectory('Select Installation File Directory:', '', Dir, [sdNewUI], Self) then Exit;
+  end else begin
+    if not SelectDirectory('', Arr) then Exit;
+    Dir := Arr[0];
+  end;
+  if not SysUtils.DirectoryExists(Dir) then Exit;
+  EditInstallFileDir.Text := Dir;
+  I := FInstaller.Profile.GetDxBuildNumber(Dir);
   EditVersion.Text := FInstaller.Profile.GetDxBuildNumberAsVersion(I);
   Screen.Cursor := crHourGlass;
   try
-    FInstaller.InstallFileDir := S[0];
+    FInstaller.InstallFileDir := Dir;
   finally
     Screen.Cursor := crDefault;
   end;
