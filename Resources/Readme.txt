@@ -1,5 +1,12 @@
 Changelog
 --------------------------
+v2.1.8	2017/05/07
+	Update profile to DevExpress VCL 17.1.1.
+	
+v2.1.7	2017/03/28
+	Delphi 10.2 Tokyo supported.
+	Update profile to DevExpress VCL 16.2.3.
+
 v2.1.6	2016/06/30
 	Delphi 10.1 Berlin supported.
 	Update profile to DevExpress VCL 16.1.2.
