@@ -15,7 +15,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtCtrls, dxGDIPlusClasses, StdCtrls, ComCtrls, ImgList, cxGraphics,
   ActnList, Buttons, DxQuantumTreeList, DxInstaller, DxProgress, DxIDE, DxUtils,
-  System.Actions, System.ImageList, cxImageList;
+  System.Actions, System.ImageList, cxLookAndFeels, cxLookAndFeelPainters,
+  Vcl.Menus, cxImageList, cxButtons;
 
 {$WARN UNIT_PLATFORM OFF}
 
@@ -47,8 +48,6 @@ type
     Install: TAction;
     Uninstall: TAction;
     ExitApp: TAction;
-    BtnRun: TButton;
-    BtnExit: TButton;
     Label9: TLabel;
     IDEListView: TListView;
     ChkHideBaseComponents: TCheckBox;
@@ -67,6 +66,8 @@ type
     Panel3: TPanel;
     Panel4: TPanel;
     Panel5: TPanel;
+    BtnRun: TcxButton;
+    BtnExit: TcxButton;
     procedure FormCreate(Sender: TObject);
     procedure URLLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
     procedure InstallExecute(Sender: TObject);
