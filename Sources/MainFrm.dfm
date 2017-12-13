@@ -40,7 +40,6 @@ object MainForm: TMainForm
       Width = 64
       Height = 64
       Anchors = [akTop, akRight]
-      AutoSize = True
       Picture.Data = {
         0B546478504E47496D61676589504E470D0A1A0A0000000D4948445200000040
         000000400806000000AA6971DE000000017352474200AECE1CE9000000046741
@@ -92,6 +91,7 @@ object MainForm: TMainForm
         494F0093D14DF4043019DD444F0093D14DF4043019DD444F0093D14DF4043019
         DD440AE0E6CFE60A14C0CD1F4E0629003F9A3635BA81F2D359D77F3CCDCFE75F
         04DDF4F93CFB8A81EFADF90F29AC8188B3FC46F40000000049454E44AE426082}
+      Stretch = True
       ExplicitLeft = 723
     end
     object LblAppName: TLabel
@@ -127,243 +127,267 @@ object MainForm: TMainForm
     Top = 109
     Width = 789
     Height = 436
-    ActivePage = TabAbout
+    ActivePage = TabInstall
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
     OnChange = PageFunsChange
     object TabInstall: TTabSheet
       Caption = 'Install'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      DesignSize = (
-        781
-        406)
-      object Label7: TLabel
-        Left = 8
-        Top = 10
-        Width = 133
-        Height = 15
-        Caption = 'Installation File Directory:'
-      end
-      object Label8: TLabel
-        Left = 710
-        Top = 10
-        Width = 42
-        Height = 15
-        Anchors = [akTop, akRight]
-        Caption = 'Version:'
-      end
-      object EditInstallFileDir: TButtonedEdit
-        Left = 8
-        Top = 30
-        Width = 696
-        Height = 23
-        Anchors = [akLeft, akTop, akRight]
-        Images = ImageSmall
-        ReadOnly = True
-        RightButton.ImageIndex = 3
-        RightButton.Visible = True
-        TabOrder = 0
-        OnRightButtonClick = EditInstallFileDirRightButtonClick
-      end
-      object EditVersion: TEdit
-        Left = 710
-        Top = 30
-        Width = 61
-        Height = 23
-        Anchors = [akTop, akRight]
-        ReadOnly = True
-        TabOrder = 1
-      end
-      object PanTreeList: TPanel
-        Left = 8
-        Top = 62
-        Width = 763
-        Height = 335
-        Anchors = [akLeft, akTop, akRight, akBottom]
-        BevelKind = bkTile
+      object Panel5: TPanel
+        Left = 0
+        Top = 0
+        Width = 781
+        Height = 406
+        Align = alClient
         BevelOuter = bvNone
-        TabOrder = 2
+        TabOrder = 0
+        DesignSize = (
+          781
+          406)
+        object Label7: TLabel
+          Left = 8
+          Top = 10
+          Width = 133
+          Height = 15
+          Caption = 'Installation File Directory:'
+        end
+        object Label8: TLabel
+          Left = 710
+          Top = 10
+          Width = 41
+          Height = 15
+          Anchors = [akTop, akRight]
+          Caption = 'Version:'
+        end
+        object EditInstallFileDir: TButtonedEdit
+          Left = 8
+          Top = 30
+          Width = 696
+          Height = 23
+          Anchors = [akLeft, akTop, akRight]
+          Images = ImageSmall
+          ReadOnly = True
+          RightButton.ImageIndex = 3
+          RightButton.Visible = True
+          TabOrder = 0
+          OnRightButtonClick = EditInstallFileDirRightButtonClick
+        end
+        object EditVersion: TEdit
+          Left = 710
+          Top = 30
+          Width = 61
+          Height = 23
+          Anchors = [akTop, akRight]
+          ReadOnly = True
+          TabOrder = 1
+        end
+        object PanTreeList: TPanel
+          Left = 8
+          Top = 62
+          Width = 763
+          Height = 335
+          Anchors = [akLeft, akTop, akRight, akBottom]
+          BevelKind = bkTile
+          BevelOuter = bvNone
+          TabOrder = 2
+        end
       end
     end
     object TabUninstall: TTabSheet
       Caption = 'Uninstall'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      DesignSize = (
-        781
-        406)
-      object Label9: TLabel
-        Left = 8
-        Top = 10
-        Width = 342
-        Height = 15
-        Caption = 'Uninstall DevExpress Components in the Following Selected IDEs:'
-      end
-      object IDEListView: TListView
-        Left = 8
-        Top = 30
-        Width = 763
-        Height = 367
-        Anchors = [akLeft, akTop, akRight, akBottom]
-        Checkboxes = True
-        Columns = <
-          item
-            AutoSize = True
-            Caption = 'IDE Name'
-          end>
-        ReadOnly = True
+      object Panel4: TPanel
+        Left = 0
+        Top = 0
+        Width = 781
+        Height = 406
+        Align = alClient
+        BevelOuter = bvNone
         TabOrder = 0
-        ViewStyle = vsReport
+        DesignSize = (
+          781
+          406)
+        object Label9: TLabel
+          Left = 8
+          Top = 10
+          Width = 342
+          Height = 15
+          Caption = 'Uninstall DevExpress Components in the Following Selected IDEs:'
+        end
+        object IDEListView: TListView
+          Left = 8
+          Top = 30
+          Width = 763
+          Height = 367
+          Anchors = [akLeft, akTop, akRight, akBottom]
+          Checkboxes = True
+          Columns = <
+            item
+              AutoSize = True
+              Caption = 'IDE Name'
+            end>
+          ReadOnly = True
+          TabOrder = 0
+          ViewStyle = vsReport
+        end
       end
     end
     object TabTools: TTabSheet
       Caption = 'Tools'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      DesignSize = (
-        781
-        406)
-      object GroupBox1: TGroupBox
-        Left = 8
-        Top = 104
-        Width = 763
-        Height = 294
-        Anchors = [akLeft, akTop, akRight, akBottom]
-        Caption = 'Profile'
+      object Panel3: TPanel
+        Left = 0
+        Top = 0
+        Width = 781
+        Height = 406
+        Align = alClient
+        BevelOuter = bvNone
         TabOrder = 0
         DesignSize = (
-          763
-          294)
-        object LblCurrentProfile: TLabel
-          Left = 16
-          Top = 32
-          Width = 138
-          Height = 15
-          Caption = 'Current Profile: <built-in>'
-        end
-        object Label1: TLabel
-          Left = 256
-          Top = 59
-          Width = 311
-          Height = 15
-          Caption = '* Profile changes will take effect after re-open the software.'
-        end
-        object BtnProfile: TButton
-          Left = 16
-          Top = 55
-          Width = 225
-          Height = 25
-          Caption = 'Export Profile'
-          ImageMargins.Left = 30
-          ImageMargins.Right = -30
-          Images = ImageSmall
+          781
+          406)
+        object GroupBox1: TGroupBox
+          Left = 8
+          Top = 104
+          Width = 763
+          Height = 294
+          Anchors = [akLeft, akTop, akRight, akBottom]
+          Caption = 'Profile'
           TabOrder = 0
+          DesignSize = (
+            763
+            294)
+          object LblCurrentProfile: TLabel
+            Left = 16
+            Top = 32
+            Width = 138
+            Height = 15
+            Caption = 'Current Profile: <built-in>'
+          end
+          object Label1: TLabel
+            Left = 256
+            Top = 59
+            Width = 311
+            Height = 15
+            Caption = '* Profile changes will take effect after re-open the software.'
+          end
+          object BtnProfile: TButton
+            Left = 16
+            Top = 55
+            Width = 225
+            Height = 25
+            Caption = 'Export Profile'
+            ImageMargins.Left = 30
+            ImageMargins.Right = -30
+            Images = ImageSmall
+            TabOrder = 0
+          end
+          object LblCustomProfile: TLinkLabel
+            Left = 16
+            Top = 88
+            Width = 730
+            Height = 19
+            Anchors = [akLeft, akTop, akRight]
+            AutoSize = False
+            Caption = 'Custom Profile:'
+            TabOrder = 1
+            OnLinkClick = URLLinkClick
+          end
         end
-        object LblCustomProfile: TLinkLabel
-          Left = 16
-          Top = 88
-          Width = 730
-          Height = 19
+        object GroupBox2: TGroupBox
+          Left = 8
+          Top = 10
+          Width = 763
+          Height = 79
           Anchors = [akLeft, akTop, akRight]
-          AutoSize = False
-          Caption = 'Custom Profile:'
+          Caption = 'Packages'
           TabOrder = 1
-          OnLinkClick = URLLinkClick
-        end
-      end
-      object GroupBox2: TGroupBox
-        Left = 8
-        Top = 10
-        Width = 763
-        Height = 79
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'Packages'
-        TabOrder = 1
-        object Button1: TButton
-          Left = 16
-          Top = 32
-          Width = 225
-          Height = 25
-          Action = SearchNewPackages
-          ImageMargins.Left = 35
-          ImageMargins.Right = -35
-          Images = ImageSmall
-          TabOrder = 0
+          object Button1: TButton
+            Left = 16
+            Top = 32
+            Width = 225
+            Height = 25
+            Action = SearchNewPackages
+            ImageMargins.Left = 35
+            ImageMargins.Right = -35
+            Images = ImageSmall
+            TabOrder = 0
+          end
         end
       end
     end
     object TabAbout: TTabSheet
       Caption = 'About'
       ImageIndex = 3
-      DesignSize = (
-        781
-        406)
-      object Label4: TLabel
-        Left = 8
-        Top = 21
-        Width = 133
-        Height = 15
-        Caption = 'Download Latest Version:'
-      end
-      object Label5: TLabel
-        Left = 8
-        Top = 119
-        Width = 138
-        Height = 15
-        Caption = 'Feedback and Bug Report:'
-      end
-      object Label6: TLabel
-        Left = 8
-        Top = 69
-        Width = 228
-        Height = 15
-        Caption = 'Download DevExpress VCL Documentation:'
-      end
-      object LinkDownApp: TLinkLabel
-        Left = 8
-        Top = 42
-        Width = 224
-        Height = 19
-        Caption = 'http://www.delphier.com/DxAutoInstaller'
+      object Panel2: TPanel
+        Left = 0
+        Top = 0
+        Width = 781
+        Height = 406
+        Align = alClient
+        BevelOuter = bvNone
         TabOrder = 0
-        OnLinkClick = URLLinkClick
-      end
-      object LinkDownDoc: TLinkLabel
-        Left = 8
-        Top = 89
-        Width = 381
-        Height = 19
-        Caption = 'https://www.devexpress.com/ClientCenter/Downloads/Documentation'
-        TabOrder = 1
-        OnLinkClick = URLLinkClick
-      end
-      object LinkEmail: TLinkLabel
-        Left = 8
-        Top = 138
-        Width = 110
-        Height = 19
-        Caption = 'faceker@gmail.com'
-        TabOrder = 2
-        OnLinkClick = URLLinkClick
-      end
-      object MemoReadme: TMemo
-        Left = 8
-        Top = 172
-        Width = 763
-        Height = 225
-        Anchors = [akLeft, akTop, akRight, akBottom]
-        ReadOnly = True
-        ScrollBars = ssVertical
-        TabOrder = 3
+        DesignSize = (
+          781
+          406)
+        object Label4: TLabel
+          Left = 8
+          Top = 21
+          Width = 132
+          Height = 15
+          Caption = 'Download Latest Version:'
+        end
+        object Label5: TLabel
+          Left = 8
+          Top = 119
+          Width = 138
+          Height = 15
+          Caption = 'Feedback and Bug Report:'
+        end
+        object Label6: TLabel
+          Left = 8
+          Top = 69
+          Width = 228
+          Height = 15
+          Caption = 'Download DevExpress VCL Documentation:'
+        end
+        object LinkDownApp: TLinkLabel
+          Left = 8
+          Top = 42
+          Width = 224
+          Height = 19
+          Caption = 'http://www.delphier.com/DxAutoInstaller'
+          TabOrder = 0
+          OnLinkClick = URLLinkClick
+        end
+        object LinkDownDoc: TLinkLabel
+          Left = 8
+          Top = 89
+          Width = 381
+          Height = 19
+          Caption = 'https://www.devexpress.com/ClientCenter/Downloads/Documentation'
+          TabOrder = 1
+          OnLinkClick = URLLinkClick
+        end
+        object LinkEmail: TLinkLabel
+          Left = 8
+          Top = 138
+          Width = 110
+          Height = 19
+          Caption = 'faceker@gmail.com'
+          TabOrder = 2
+          OnLinkClick = URLLinkClick
+        end
+        object MemoReadme: TMemo
+          Left = 8
+          Top = 172
+          Width = 763
+          Height = 225
+          Anchors = [akLeft, akTop, akRight, akBottom]
+          ReadOnly = True
+          ScrollBars = ssVertical
+          TabOrder = 3
+        end
       end
     end
   end
@@ -437,6 +461,7 @@ object MainForm: TMainForm
     end
   end
   object ImageSmall: TcxImageList
+    SourceDPI = 96
     FormatVersion = 1
     DesignInfo = 24117648
     ImageInfo = <

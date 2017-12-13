@@ -15,7 +15,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtCtrls, dxGDIPlusClasses, StdCtrls, ComCtrls, ImgList, cxGraphics,
   ActnList, Buttons, DxQuantumTreeList, DxInstaller, DxProgress, DxIDE, DxUtils,
-  System.Actions, System.ImageList;
+  System.Actions, System.ImageList, cxImageList;
 
 {$WARN UNIT_PLATFORM OFF}
 
@@ -63,6 +63,10 @@ type
     GroupBox2: TGroupBox;
     Button1: TButton;
     SearchNewPackages: TAction;
+    Panel2: TPanel;
+    Panel3: TPanel;
+    Panel4: TPanel;
+    Panel5: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure URLLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
     procedure InstallExecute(Sender: TObject);
