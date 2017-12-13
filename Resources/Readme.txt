@@ -1,5 +1,9 @@
 Changelog
 --------------------------
+v2.1.9	2017/12/13
+	Update profile to DevExpress VCL 17.2.1.
+	High-DPI enhancements.
+
 v2.1.8	2017/05/07
 	Update profile to DevExpress VCL 17.1.1.
 	
