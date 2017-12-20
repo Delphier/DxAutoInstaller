@@ -15,6 +15,10 @@ uses
   SysUtils, JclIDEUtils;
 
 type
+  TJclBorRADToolInstallationHelper = class helper for TJclBorRADToolInstallation
+    function CompileDelphiPackageEx(const PackageName, BPLPath, DCPPath, ExtraOptions: string): Boolean;
+  end;
+
   TDxIDEPlatform = TJclBDSPlatform;
   TDxIDE = TJclBorRADToolInstallation;
   TDxBDSIDE = TJclBDSInstallation;
@@ -39,6 +43,13 @@ const
   IDEEnvironmentVariablesSectionName = 'Environment Variables';
 
 implementation
+
+{ TJclBorRADToolInstallationHelper }
+
+function TJclBorRADToolInstallationHelper.CompileDelphiPackageEx(const PackageName, BPLPath, DCPPath, ExtraOptions: string): Boolean;
+begin
+  Result := CompileDelphiPackage(PackageName, BPLPath, DCPPath, ExtraOptions);
+end;
 
 { TDxIDEs }
 

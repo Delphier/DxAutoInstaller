@@ -46,7 +46,7 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <DCC_UnitSearchPath>..\JCL\jcl\source\common;..\JCL\jcl\source\include;..\JCL\jcl\source\windows;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>F:\Codes\JCL\source\common;F:\Codes\JCL\source\include;F:\Codes\JCL\source\windows;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=2.1.1.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=2.1;Comments=</VerInfo_Keys>
         <VerInfo_Locale>2052</VerInfo_Locale>

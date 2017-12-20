@@ -393,10 +393,7 @@ begin
   if dxioInstallToCppBuilder in Options[IDE] then
     ExtraOptions := ExtraOptions + Format(' -JL -NB"%s" -NH"%s" -NO"%s" ', [DCPPath, InstallLibraryDir, DCPPath]);
 
-    // **NOTE** Editing JclIDEUtils: Move CompileDelphiPackage(..., ExtraOptions) from Protected to Public:
-    // 1. TJclBorRADToolInstallation.CompileDelphiPackage(..., ExtraOptions)
-    // 2. TJclBDSInstallation.CompileDelphiPackage(..., ExtraOptions)
-    R := IDE.CompileDelphiPackage(Package.FullFileName, BPLPath, DCPPath, ExtraOptions);
+    R := IDE.CompileDelphiPackageEx(Package.FullFileName, BPLPath, DCPPath, ExtraOptions);
     if R and (IDEPlatform = Win32) and (Package.Usage <> dxpuRuntimeOnly) then
       R := IDE.RegisterPackage(Package.FullFileName, BPLPath, Package.Description);
     //then R := IDE.CompilePackage(Package.FullFileName, BPLPath, DCPPath)
