@@ -1,5 +1,8 @@
 Changelog
 --------------------------
+v2.1.10	2018/06/28
+	Update profile to DevExpress VCL 18.1.2, ExpressEntityMapping Framework supported.
+
 v2.1.9	2017/12/13
 	Update profile to DevExpress VCL 17.2.1.
 	High-DPI enhancements.
