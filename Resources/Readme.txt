@@ -1,5 +1,9 @@
 Changelog
 --------------------------
+v2.1.11	2018/12/02
+	Delphi 10.3 Rio supported.
+	Bugfix: the error icons are not displayed in component list.
+
 v2.1.10	2018/06/28
 	Update profile to DevExpress VCL 18.1.2, ExpressEntityMapping Framework supported.
 
