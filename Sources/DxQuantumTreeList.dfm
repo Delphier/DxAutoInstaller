@@ -38,6 +38,7 @@ object DxResourceModule: TDxResourceModule
         FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
         FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
       Properties.GlyphCount = 1
+      Properties.NullStyle = nssUnchecked
       Properties.ReadOnly = True
     end
     object NotFoundItem: TcxEditRepositoryCheckBoxItem
@@ -69,6 +70,7 @@ object DxResourceModule: TDxResourceModule
         FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
         FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
       Properties.GlyphCount = 1
+      Properties.NullStyle = nssUnchecked
       Properties.ReadOnly = True
     end
     object NotSupportedItem: TcxEditRepositoryCheckBoxItem
@@ -100,6 +102,7 @@ object DxResourceModule: TDxResourceModule
         FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
         FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
       Properties.GlyphCount = 1
+      Properties.NullStyle = nssUnchecked
       Properties.ReadOnly = True
     end
   end
