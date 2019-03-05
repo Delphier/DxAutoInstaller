@@ -89,6 +89,7 @@ begin
   if IsRequiredPackages then List := Component.Profile.RequiredPackages else List := Component.Profile.OptionalPackages;
   for PackageName in List do begin
     FileName := TDxProfile.GetPackageFullFileName(Installer.InstallFileDir, Component.Profile.ComponentName, PackageName, IDE);
+    if not FileExists(FileName) then Continue;
     Package := TDxPackage.Create(FileName);
     Package.Required := IsRequiredPackages;
     Component.Packages.Add(Package);

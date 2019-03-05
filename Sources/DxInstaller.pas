@@ -282,6 +282,8 @@ var
   Comp: TDxComponent;
   Package: TDxPackage;
   SourcesFileDir, InstallSourcesDir: String;
+  dxBuildNumber: Cardinal;
+  I: Integer;
 
   procedure AddLibrarySearchPath(const Dir: String; const IDEPlatform: TDxIDEPlatform);
   begin
@@ -293,18 +295,31 @@ var
     IDE.AddToLibraryBrowsingPath(Dir, IDEPlatform);
     if (dxioInstallToCppBuilder in Options[IDE]) and IsRADStudio(IDE) then TDxBDSIDE(IDE).AddToCppBrowsingPath(Dir, IDEPlatform);
   end;
+  procedure CopyFiles(const ASourcesFileDir: String);
+  begin
+    CopyFilesToDirectory(ASourcesFileDir + '*.*', InstallSourcesDir);
+    CopyFilesToDirectory(ASourcesFileDir + '*.dfm;*.res', GetInstallLibraryDir(InstallFileDir, IDE, Win32));
+    if dxioCompileWin64Library in Options[IDE] then
+      CopyFilesToDirectory(ASourcesFileDir + '*.dfm;*.res', GetInstallLibraryDir(InstallFileDir, IDE, Win64));
+  end;
 begin
   Uninstall(IDE);
+  dxBuildNumber := Profile.GetDxBuildNumber(InstallFileDir);
   InstallSourcesDir := GetInstallSourcesDir(InstallFileDir);
   for Comp in Components[IDE] do begin
     if Comp.State <> dxcsInstall then Continue;
     SourcesFileDir := IncludeTrailingPathDelimiter(Profile.GetComponentSourcesDir(InstallFileDir, Comp.Profile.ComponentName));
     UpdateProgress(IDE, Comp.Profile, 'Copying', 'Sources Files');
     UpdateProgressState('Copying Files: ' + SourcesFileDir + '*.*');
-    CopyFilesToDirectory(SourcesFileDir + '*.*', InstallSourcesDir);
-    CopyFilesToDirectory(SourcesFileDir + '*.dfm;*.res', GetInstallLibraryDir(InstallFileDir, IDE, Win32));
-    if dxioCompileWin64Library in Options[IDE] then
-      CopyFilesToDirectory(SourcesFileDir + '*.dfm;*.res', GetInstallLibraryDir(InstallFileDir, IDE, Win64));
+    CopyFiles(SourcesFileDir);
+    // Fix for version >= 18.2.x
+    if (dxBuildNumber >= 20180200) and (Comp.Profile.ComponentName = 'ExpressLibrary') then begin
+      for I := 0 to Profile.Components.Count - 1 do
+        if DirectoryExists(Profile.GetComponentSourcesDir(InstallFileDir, Profile.Components[I].ComponentName)) and
+          not DirectoryExists(Profile.GetComponentPackagesDir(InstallFileDir, Profile.Components[I].ComponentName)) then
+            CopyFiles(IncludeTrailingPathDelimiter(Profile.GetComponentSourcesDir(InstallFileDir, Profile.Components[I].ComponentName)));
+      CopyFiles(IncludeTrailingPathDelimiter(Profile.GetComponentSourcesDir(InstallFileDir, 'ExpressPageControl')));
+    end;
     for Package in Comp.Packages do if Package.Required then begin
       InstallPackage(IDE, Win32, Comp, Package);
       InstallPackage(IDE, Win64, Comp, Package);

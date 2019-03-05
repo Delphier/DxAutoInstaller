@@ -58,6 +58,7 @@ type
     class function GetIDEVersionNumberStr(IDE: TDxIDE): String;
     class function GetComponentDir(const InstallFileDir, ComponentName: String): String;
     class function GetComponentSourcesDir(const InstallFileDir, ComponentName: String): String;
+    class function GetComponentPackagesDir(const InstallFileDir, ComponentName: String): String;
     class function GetPackageName(const PackageBaseName: String; IDE: TDxIDE): String;
     class function GetPackageFullFileName(const InstallFileDir, ComponentName, PackageBaseName: String; IDE: TDxIDE): String;
     class function GetDxBuildNumber(const InstallFileDir: String): Cardinal;
@@ -169,6 +170,11 @@ begin
   Result := GetComponentDir(InstallFileDir, ComponentName) + '\Sources';
 end;
 
+class function TDxProfile.GetComponentPackagesDir(const InstallFileDir, ComponentName: String): String;
+begin
+  Result := GetComponentDir(InstallFileDir, ComponentName) + '\Packages';
+end;
+
 class function TDxProfile.GetPackageName(const PackageBaseName: String; IDE: TDxIDE): String;
 begin
   Result := PackageBaseName + GetIDEVersionNumberStr(IDE);
@@ -176,7 +182,7 @@ end;
 
 class function TDxProfile.GetPackageFullFileName(const InstallFileDir, ComponentName, PackageBaseName: String; IDE: TDxIDE): String;
 begin
-  Result := GetComponentDir(InstallFileDir, ComponentName) + '\Packages\' +
+  Result := GetComponentPackagesDir(InstallFileDir, ComponentName) + '\' +
             GetPackageName(PackageBaseName, IDE) + IDE.PackageSourceFileExtension;
 end;
 
