@@ -1,5 +1,9 @@
 Changelog
 --------------------------
+v2.2	2019/03/05
+	DevExpress VCL 18.2.x is compatible.
+	Hide the base components by default now.
+
 v2.1.11	2018/12/02
 	Delphi 10.3 Rio supported.
 	Bugfix: the error icons are not displayed in component list.
