@@ -133,10 +133,6 @@ object MainForm: TMainForm
     OnChange = PageFunsChange
     object TabInstall: TTabSheet
       Caption = 'Install'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel5: TPanel
         Left = 0
         Top = 0
@@ -200,10 +196,6 @@ object MainForm: TMainForm
     object TabUninstall: TTabSheet
       Caption = 'Uninstall'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel4: TPanel
         Left = 0
         Top = 0
@@ -327,10 +319,6 @@ object MainForm: TMainForm
     object TabAbout: TTabSheet
       Caption = 'About'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel2: TPanel
         Left = 0
         Top = 0
@@ -410,6 +398,8 @@ object MainForm: TMainForm
     Height = 17
     Anchors = [akLeft, akBottom]
     Caption = 'Hide Base Components'
+    Checked = True
+    State = cbChecked
     TabOrder = 2
     OnClick = RefreshTreeList
   end
