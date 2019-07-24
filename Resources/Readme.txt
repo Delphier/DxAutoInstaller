@@ -1,5 +1,8 @@
 Changelog
 --------------------------
+v2.2.1	2019/07/24
+	Update profile to DevExpress VCL 19.1.3.
+
 v2.2	2019/03/05
 	DevExpress VCL 18.2.x is compatible.
 	Hide the base components by default now.
