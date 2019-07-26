@@ -408,12 +408,16 @@ begin
   if dxioInstallToCppBuilder in Options[IDE] then
     ExtraOptions := ExtraOptions + Format(' -JL -NB"%s" -NH"%s" -NO"%s" ', [DCPPath, InstallLibraryDir, DCPPath]);
 
-    R := IDE.CompileDelphiPackageEx(Package.FullFileName, BPLPath, DCPPath, ExtraOptions);
-    if R and (IDEPlatform = Win32) and (Package.Usage <> dxpuRuntimeOnly) then
+  R := IDE.CompileDelphiPackageEx(Package.FullFileName, BPLPath, DCPPath, ExtraOptions);
+  if R then begin
+    // Fix issue that the skin names not listed since v18.2.x. dxSkinXxxxx.bpl should be placed in the library install directory.
+    if Package.Name.StartsWith('dxSkin') and CharInSet(Package.Name.Chars[6], ['A'..'Z']) then
+      CopyFile(IncludeTrailingPathDelimiter(BPLPath) + Package.Name + BPLExtName, IncludeTrailingPathDelimiter(InstallLibraryDir) + Package.Name + BPLExtName, True);
+
+    if (IDEPlatform = Win32) and (Package.Usage <> dxpuRuntimeOnly) then
       R := IDE.RegisterPackage(Package.FullFileName, BPLPath, Package.Description);
-    //then R := IDE.CompilePackage(Package.FullFileName, BPLPath, DCPPath)
-    //else R := IDE.InstallPackage(Package.FullFileName, BPLPath, DCPPath);
-  if R = False then SetState(dxisError);
+  end;
+  if not R then SetState(dxisError);
 end;
 
 procedure TDxInstaller.Uninstall(IDE: TDxIDE);
