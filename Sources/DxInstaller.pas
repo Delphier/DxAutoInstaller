@@ -141,7 +141,7 @@ class function TDxInstaller.GetInstallLibraryDir(const InstallFileDir: String; I
 begin
   Result := IncludeTrailingPathDelimiter(InstallFileDir) + 'Library';
   if IDE <> nil then begin
-    Result := Result + '\' + IDE.Name;
+    Result := Result + '\' + TDxProfile.GetIDEVersionNumberStr(IDE);
     if IDEPlatform = Win64 then Result := Result + '\' + DxIDEPlatformNames[IDEPlatform];
   end;
 end;
