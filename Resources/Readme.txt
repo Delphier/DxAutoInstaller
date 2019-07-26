@@ -1,5 +1,8 @@
 Changelog
 --------------------------
+v2.2.2	2019/07/26
+	Fix issue that the skin names not listed since v18.2.x.
+
 v2.2.1	2019/07/24
 	Update profile to DevExpress VCL 19.1.3.
 
