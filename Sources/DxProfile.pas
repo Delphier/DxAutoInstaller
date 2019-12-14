@@ -188,6 +188,7 @@ end;
 
 class function TDxProfile.GetDxBuildNumber(const InstallFileDir: String): Cardinal;
 const
+  VersionIdent     = 'dxVersion = ';
   BuildNumberIdent = 'dxBuildNumber: Cardinal = ';
 var
   SourceFile: TextFile;
@@ -201,10 +202,11 @@ begin
   Reset(SourceFile);
   while not Eof(SourceFile) do begin
     ReadLn(SourceFile, S);
-    if Pos(BuildNumberIdent, S) > 0 then begin
-      S := StringReplace(S, BuildNumberIdent, '', []);
-      S := StringReplace(S, ';', '', []);
-      Result := StrToIntDef(Trim(S), 0);
+    S := S.Trim;
+    if S.StartsWith(VersionIdent) or S.StartsWith(BuildNumberIdent) then begin
+      S := S.Substring(S.IndexOf('=') + 1);
+      S := S.Remove(S.IndexOf(';'));
+      Result := StrToIntDef(S.Trim, 0);
       Break;
     end;
   end;
