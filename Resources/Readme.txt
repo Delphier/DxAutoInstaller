@@ -1,5 +1,8 @@
 Changelog
 --------------------------
+v2.3	2020/06/08
+	Delphi 10.4 supported.
+
 v2.2.3	2019/12/14
 	Update profile to DevExpress VCL 19.2.2.
 	Updated DevExpress version number detection method to be compatible with 19.2.2.
