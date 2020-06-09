@@ -1,5 +1,8 @@
 Changelog
 --------------------------
+v2.3.1	2020/06/09
+	Update profile to DevExpress VCL 20.1.2.
+
 v2.3	2020/06/08
 	Delphi 10.4 supported.
 
