@@ -489,15 +489,15 @@ begin
   PackageName := Profile.GetPackageName(PackageBaseName, IDE);
 
   FileName := BPLPath + PackageName + BPLExtName;
-  UpdateProgress(IDE, Component, 'Unistall Package', FileName);
+  UpdateProgress(IDE, Component, 'Uninstall Package', FileName);
   IDE.UnregisterPackage(FileName);
 
   FileName := ChangeFileExt(FileName, '.*');
-  UpdateProgressState('Deleing BPL Files: ' + FileName);
+  UpdateProgressState('Deleting BPL Files: ' + FileName);
   DeleteFiles(FileName);
 
   FileName := DCPPath + PackageName + '.*';
-  UpdateProgressState('Deleing DCP Files: ' + FileName);
+  UpdateProgressState('Deleting DCP Files: ' + FileName);
   DeleteFiles(FileName);
 end;
 
