@@ -1,5 +1,8 @@
 Changelog
 --------------------------
+v2.3.2	2021/06/17
+	Update profile to DevExpress VCL 20.2.8.
+
 v2.3.1	2020/06/09
 	Update profile to DevExpress VCL 20.1.2.
 
