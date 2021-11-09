@@ -1,5 +1,8 @@
 Changelog
 --------------------------
+v2.3.3	2021/11/09
+	Support for Delphi 11 Alexandria.
+
 v2.3.2	2021/06/17
 	Update profile to DevExpress VCL 20.2.8.
 

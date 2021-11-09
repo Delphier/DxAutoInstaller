@@ -38,7 +38,7 @@ type
 const
   Win32 = bpWin32;
   Win64 = bpWin64;
-  DxIDEPlatformNames: array[TDxIDEPlatform] of String = (BDSPlatformWin32, BDSPlatformWin64, BDSPlatformOSX32);
+  DxIDEPlatformNames: array[TDxIDEPlatform] of String = (BDSPlatformWin32, BDSPlatformWin64, BDSPlatformOSX32, BDSPlatformOSX64, BDSPlatformAndroid32, BDSPlatformAndroid64, BDSPlatformiOSDevice32, BDSPlatformiOSDevice64, BDSPlatformiOSSimulator, BDSPlatformLinux64);
   BPLExtName = '.bpl';
   IDEEnvironmentVariablesSectionName = 'Environment Variables';
 
