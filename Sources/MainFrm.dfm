@@ -10,14 +10,12 @@ object MainForm: TMainForm
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   DesignSize = (
     804
     582)
-  PixelsPerInch = 96
   TextHeight = 15
   object Panel1: TPanel
     Left = 0
@@ -133,10 +131,6 @@ object MainForm: TMainForm
     OnChange = PageFunsChange
     object TabInstall: TTabSheet
       Caption = 'Install'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel5: TPanel
         Left = 0
         Top = 0
@@ -200,10 +194,6 @@ object MainForm: TMainForm
     object TabUninstall: TTabSheet
       Caption = 'Uninstall'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel4: TPanel
         Left = 0
         Top = 0
@@ -470,7 +460,7 @@ object MainForm: TMainForm
     Left = 400
     Top = 368
     Bitmap = {
-      494C010107000800040010001000FFFFFFFF2100FFFFFFFFFFFFFFFF424D3600
+      494C010107000800040010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       00000000000000000000000000000000000000000000686565D7908C8CF58E8A
       8AF58D8989F58C8888F58B8787F58A8686F5898585F5888585F5888585F58784
@@ -738,7 +728,8 @@ object MainForm: TMainForm
       0000000000000003000000000000000100000000000000010000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000003000000000000000300000000000000030000000000000003
-      000000000000FC07000000000000FFFF}
+      000000000000FC07000000000000FFFF00000000000000000000000000000000
+      000000000000}
     DesignInfo = 24117648
     ImageInfo = <
       item

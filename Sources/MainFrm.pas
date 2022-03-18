@@ -224,15 +224,9 @@ end;
 procedure TMainForm.InstallExecute(Sender: TObject);
 var
   IDEs: TDxIDEArray;
-  I: Integer;
 begin
-  if FTreeList.GetSelectedComponentCount = 0 then Exit;
-  for I := 0 to FInstaller.IDEs.Count - 1 do begin
-    if FInstaller.GetInstallComponentCount(FInstaller.IDEs[I]) > 0 then begin
-      SetLength(IDEs, Length(IDEs) + 1);
-      IDEs[Length(IDEs) - 1] := FInstaller.IDEs[I];
-    end;
-  end;
+  IDEs := FTreeList.GetSelectedIDEs;
+  if Length(IDEs) = 0 then Exit;
   RunInstaller(FInstaller.Install, IDEs);
 end;
 

@@ -12,7 +12,7 @@ unit DxQuantumTreeList;
 interface
 
 uses
-  SysUtils, Classes, DxInstaller, Controls, cxTL, cxEdit, cxGraphics,
+  SysUtils, Classes, DxInstaller, DxIDE, Controls, cxTL, cxEdit, cxGraphics,
   cxExtEditRepositoryItems, cxEditRepositoryItems, cxStyles, cxClasses,
   dxScreenTip, dxCustomHint, cxHint, Windows;
 
@@ -58,7 +58,7 @@ type
     constructor Create(Installer: TDxInstaller; Parent: TWinControl);
     destructor Destroy; override;
     procedure DispData(const IsHideBaseComponents: Boolean);
-    function GetSelectedComponentCount(): Integer;
+    function GetSelectedIDEs(): TDxIDEArray;
   end;
 
 implementation
@@ -66,7 +66,7 @@ implementation
 {$R *.dfm}
 
 uses
-  DxProfile, DxComponent, DxIDE, Variants, Graphics, Forms;
+  DxProfile, DxComponent, Variants, Graphics, Forms;
 
 { TDxResourceModule }
 
@@ -217,17 +217,21 @@ begin
   end;
 end;
 
-function TDxQuantumTreeList.GetSelectedComponentCount: Integer;
+function TDxQuantumTreeList.GetSelectedIDEs(): TDxIDEArray;
 var
-  I, N: Integer;
+  I, N, Tag: Integer;
   Node: TcxTreeListNode;
 begin
-  Result := 0;
   for I := 0 to TreeList.ColumnCount - 1 do begin
-    if TreeList.Columns[I].Tag < 0 then Continue;
+    Tag := TreeList.Columns[I].Tag;
+    if Tag < 0 then Continue;
     for N := 0 to FComponentsNode.Count - 1 do begin
       Node := FComponentsNode[N];
-      if Node.Visible and (TreeList.Columns[I].Values[Node] = True) then Inc(Result);
+      if Node.Visible and (TreeList.Columns[I].Values[Node] = True) then begin
+        SetLength(Result, Length(Result) + 1);
+        Result[Length(Result) - 1] := Installer.IDEs[Tag];
+        Break;
+      end;
     end;
   end;
 end;
@@ -312,7 +316,6 @@ var
   I: Integer;
   procedure SetComponentNodeState(Node: TcxTreeListNode);
   begin
-    if not Node.Visible then Exit;
     if Checked then Installer.Components[IDE][Node.Index].State := dxcsInstall
                else Installer.Components[IDE][Node.Index].State := dxcsNotInstall;
   end;

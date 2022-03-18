@@ -70,7 +70,6 @@ type
     procedure Install(const IDEArray: TDxIDEArray); overload;
     procedure Uninstall(const IDEArray: TDxIDEArray); overload;
     procedure Stop();
-    function GetInstallComponentCount(IDE: TDxIDE): Integer;
     procedure SearchNewPackages(List: TStringList);
     class function GetInstallLibraryDir(const InstallFileDir: String; IDE: TDxIDE; const IDEPlatform: TDxIDEPlatform = Win32): String;
     class function GetInstallSourcesDir(const InstallFileDir: String): String;
@@ -127,14 +126,6 @@ begin
     else if (not(dxtpcBDE in Components)) and (Pos('\dclbde', FileName) > 0) then Include(Components, dxtpcBDE);
   end;
   ThirdPartyComponents[IDE] := Components;
-end;
-
-function TDxInstaller.GetInstallComponentCount(IDE: TDxIDE): Integer;
-var
-  Comp: TDxComponent;
-begin
-  Result := 0;
-  for Comp in Components[IDE] do if Comp.State = dxcsInstall then Inc(Result);
 end;
 
 class function TDxInstaller.GetInstallLibraryDir(const InstallFileDir: String; IDE: TDxIDE; const IDEPlatform: TDxIDEPlatform): String;
@@ -510,8 +501,5 @@ procedure TDxInstaller.UpdateProgressState(const StateText: String);
 begin
   if Assigned(FOnUpdateProgressState) then FOnUpdateProgressState(StateText)
 end;
-
-
-
 
 end.
