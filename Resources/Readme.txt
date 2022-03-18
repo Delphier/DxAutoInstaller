@@ -1,5 +1,8 @@
 Changelog
 --------------------------
+v2.3.4	2022/03/18
+	Bugfix for component selecting.
+
 v2.3.3	2021/11/09
 	Support for Delphi 11 Alexandria.
 
