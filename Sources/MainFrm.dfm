@@ -2,8 +2,8 @@ object MainForm: TMainForm
   Left = 0
   Top = 0
   Caption = 'MainForm'
-  ClientHeight = 582
-  ClientWidth = 804
+  ClientHeight = 834
+  ClientWidth = 618
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
@@ -14,13 +14,13 @@ object MainForm: TMainForm
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   DesignSize = (
-    804
-    582)
+    618
+    834)
   TextHeight = 15
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 804
+    Width = 618
     Height = 97
     Align = alTop
     BevelEdges = [beBottom]
@@ -29,11 +29,12 @@ object MainForm: TMainForm
     Color = clWhite
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 804
     DesignSize = (
-      804
+      618
       95)
     object Image1: TImage
-      Left = 722
+      Left = 536
       Top = 16
       Width = 64
       Height = 64
@@ -123,25 +124,29 @@ object MainForm: TMainForm
   object PageFuns: TPageControl
     Left = 8
     Top = 109
-    Width = 789
-    Height = 436
-    ActivePage = TabAbout
+    Width = 603
+    Height = 688
+    ActivePage = TabInstall
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
     OnChange = PageFunsChange
+    ExplicitWidth = 789
+    ExplicitHeight = 436
     object TabInstall: TTabSheet
       Caption = 'Install'
       object Panel5: TPanel
         Left = 0
         Top = 0
-        Width = 781
-        Height = 406
+        Width = 595
+        Height = 658
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
+        ExplicitWidth = 655
+        ExplicitHeight = 568
         DesignSize = (
-          781
-          406)
+          595
+          658)
         object Label7: TLabel
           Left = 8
           Top = 10
@@ -150,17 +155,18 @@ object MainForm: TMainForm
           Caption = 'Installation File Directory:'
         end
         object Label8: TLabel
-          Left = 710
+          Left = 524
           Top = 10
           Width = 41
           Height = 15
           Anchors = [akTop, akRight]
           Caption = 'Version:'
+          ExplicitLeft = 710
         end
         object EditInstallFileDir: TButtonedEdit
           Left = 8
           Top = 30
-          Width = 696
+          Width = 510
           Height = 23
           Anchors = [akLeft, akTop, akRight]
           Images = ImageSmall
@@ -169,25 +175,29 @@ object MainForm: TMainForm
           RightButton.Visible = True
           TabOrder = 0
           OnRightButtonClick = EditInstallFileDirRightButtonClick
+          ExplicitWidth = 570
         end
         object EditVersion: TEdit
-          Left = 710
+          Left = 524
           Top = 30
           Width = 61
           Height = 23
           Anchors = [akTop, akRight]
           ReadOnly = True
           TabOrder = 1
+          ExplicitLeft = 584
         end
         object PanTreeList: TPanel
           Left = 8
           Top = 62
-          Width = 763
-          Height = 335
+          Width = 577
+          Height = 587
           Anchors = [akLeft, akTop, akRight, akBottom]
           BevelKind = bkTile
           BevelOuter = bvNone
           TabOrder = 2
+          ExplicitWidth = 637
+          ExplicitHeight = 497
         end
       end
     end
@@ -197,14 +207,16 @@ object MainForm: TMainForm
       object Panel4: TPanel
         Left = 0
         Top = 0
-        Width = 781
-        Height = 406
+        Width = 595
+        Height = 658
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
+        ExplicitWidth = 655
+        ExplicitHeight = 568
         DesignSize = (
-          781
-          406)
+          595
+          658)
         object Label9: TLabel
           Left = 8
           Top = 10
@@ -215,8 +227,8 @@ object MainForm: TMainForm
         object IDEListView: TListView
           Left = 8
           Top = 30
-          Width = 763
-          Height = 367
+          Width = 577
+          Height = 619
           Anchors = [akLeft, akTop, akRight, akBottom]
           Checkboxes = True
           Columns = <
@@ -227,6 +239,8 @@ object MainForm: TMainForm
           ReadOnly = True
           TabOrder = 0
           ViewStyle = vsReport
+          ExplicitWidth = 763
+          ExplicitHeight = 367
         end
       end
     end
@@ -236,25 +250,29 @@ object MainForm: TMainForm
       object Panel3: TPanel
         Left = 0
         Top = 0
-        Width = 781
-        Height = 406
+        Width = 595
+        Height = 658
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
+        ExplicitWidth = 655
+        ExplicitHeight = 568
         DesignSize = (
-          781
-          406)
+          595
+          658)
         object GroupBox1: TGroupBox
           Left = 8
           Top = 104
-          Width = 763
-          Height = 294
+          Width = 577
+          Height = 546
           Anchors = [akLeft, akTop, akRight, akBottom]
           Caption = 'Profile'
           TabOrder = 1
+          ExplicitWidth = 637
+          ExplicitHeight = 456
           DesignSize = (
-            763
-            294)
+            577
+            546)
           object LblCurrentProfile: TLabel
             Left = 16
             Top = 32
@@ -283,23 +301,25 @@ object MainForm: TMainForm
           object LblCustomProfile: TLinkLabel
             Left = 16
             Top = 88
-            Width = 730
+            Width = 544
             Height = 19
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
             Caption = 'Custom Profile:'
             TabOrder = 1
             OnLinkClick = URLLinkClick
+            ExplicitWidth = 730
           end
         end
         object GroupBox2: TGroupBox
           Left = 8
           Top = 10
-          Width = 763
+          Width = 577
           Height = 79
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Packages'
           TabOrder = 0
+          ExplicitWidth = 763
           object Button1: TButton
             Left = 16
             Top = 32
@@ -320,14 +340,16 @@ object MainForm: TMainForm
       object Panel2: TPanel
         Left = 0
         Top = 0
-        Width = 781
-        Height = 406
+        Width = 595
+        Height = 658
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
+        ExplicitWidth = 781
+        ExplicitHeight = 406
         DesignSize = (
-          781
-          406)
+          595
+          658)
         object Label4: TLabel
           Left = 8
           Top = 21
@@ -379,19 +401,21 @@ object MainForm: TMainForm
         object MemoReadme: TMemo
           Left = 8
           Top = 172
-          Width = 763
-          Height = 225
+          Width = 577
+          Height = 477
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssVertical
           TabOrder = 3
+          ExplicitWidth = 763
+          ExplicitHeight = 225
         end
       end
     end
   end
   object ChkHideBaseComponents: TCheckBox
     Left = 20
-    Top = 555
+    Top = 807
     Width = 167
     Height = 17
     Anchors = [akLeft, akBottom]
@@ -400,24 +424,29 @@ object MainForm: TMainForm
     State = cbChecked
     TabOrder = 2
     OnClick = RefreshTreeList
+    ExplicitTop = 555
   end
   object BtnRun: TcxButton
-    Left = 627
-    Top = 551
+    Left = 441
+    Top = 803
     Width = 75
     Height = 25
     Action = Install
     Anchors = [akRight, akBottom]
     TabOrder = 3
+    ExplicitLeft = 627
+    ExplicitTop = 551
   end
   object BtnExit: TcxButton
-    Left = 708
-    Top = 551
+    Left = 522
+    Top = 803
     Width = 75
     Height = 25
     Action = ExitApp
     Anchors = [akRight, akBottom]
     TabOrder = 4
+    ExplicitLeft = 708
+    ExplicitTop = 551
   end
   object ActionBase: TActionList
     Images = ImageSmall
