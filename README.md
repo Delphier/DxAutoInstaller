@@ -1,7 +1,7 @@
 # DxAutoInstaller
 DevExpress VCL Components Automatic Installer
 
-![DxAutoInstaller](Resources/Images/DxAutoInstaller.png)
+<img src="Resources/Images/DxAutoInstaller.png" alt="DxAutoInstaller" width="75%" />
 
 ## Compiling
 DxAutoInstaller requires [JCL](https://github.com/project-jedi/jcl). If the JCL is installed manually, you need to add the following paths to the compiler search path:
