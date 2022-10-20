@@ -22,7 +22,7 @@ uses
 
 type
   TMainForm = class(TDxForm)
-    Panel1: TPanel;
+    PanelTop: TPanel;
     Image1: TImage;
     LblAppName: TLabel;
     Label2: TLabel;
@@ -68,6 +68,7 @@ type
     Panel5: TPanel;
     BtnRun: TcxButton;
     BtnExit: TcxButton;
+    PanelBottom: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure URLLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
     procedure InstallExecute(Sender: TObject);
@@ -106,6 +107,7 @@ procedure TMainForm.FormCreate(Sender: TObject);
 var
   ReadmeFile: String;
 begin
+  if Height > Screen.WorkAreaHeight then Height := Screen.WorkAreaHeight;
   Caption := Application.Title;
   LblAppName.Caption := Application.Title;
   LblVersion.Caption := GetVersionStr();
