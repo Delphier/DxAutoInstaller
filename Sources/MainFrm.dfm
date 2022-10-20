@@ -201,28 +201,35 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 594
-        Height = 675
+        Height = 655
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
-        ExplicitWidth = 595
-        ExplicitHeight = 658
-        DesignSize = (
-          594
-          655)
         object Label9: TLabel
+          AlignWithMargins = True
           Left = 8
           Top = 10
-          Width = 343
+          Width = 578
           Height = 15
+          Margins.Left = 8
+          Margins.Top = 10
+          Margins.Right = 8
+          Margins.Bottom = 10
+          Align = alTop
           Caption = 'Uninstall DevExpress Components in the Following Selected IDEs:'
+          ExplicitWidth = 343
         end
         object IDEListView: TListView
+          AlignWithMargins = True
           Left = 8
-          Top = 30
-          Width = 576
-          Height = 596
-          Anchors = [akLeft, akTop, akRight, akBottom]
+          Top = 35
+          Width = 578
+          Height = 610
+          Margins.Left = 8
+          Margins.Top = 0
+          Margins.Right = 8
+          Margins.Bottom = 10
+          Align = alClient
           Checkboxes = True
           Columns = <
             item
@@ -232,8 +239,9 @@ object MainForm: TMainForm
           ReadOnly = True
           TabOrder = 0
           ViewStyle = vsReport
-          ExplicitWidth = 577
-          ExplicitHeight = 619
+          ExplicitTop = 30
+          ExplicitWidth = 576
+          ExplicitHeight = 616
         end
       end
     end
@@ -244,28 +252,28 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 594
-        Height = 675
+        Height = 655
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
-        ExplicitWidth = 595
-        ExplicitHeight = 658
-        DesignSize = (
-          594
-          655)
         object GroupBox1: TGroupBox
+          AlignWithMargins = True
           Left = 8
-          Top = 104
-          Width = 576
-          Height = 523
-          Anchors = [akLeft, akTop, akRight, akBottom]
+          Top = 102
+          Width = 578
+          Height = 543
+          Margins.Left = 8
+          Margins.Right = 8
+          Margins.Bottom = 10
+          Align = alClient
           Caption = 'Profile'
           TabOrder = 1
-          ExplicitWidth = 577
-          ExplicitHeight = 546
+          ExplicitTop = 104
+          ExplicitWidth = 576
+          ExplicitHeight = 542
           DesignSize = (
-            576
-            523)
+            578
+            543)
           object LblCurrentProfile: TLabel
             Left = 16
             Top = 32
@@ -294,25 +302,30 @@ object MainForm: TMainForm
           object LblCustomProfile: TLinkLabel
             Left = 16
             Top = 88
-            Width = 543
+            Width = 545
             Height = 19
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
             Caption = 'Custom Profile:'
             TabOrder = 1
             OnLinkClick = URLLinkClick
-            ExplicitWidth = 544
+            ExplicitWidth = 543
           end
         end
         object GroupBox2: TGroupBox
+          AlignWithMargins = True
           Left = 8
           Top = 10
-          Width = 576
+          Width = 578
           Height = 79
-          Anchors = [akLeft, akTop, akRight]
+          Margins.Left = 8
+          Margins.Top = 10
+          Margins.Right = 8
+          Margins.Bottom = 10
+          Align = alTop
           Caption = 'Packages'
           TabOrder = 0
-          ExplicitWidth = 577
+          ExplicitWidth = 576
           object Button1: TButton
             Left = 16
             Top = 32
@@ -334,12 +347,10 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 594
-        Height = 675
+        Height = 655
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
-        ExplicitWidth = 595
-        ExplicitHeight = 658
         DesignSize = (
           594
           655)
@@ -395,12 +406,11 @@ object MainForm: TMainForm
           Left = 8
           Top = 172
           Width = 576
-          Height = 454
+          Height = 473
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssVertical
           TabOrder = 3
-          ExplicitHeight = 474
         end
       end
     end
