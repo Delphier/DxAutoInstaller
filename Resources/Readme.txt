@@ -1,5 +1,9 @@
 Changelog
 --------------------------
+v2.3.5	2022/10/20
+	Update profile to DevExpress VCL 22.1.2.
+	Bugfix for mainform page control aligning.
+	
 v2.3.4	2022/03/18
 	Bugfix for component selecting.
 
