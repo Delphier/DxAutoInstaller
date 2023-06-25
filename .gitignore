@@ -12,5 +12,6 @@
 *.local
 *.identcache
 *.stat
+*.dres
 
 Desktop.ini
