@@ -387,9 +387,9 @@ object MainForm: TMainForm
         object LinkDownDoc: TLinkLabel
           Left = 8
           Top = 89
-          Width = 297
+          Width = 188
           Height = 19
-          Caption = 'https://www.devexpress.com/support/documentation/'
+          Caption = 'https://docs.devexpress.com/VCL/'
           TabOrder = 1
           OnLinkClick = URLLinkClick
         end
