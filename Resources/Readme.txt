@@ -1,5 +1,8 @@
 Changelog
 --------------------------
+v2.3.6	2023/06/25
+	Add v23.1 new skin dxSkinWXI to profile.
+
 v2.3.5	2022/10/20
 	Update profile to DevExpress VCL 22.1.2.
 	Bugfix for mainform page control aligning.
