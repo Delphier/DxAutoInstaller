@@ -194,11 +194,18 @@ begin
 end;
 
 procedure TMainForm.RunInstaller(Action: TDxInstallerAction; const IDEArray: TDxIDEArray);
+var
+  IDE: TDxIDE;
 begin
-  if FInstaller.IDEs.AnyInstanceRunning then begin
-    ShowInformation('Please close all running IDEs.');
-    Exit;
+  for IDE in IDEArray do
+  begin
+    if IDE.AnyInstanceRunning then
+    begin
+      ShowInformation(Format('Please close all running %s instances.', [IDE.Name]));
+      Exit;
+    end;
   end;
+
   Hide;
   try
     FProgressForm.Initial;
