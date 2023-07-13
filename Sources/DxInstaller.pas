@@ -15,7 +15,7 @@ uses
   Forms, Classes, SysUtils, DxIDE, DxComponent, DxProfile;
 
 type
-  TDxInstallOption = (dxioAddBrowsingPath, dxioNativeLookAndFeel, dxioCompileWin64Library, dxioInstallToCppBuilder);
+  TDxInstallOption = (dxioAddBrowsingPath, dxioNativeLookAndFeel, dxioCompileWin64Library, dxioInstallToCppBuilder, dxioMakeDebugDcu);
   TDxInstallOptions = set of TDxInstallOption;
 
   TDxThirdPartyComponent = (dxtpcIBX, dxtpcTeeChart, dxtpcFireDAC, dxtpcBDE);
@@ -76,7 +76,7 @@ type
   end;
 
 const
-  DxInstallOptionNames: array[TDxInstallOption] of String = ('Add Browsing Path', 'Use Native Look and Feel as Default', 'Compile Win64 Library', 'Install to C++Builder');
+  DxInstallOptionNames: array[TDxInstallOption] of String = ('Add Browsing Path', 'Use Native Look and Feel as Default', 'Compile Win64 Library', 'Install to C++Builder', 'Make debug .dcu');
 
 implementation
 
@@ -382,14 +382,18 @@ begin
   // -A   Unit Alias;
   // -NS  Namespaces Search Paths;
 
-  // -D   Define Donditionals;
+  // -D   Define Conditionals;
 
   // -JL  Generate package .lib, .bpi, and all .hpp files for C++;
   // -NB  Unit .bpi Output Directory - DCP Path;
   // -NH  Unit .hpp Output Directory;
   // -NO  Unit .obj Output Directory - DCP Path;
-  ExtraOptions :=
-    ' -$D- -$L- -$Y- -Q ' +
+  if dxioMakeDebugDcu in Options[IDE] then
+    ExtraOptions := ' -$D+'
+  else
+    ExtraOptions := ' -$D-';
+  ExtraOptions := ExtraOptions +
+    ' -$L- -$Y- -Q ' +
     Format(' -U"%s" -U"%s" -R"%s" ', [DCPPath, InstallSourcesDir, InstallSourcesDir]) +
     Format(' -B -NU"%s" -N0"%s" ', [InstallLibraryDir, InstallLibraryDir]) +
     '-AWinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE ' +
