@@ -2,7 +2,7 @@ object MainForm: TMainForm
   Left = 0
   Top = 0
   Caption = 'MainForm'
-  ClientHeight = 834
+  ClientHeight = 854
   ClientWidth = 618
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
@@ -122,7 +122,7 @@ object MainForm: TMainForm
     Left = 8
     Top = 109
     Width = 602
-    Height = 685
+    Height = 705
     Margins.Left = 8
     Margins.Top = 12
     Margins.Right = 8
@@ -131,19 +131,21 @@ object MainForm: TMainForm
     Align = alClient
     TabOrder = 1
     OnChange = PageFunsChange
+    ExplicitHeight = 685
     object TabInstall: TTabSheet
       Caption = 'Install'
       object Panel5: TPanel
         Left = 0
         Top = 0
         Width = 594
-        Height = 655
+        Height = 675
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
+        ExplicitHeight = 655
         DesignSize = (
           594
-          655)
+          675)
         object Label7: TLabel
           Left = 8
           Top = 10
@@ -186,11 +188,12 @@ object MainForm: TMainForm
           Left = 8
           Top = 62
           Width = 576
-          Height = 584
+          Height = 604
           Anchors = [akLeft, akTop, akRight, akBottom]
           BevelKind = bkTile
           BevelOuter = bvNone
           TabOrder = 2
+          ExplicitHeight = 584
         end
       end
     end
@@ -209,7 +212,7 @@ object MainForm: TMainForm
           AlignWithMargins = True
           Left = 8
           Top = 10
-          Width = 578
+          Width = 343
           Height = 15
           Margins.Left = 8
           Margins.Top = 10
@@ -217,7 +220,6 @@ object MainForm: TMainForm
           Margins.Bottom = 10
           Align = alTop
           Caption = 'Uninstall DevExpress Components in the Following Selected IDEs:'
-          ExplicitWidth = 343
         end
         object IDEListView: TListView
           AlignWithMargins = True
@@ -252,28 +254,27 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 594
-        Height = 655
+        Height = 675
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
+        ExplicitHeight = 655
         object GroupBox1: TGroupBox
           AlignWithMargins = True
           Left = 8
           Top = 102
           Width = 578
-          Height = 543
+          Height = 563
           Margins.Left = 8
           Margins.Right = 8
           Margins.Bottom = 10
           Align = alClient
           Caption = 'Profile'
           TabOrder = 1
-          ExplicitTop = 104
-          ExplicitWidth = 576
-          ExplicitHeight = 542
+          ExplicitHeight = 543
           DesignSize = (
             578
-            543)
+            563)
           object LblCurrentProfile: TLabel
             Left = 16
             Top = 32
@@ -347,13 +348,14 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 594
-        Height = 655
+        Height = 675
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
+        ExplicitHeight = 655
         DesignSize = (
           594
-          655)
+          675)
         object Label4: TLabel
           Left = 8
           Top = 21
@@ -406,23 +408,25 @@ object MainForm: TMainForm
           Left = 8
           Top = 172
           Width = 576
-          Height = 473
+          Height = 493
           Anchors = [akLeft, akTop, akRight, akBottom]
           ReadOnly = True
           ScrollBars = ssVertical
           TabOrder = 3
+          ExplicitHeight = 473
         end
       end
     end
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 794
+    Top = 814
     Width = 618
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
+    ExplicitTop = 794
     DesignSize = (
       618
       40)

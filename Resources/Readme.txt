@@ -1,5 +1,8 @@
 Changelog
 --------------------------
+v2.3.7	2023/11/20
+	RAD Studio 12 Athens supported.
+
 v2.3.6	2023/06/25
 	Add v23.1 new skin dxSkinWXI to profile.
 
