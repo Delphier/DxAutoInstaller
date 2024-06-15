@@ -1,5 +1,8 @@
 Changelog
 --------------------------
+v2.3.8	2024/06/15
+	Update profile to DevExpress VCL 24.1.3.
+
 v2.3.7	2023/11/20
 	RAD Studio 12 Athens supported.
 

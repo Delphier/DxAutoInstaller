@@ -51,8 +51,8 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
         <VerInfo_MinorVer>3</VerInfo_MinorVer>
-        <VerInfo_Release>7</VerInfo_Release>        
-        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=2.3.7.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=2.3;Comments=</VerInfo_Keys>
+        <VerInfo_Release>8</VerInfo_Release>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=2.3.8.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=2.3;Comments=</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <SanitizedProjectName>DxAutoInstaller</SanitizedProjectName>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
