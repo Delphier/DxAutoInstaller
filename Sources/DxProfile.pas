@@ -42,7 +42,6 @@ type
     IsBaseIdent = 'IsBase';
 
     ProfileResourceName = 'Profile';
-    ProfileResourceType = 'ini';
   private
     FFileName: String;
     FComponents: TDxComponentProfileList;
@@ -112,7 +111,7 @@ end;
 
 procedure TDxProfile.ExportBuiltInProfile(const FileName: String);
 begin
-  ExportResourceToFile(FileName, ProfileResourceName, ProfileResourceType);
+  ExportResourceToFile(FileName, ProfileResourceName);
 end;
 
 function TDxProfile.IsCustomProfile: Boolean;
@@ -157,7 +156,7 @@ end;
 
 class function TDxProfile.GetCustomProfileFileName: String;
 begin
-  Result := Format('%s%s.%s', [ExtractFilePath(Application.ExeName), ProfileResourceName, ProfileResourceType]);
+  Result := TPath.Combine(ExtractFilePath(Application.ExeName), ProfileResourceName + '.ini');
 end;
 
 class function TDxProfile.GetComponentDir(const InstallFileDir, ComponentName: String): String;

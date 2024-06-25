@@ -23,7 +23,7 @@ uses
 type
   TMainForm = class(TDxForm)
     PanelTop: TPanel;
-    Image1: TImage;
+    ImageIcon: TImage;
     LblAppName: TLabel;
     Label2: TLabel;
     LblVersion: TLabel;
@@ -104,13 +104,12 @@ uses
 {$R *.dfm}
 
 procedure TMainForm.FormCreate(Sender: TObject);
-var
-  ReadmeFile: String;
 begin
   if Height > Screen.WorkAreaHeight then Height := Screen.WorkAreaHeight;
   Caption := Application.Title;
   LblAppName.Caption := Application.Title;
   LblVersion.Caption := GetVersionStr();
+  LoadFromResource(ImageIcon.Picture.LoadFromStream, 'IconVCL');
   PageFuns.ActivePage := TabInstall;
 
   // Initial Install Page;
@@ -132,9 +131,7 @@ begin
   LinkDownApp.Caption := Format('<a href="%s">%s</a>', [LinkDownApp.Caption, LinkDownApp.Caption]);
   LinkDownDoc.Caption := Format('<a href="%s">%s</a>', [LinkDownDoc.Caption, LinkDownDoc.Caption]);
   LinkEmail.Caption := Format('<a href="mailto:%s">%s</a>', [LinkEmail.Caption, LinkEmail.Caption]);
-  ReadmeFile := TPath.GetTempFileName;
-  ExportResourceToFile(ReadmeFile, 'Readme', 'TXT');
-  MemoReadme.Lines.LoadFromFile(ReadmeFile);
+  LoadFromResource(MemoReadme.Lines.LoadFromStream, 'Readme');
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);

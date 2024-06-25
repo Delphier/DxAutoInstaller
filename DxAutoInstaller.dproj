@@ -123,13 +123,18 @@
         <DCCReference Include="Sources\DxUtils.pas"/>
         <RcItem Include="Resources\Profile.ini">
             <ContainerId>ResourceItem</ContainerId>
-            <ResourceType>INI</ResourceType>
+            <ResourceType>RCDATA</ResourceType>
             <ResourceId>Profile</ResourceId>
         </RcItem>
         <RcItem Include="Resources\Readme.txt">
             <ContainerId>ResourceItem</ContainerId>
-            <ResourceType>TXT</ResourceType>
+            <ResourceType>RCDATA</ResourceType>
             <ResourceId>Readme</ResourceId>
+        </RcItem>
+        <RcItem Include="Resources\Images\IconVCL-2024.svg">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>IconVCL</ResourceId>
         </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

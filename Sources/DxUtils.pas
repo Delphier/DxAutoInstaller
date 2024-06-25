@@ -20,6 +20,8 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
+  TLoadFromStreamProc = procedure(Stream: TStream) of object;
+
   function BuildFileList(const Path: String; const List: TStrings; const Attr: Integer;
     const FullFileName: Boolean; const Recursive: Boolean): Boolean;
   procedure DeleteFiles(const FilePath: String);
@@ -28,7 +30,8 @@ type
   procedure CopyFilesToDirectory(const FilePath, DirPath: String);
   function IsEmptyDirectory(const DirPath, ExcludeFile: String): Boolean;
   function GetVersionStr(): String;
-  procedure ExportResourceToFile(const FileName, ResourceName, ResourceType: String);
+  procedure LoadFromResource(AProc: TLoadFromStreamProc; const AResName: string; AResType: PChar = RT_RCDATA);
+  procedure ExportResourceToFile(const AFileName, AResName: string; AResType: PChar = RT_RCDATA);
   procedure ShowInformation(const Text: String);
 
 const
@@ -141,13 +144,21 @@ begin
   end;
 end;
 
-procedure ExportResourceToFile(const FileName, ResourceName, ResourceType: String);
-var
-  RS: TResourceStream;
+procedure LoadFromResource(AProc: TLoadFromStreamProc; const AResName: string; AResType: PChar);
 begin
-  RS := TResourceStream.Create(HInstance,ResourceName, PChar(ResourceType));
+  var RS := TResourceStream.Create(HInstance, AResName, AResType);
   try
-    RS.SaveToFile(FileName);
+    AProc(RS);
+  finally
+    RS.Free;
+  end;
+end;
+
+procedure ExportResourceToFile(const AFileName, AResName: string; AResType: PChar);
+begin
+  var RS := TResourceStream.Create(HInstance, AResName, AResType);
+  try
+    RS.SaveToFile(AFileName);
   finally
     RS.Free;
   end;

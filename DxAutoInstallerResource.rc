@@ -1,2 +1,3 @@
-Profile INI "Resources\\Profile.ini"
-Readme TXT "Resources\\Readme.txt"
+Profile RCDATA "Resources\\Profile.ini"
+Readme RCDATA "Resources\\Readme.txt"
+IconVCL RCDATA "Resources\\Images\\IconVCL-2024.svg"
