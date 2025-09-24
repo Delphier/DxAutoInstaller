@@ -16,7 +16,7 @@ uses
   Dialogs, ExtCtrls, dxGDIPlusClasses, StdCtrls, ComCtrls, ImgList, cxGraphics,
   ActnList, Buttons, DxQuantumTreeList, DxInstaller, DxProgress, DxIDE, DxUtils,
   System.Actions, System.ImageList, cxLookAndFeels, cxLookAndFeelPainters,
-  Vcl.Menus, cxImageList, cxButtons;
+  Vcl.Menus, cxImageList, cxButtons, dxUIAClasses;
 
 {$WARN UNIT_PLATFORM OFF}
 

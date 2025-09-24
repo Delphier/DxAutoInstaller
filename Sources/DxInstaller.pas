@@ -118,8 +118,9 @@ var
   Components: TDxThirdPartyComponents;
 begin
   Components := [];
-  for I := 0 to IDE.IdePackages.Count - 1 do begin
-    FileName := IDE.IdePackages.PackageFileNames[I];
+  for I := 0 to IDE.IdePackages.Count[false] - 1 do
+  begin
+    FileName := IDE.IdePackages.PackageFileNames[I, false];
     if (not(dxtpcIBX in Components)) and (Pos('\dclib', FileName) > 0) then Include(Components, dxtpcIBX)
     else if (not(dxtpcTeeChart in Components)) and (Pos('\dcltee', FileName) > 0) then Include(Components, dxtpcTeeChart)
     else if (not(dxtpcFireDAC in Components)) and ((Pos('\dclFireDAC', FileName) > 0) or (Pos('\AnyDAC_', FileName) > 0)) then Include(Components, dxtpcFireDAC)
