@@ -54,14 +54,14 @@ object MainForm: TMainForm
     object Label2: TLabel
       Left = 24
       Top = 60
-      Width = 258
+      Width = 257
       Height = 15
       Caption = 'DevExpress VCL Components Automatic Installer'
     end
     object LblVersion: TLabel
       Left = 203
       Top = 37
-      Width = 21
+      Width = 20
       Height = 15
       Caption = 'v2.x'
     end
@@ -158,7 +158,7 @@ object MainForm: TMainForm
           AlignWithMargins = True
           Left = 8
           Top = 10
-          Width = 343
+          Width = 342
           Height = 15
           Margins.Left = 8
           Margins.Top = 10
@@ -316,7 +316,7 @@ object MainForm: TMainForm
         object Label6: TLabel
           Left = 8
           Top = 69
-          Width = 229
+          Width = 228
           Height = 15
           Caption = 'Download DevExpress VCL Documentation:'
         end
