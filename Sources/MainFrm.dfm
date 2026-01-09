@@ -29,7 +29,7 @@ object MainForm: TMainForm
     DesignSize = (
       618
       95)
-    object ImageIcon: TImage
+    object ImageLogo: TImage
       Left = 536
       Top = 16
       Width = 64
@@ -347,7 +347,7 @@ object MainForm: TMainForm
           TabOrder = 2
           OnLinkClick = URLLinkClick
         end
-        object MemoReadme: TMemo
+        object MemoChangelog: TMemo
           Left = 8
           Top = 172
           Width = 576

@@ -122,19 +122,20 @@
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="Sources\DxUtils.pas"/>
+        <DCCReference Include="Sources\DxAutoInstaller.Utils.pas"/>
         <RcItem Include="Resources\Profile.ini">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>Profile</ResourceId>
         </RcItem>
-        <RcItem Include="Resources\Readme.txt">
+        <RcItem Include="Resources\Changelog.txt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
-            <ResourceId>Readme</ResourceId>
+            <ResourceId>Changelog</ResourceId>
         </RcItem>
-        <RcItem Include="Resources\Images\IconVCL-2024.svg">
+        <RcItem Include="Resources\Images\Logo-2024.svg">
             <ResourceType>RCDATA</ResourceType>
-            <ResourceId>IconVCL</ResourceId>
+            <ResourceId>Logo</ResourceId>
         </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
@@ -162,13 +163,6 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="5">
-                <DeployFile LocalName="Bin\DxAutoInstaller.exe" Configuration="Debug" Class="ProjectOutput"/>
-                <DeployFile LocalName="Bin\DxAutoInstaller.exe" Configuration="Release" Class="ProjectOutput"/>
-                <DeployFile LocalName="Resources\Profile.ini" Configuration="Debug" Class="ProjectFile"/>
-                <DeployFile LocalName="Resources\Profile.ini" Configuration="Release" Class="ProjectFile"/>
-                <DeployFile LocalName="Resources\Readme.txt" Configuration="Debug" Class="ProjectFile"/>
-                <DeployFile LocalName="Resources\Readme.txt" Configuration="Release" Class="ProjectFile"/>
-                <DeployFile LocalName="Win32\Debug\DxAutoInstaller.exe" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="iOSSimulator">
                         <Operation>1</Operation>

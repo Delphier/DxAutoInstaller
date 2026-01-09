@@ -68,7 +68,7 @@ type
 implementation
 
 uses
-  IniFiles, IOUtils, Forms, DxUtils;
+  IniFiles, IOUtils, Forms, DxAutoInstaller.Utils;
 
 { TDxComponentProfile }
 

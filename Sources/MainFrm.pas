@@ -23,7 +23,7 @@ uses
 type
   TMainForm = class(TDxForm)
     PanelTop: TPanel;
-    ImageIcon: TImage;
+    ImageLogo: TImage;
     LblAppName: TLabel;
     Label2: TLabel;
     LblVersion: TLabel;
@@ -58,7 +58,7 @@ type
     ProfileDelete: TAction;
     LblCustomProfile: TLinkLabel;
     Label1: TLabel;
-    MemoReadme: TMemo;
+    MemoChangelog: TMemo;
     GroupBox2: TGroupBox;
     Button1: TButton;
     SearchNewPackages: TAction;
@@ -99,7 +99,7 @@ var
 implementation
 
 uses
-  ShellAPI, FileCtrl, IOUtils;
+  ShellAPI, FileCtrl, IOUtils, DxAutoInstaller.Utils;
 
 {$R *.dfm}
 
@@ -109,7 +109,7 @@ begin
   Caption := Application.Title;
   LblAppName.Caption := Application.Title;
   LblVersion.Caption := GetVersionStr();
-  LoadFromResource(ImageIcon.Picture.LoadFromStream, 'IconVCL');
+  LoadResourceToStream(ImageLogo.Picture.LoadFromStream, 'Logo');
   PageFuns.ActivePage := TabInstall;
 
   // Initial Install Page;
@@ -131,7 +131,7 @@ begin
   LinkDownApp.Caption := Format('<a href="%s">%s</a>', [LinkDownApp.Caption, LinkDownApp.Caption]);
   LinkDownDoc.Caption := Format('<a href="%s">%s</a>', [LinkDownDoc.Caption, LinkDownDoc.Caption]);
   LinkEmail.Caption := Format('<a href="mailto:%s">%s</a>', [LinkEmail.Caption, LinkEmail.Caption]);
-  LoadFromResource(MemoReadme.Lines.LoadFromStream, 'Readme');
+  LoadResourceToStream(MemoChangelog.Lines.LoadFromStream, 'Changelog');
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);

@@ -12,7 +12,8 @@ uses
   DxProfile in 'Sources\DxProfile.pas',
   DxProgress in 'Sources\DxProgress.pas' {DxProgressForm},
   DxQuantumTreeList in 'Sources\DxQuantumTreeList.pas' {DxResourceModule: TDataModule},
-  DxUtils in 'Sources\DxUtils.pas';
+  DxUtils in 'Sources\DxUtils.pas',
+  DxAutoInstaller.Utils in 'Sources\DxAutoInstaller.Utils.pas';
 
 {$R *.res}
 
