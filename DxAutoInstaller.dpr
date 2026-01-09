@@ -13,6 +13,7 @@ uses
   DxProgress in 'Sources\DxProgress.pas' {DxProgressForm},
   DxQuantumTreeList in 'Sources\DxQuantumTreeList.pas' {DxResourceModule: TDataModule},
   DxUtils in 'Sources\DxUtils.pas',
+  DxAutoInstaller.Core in 'Sources\DxAutoInstaller.Core.pas',
   DxAutoInstaller.Utils in 'Sources\DxAutoInstaller.Utils.pas';
 
 {$R *.res}

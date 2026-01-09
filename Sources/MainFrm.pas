@@ -99,7 +99,7 @@ var
 implementation
 
 uses
-  ShellAPI, FileCtrl, IOUtils, DxAutoInstaller.Utils;
+  ShellAPI, FileCtrl, IOUtils, DxAutoInstaller.Core, DxAutoInstaller.Utils;
 
 {$R *.dfm}
 
@@ -108,7 +108,7 @@ begin
   if Height > Screen.WorkAreaHeight then Height := Screen.WorkAreaHeight;
   Caption := Application.Title;
   LblAppName.Caption := Application.Title;
-  LblVersion.Caption := GetVersionStr();
+  LblVersion.Caption := TApp.Version;
   LoadResourceToStream(ImageLogo.Picture.LoadFromStream, 'Logo');
   PageFuns.ActivePage := TabInstall;
 
