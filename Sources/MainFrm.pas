@@ -14,7 +14,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtCtrls, dxGDIPlusClasses, StdCtrls, ComCtrls, ImgList, cxGraphics,
-  ActnList, Buttons, DxQuantumTreeList, DxInstaller, DxProgress, DxIDE, DxUtils,
+  ActnList, Buttons, DxQuantumTreeList, DxInstaller, DxProgress, DxIDE,
   System.Actions, System.ImageList, cxLookAndFeels, cxLookAndFeelPainters,
   Vcl.Menus, cxImageList, cxButtons, cxControls, cxContainer, cxEdit,
   dxCoreGraphics, cxTextEdit, cxMaskEdit, cxButtonEdit;
@@ -22,7 +22,7 @@ uses
 {$WARN UNIT_PLATFORM OFF}
 
 type
-  TMainForm = class(TDxForm)
+  TMainForm = class(TForm)
     PanelTop: TPanel;
     ImageLogo: TImage;
     LblAppName: TLabel;
@@ -100,7 +100,7 @@ var
 implementation
 
 uses
-  ShellAPI, FileCtrl, IOUtils, DxAutoInstaller.Core, DxAutoInstaller.Utils;
+  ShellAPI, FileCtrl, IOUtils, DxAutoInstaller.Core, DxAutoInstaller.Utils, DxUtils;
 
 {$R *.dfm}
 

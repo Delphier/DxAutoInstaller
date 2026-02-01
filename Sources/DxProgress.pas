@@ -14,10 +14,10 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Buttons, ExtCtrls, DxIDE, DxProfile, DxInstaller, ActnList,
-  ImgList, cxGraphics, DxUtils;
+  ImgList, cxGraphics;
 
 type
-  TDxProgressForm = class(TDxForm)
+  TDxProgressForm = class(TForm)
     PanLogs: TPanel;
     ProgressLogs: TMemo;
     ProgressTitle: TLabel;
@@ -47,6 +47,9 @@ type
 implementation
 
 {$R *.dfm}
+
+uses
+  DxUtils;
 
 { TDxProgressForm }
 

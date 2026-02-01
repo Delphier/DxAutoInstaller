@@ -14,12 +14,6 @@ interface
 uses
   Windows, SysUtils, Classes, Forms;
 
-type
-  TDxForm = class(TForm)
-  public
-    constructor Create(AOwner: TComponent); override;
-  end;
-
   function BuildFileList(const Path: String; const List: TStrings; const Attr: Integer;
     const FullFileName: Boolean; const Recursive: Boolean): Boolean;
   procedure DeleteFiles(const FilePath: String);
@@ -109,14 +103,6 @@ end;
 procedure ShowInformation(const Text: String);
 begin
   Application.MessageBox(PChar(Text), 'Information', MB_ICONINFORMATION);
-end;
-
-{ TDxForm }
-
-constructor TDxForm.Create(AOwner: TComponent);
-begin
-  inherited;
-  if Screen.Fonts.IndexOf(Font.Name) < 0 then Font.Name := 'Tahoma';
 end;
 
 end.
