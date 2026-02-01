@@ -16,7 +16,8 @@ uses
   Dialogs, ExtCtrls, dxGDIPlusClasses, StdCtrls, ComCtrls, ImgList, cxGraphics,
   ActnList, Buttons, DxQuantumTreeList, DxInstaller, DxProgress, DxIDE, DxUtils,
   System.Actions, System.ImageList, cxLookAndFeels, cxLookAndFeelPainters,
-  Vcl.Menus, cxImageList, cxButtons;
+  Vcl.Menus, cxImageList, cxButtons, cxControls, cxContainer, cxEdit,
+  dxCoreGraphics, cxTextEdit, cxMaskEdit, cxButtonEdit;
 
 {$WARN UNIT_PLATFORM OFF}
 
@@ -40,7 +41,7 @@ type
     LinkEmail: TLinkLabel;
     Label7: TLabel;
     Label8: TLabel;
-    EditInstallFileDir: TButtonedEdit;
+    EditInstallFileDir: TcxButtonEdit;
     EditVersion: TEdit;
     PanTreeList: TPanel;
     ActionBase: TActionList;
@@ -75,7 +76,7 @@ type
     procedure UninstallExecute(Sender: TObject);
     procedure ExitAppExecute(Sender: TObject);
     procedure PageFunsChange(Sender: TObject);
-    procedure EditInstallFileDirRightButtonClick(Sender: TObject);
+    procedure EditInstallFileDirPropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
     procedure FormDestroy(Sender: TObject);
     procedure InitialIDEListView();
     procedure InitialProfileInfo();
@@ -114,7 +115,7 @@ begin
 
   // Initial Install Page;
   FInstaller := TDxInstaller.Create;
-  PanTreeList.BevelKind := bkNone;
+  PanTreeList.BevelKind := TBevelKind.bkNone;
   FTreeList := TDxQuantumTreeList.Create(FInstaller, PanTreeList);
   FProgressForm := TDxProgressForm.Create(nil);
   FProgressForm.Installer := FInstaller;
@@ -245,7 +246,7 @@ begin
   RunInstaller(FInstaller.Uninstall, IDEs);
 end;
 
-procedure TMainForm.EditInstallFileDirRightButtonClick(Sender: TObject);
+procedure TMainForm.EditInstallFileDirPropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
 var
   Arr: TArray<String>;
   Dir: String;
