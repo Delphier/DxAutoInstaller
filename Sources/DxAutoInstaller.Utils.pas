@@ -19,14 +19,20 @@ uses
 type
   TLoadFromStreamProc = procedure(AStream: TStream) of object;
 
+function CreateResourceStream(const AResName: string): TResourceStream;
 procedure LoadResourceToStream(ALoadFromStream: TLoadFromStreamProc; const AResName: string);
 procedure ExportResourceToFile(const AFileName, AResName: string);
 
 implementation
 
+function CreateResourceStream(const AResName: string): TResourceStream;
+begin
+  Result := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+end;
+
 procedure LoadResourceToStream(ALoadFromStream: TLoadFromStreamProc; const AResName: string);
 begin
-  var Stream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  var Stream := CreateResourceStream(AResName);
   try
     ALoadFromStream(Stream);
   finally
@@ -36,7 +42,7 @@ end;
 
 procedure ExportResourceToFile(const AFileName, AResName: string);
 begin
-  with TResourceStream.Create(HInstance, AResName, RT_RCDATA) do begin
+  with CreateResourceStream(AResName) do begin
     try
       SaveToFile(AFileName);
     finally
