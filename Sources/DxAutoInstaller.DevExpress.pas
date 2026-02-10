@@ -20,10 +20,13 @@ type
   TComponentMetadata = record
     Name: string;
     IsBase: Boolean;
-    RequiredPackages: TArray<string>;
-    OptionalPackages: TArray<string>;
+    RequiredPackages: TArray<string>; // Install in component order.
+    OptionalPackages: TArray<string>; // Install after the RequiredPackages for all components have been installed.
     OutdatedPackages: TArray<string>; // Uninstall only.
   end;
+
+  PComponentMetadata = ^TComponentMetadata;
+  TComponentMetadataList = TArray<PComponentMetadata>;
 
   TManifest = class
   const
@@ -31,14 +34,14 @@ type
     ResourceName        = 'DevExpressManifest';
   private
     FIsCustom: Boolean;
-    FComponents: TArray<TComponentMetadata>;
+    FComponents: TComponentMetadataList;
     procedure ReadComponents;
   public
     class function CustomFileName: string;
     class function CustomFileExists: Boolean;
     constructor Create(const AUseCustomFile: Boolean);
     property IsCustom: Boolean read FIsCustom;
-    property Components: TArray<TComponentMetadata> read FComponents;
+    property Components: TComponentMetadataList read FComponents;
     procedure Export;
   end;
 
@@ -48,20 +51,89 @@ type
     function IsDesigntime: Boolean;
   end;
 
+  PComponent = ^TComponent;
+  TComponentList = TArray<PComponent>;
+
   TPackage = record
-    Name: TPackageName;
-    FileName: string;
-    Description: string;
-    Requires: TArray<string>;
+  private
+    FName: TPackageName;
+    FFileName: string;
+    FExists: Boolean;
+    FDescription: string;
+    FRequires: TArray<string>;
+    FDependencies: TComponentList;
+  public
     class procedure ParseFile(const AFileName: string; out ADescription: string; out ARequires: TArray<string>); static;
     constructor Create(const AName: TPackageName; const AFileName: string);
-    function Exists: Boolean;
+    property Name: TPackageName read FName;
+    property FileName: string read FFileName;
+    property Exists: Boolean read FExists;
+    property Description: string read FDescription;
+    property Dependencies: TComponentList read FDependencies;
+  end;
+
+  PPackage = ^TPackage;
+  TPackageList = TArray<PPackage>;
+  TPackageListHelper = record helper for TPackageList
+    function ValidCount: NativeInt;
+  end;
+
+  TComponentDir = type string;
+  TComponentDirHelper = record helper for TComponentDir
+    function PackagesDir: string;
+    function SourcesDir: string;
+  end;
+
+  TRootDir = type string;
+  TRootDirHelper = record helper for TRootDir
+    function ComponentDir(const AComponentName: string): TComponentDir;
+  end;
+
+  TComponent = record
+  private
+    FName: string;
+    FIsBase: Boolean;
+    FDir: TComponentDir;
+    FError: TError;
+    FChecked: Boolean;
+
+    FRequiredPackages: TPackageList;
+    FOptionalPackages: TPackageList;
+    FDependencies: TComponentList;
+    FDependents: TComponentList;
+
+    procedure SetChecked(const AChecked: Boolean);
+  public
+    constructor Create(AMetadata: PComponentMetadata; const ARootDir: TRootDir; AIDE: TIDE);
+    property Name: string read FName;
+    property IsBase: Boolean read FIsBase;
+    property Dir: TComponentDir read FDir;
+    property Error: TError read FError;
+    property Checked: Boolean read FChecked write SetChecked;
+
+    property RequiredPackages: TPackageList read FRequiredPackages;
+    property OptionalPackages: TPackageList read FOptionalPackages;
+    property Dependencies: TComponentList read FDependencies;
+    property Dependents: TComponentList read FDependents;
+
+    function Packages: TPackageList;
+    function Valid: Boolean;
+    procedure CheckError;
+  end;
+
+  TComponentListHelper = record helper for TComponentList
+  strict private
+    procedure InitDependencies;
+  public
+    constructor Create(AMetadataList: TComponentMetadataList; const ARootDir: TRootDir; AIDE: TIDE);
+    function ValidCount: NativeInt;
   end;
 
 implementation
 
 uses
-  System.Classes, System.SysUtils, System.IOUtils, System.IniFiles, System.RegularExpressions,
+  System.Classes, System.SysUtils, System.IOUtils,
+  System.IniFiles, System.RegularExpressions, System.Generics.Collections,
   Vcl.Forms, DxAutoInstaller.Utils;
 
 { TManifest }
@@ -73,7 +145,7 @@ end;
 
 class function TManifest.CustomFileExists: Boolean;
 begin
-  Result := FileExists(CustomFileName);
+  Result := TFile.Exists(CustomFileName);
 end;
 
 constructor TManifest.Create(const AUseCustomFile: Boolean);
@@ -88,7 +160,7 @@ const
 var
   IniFile: TMemIniFile;
 begin
-  if FIsCustom then IniFile := TMemIniFile.Create(CustomFileName) else begin
+  if IsCustom then IniFile := TMemIniFile.Create(CustomFileName) else begin
     var Stream := CreateResourceStream(ResourceName);
     try
       IniFile := TMemIniFile.Create(Stream);
@@ -108,7 +180,7 @@ begin
         Component.RequiredPackages := IniFile.ReadString(Name, 'RequiredPackages', '').Split(Separators, TStringSplitOptions.ExcludeEmpty);
         Component.OptionalPackages := IniFile.ReadString(Name, 'OptionalPackages', '').Split(Separators, TStringSplitOptions.ExcludeEmpty);
         Component.OutdatedPackages := IniFile.ReadString(Name, 'OutdatedPackages', '').Split(Separators, TStringSplitOptions.ExcludeEmpty);
-        FComponents := FComponents + [Component];
+        FComponents := FComponents + [@Component];
       end;
     finally
       Names.Free;
@@ -127,14 +199,11 @@ end;
 
 constructor TPackage.Create(const AName: TPackageName; const AFileName: string);
 begin
-  Name := AName;
-  FileName := AFileName;
-  ParseFile(AFileName, Description, Requires);
-end;
-
-function TPackage.Exists: Boolean;
-begin
-  Result := TFile.Exists(FileName);
+  Self := Default(TPackage);
+  FName := AName;
+  FFileName := AFileName;
+  FExists := TFile.Exists(FFileName);
+  if FExists then ParseFile(FFileName, FDescription, FRequires);
 end;
 
 class procedure TPackage.ParseFile(const AFileName: string; out ADescription: string; out ARequires: TArray<string>);
@@ -162,16 +231,153 @@ begin
   end;
 end;
 
+{ TPackageListHelper }
+
+function TPackageListHelper.ValidCount: NativeInt;
+begin
+  Result := 0;
+  for var Package in Self do if Package.Exists then Inc(Result);
+end;
+
+{ TComponent }
+
+constructor TComponent.Create(AMetadata: PComponentMetadata; const ARootDir: TRootDir; AIDE: TIDE);
+  function BuildPackageList(ABaseNames: TArray<string>): TPackageList;
+  begin
+    Result := [];
+    for var BaseName in ABaseNames do begin
+      var PackageName := TPackageName.Create(BaseName, AIDE);
+      var FileName := TPath.Combine(FDir.PackagesDir, PackageName + '.dpk');
+      var Package := TPackage.Create(PackageName, FileName);
+      Result := Result + [@Package];
+    end;
+  end;
+
+begin
+  Self := Default(TComponent);
+  FName := AMetadata.Name;
+  FIsBase := AMetadata.IsBase;
+  FDir := ARootDir.ComponentDir(FName);
+  FRequiredPackages := BuildPackageList(AMetadata.RequiredPackages);
+  FOptionalPackages := BuildPackageList(AMetadata.OptionalPackages);
+end;
+
+function TComponent.Packages: TPackageList;
+begin
+  Result := RequiredPackages + OptionalPackages;
+end;
+
+function TComponent.Valid: Boolean;
+begin
+  Result := Error = errNone;
+end;
+
+procedure TComponent.CheckError;
+begin
+  if not TDirectory.Exists(Dir) then FError := errComponentNotFound
+  else if RequiredPackages.ValidCount < 1 then FError := errComponentMissingPackages
+  else if Dependencies.ValidCount < 1 then FError := errComponentMissingDependencies
+  else FError := errNone;
+end;
+
+procedure TComponent.SetChecked(const AChecked: Boolean);
+begin
+  if not Valid then Exit;
+  if AChecked then for var Component in Dependencies do Component.Checked := True
+              else for var Component in Dependents do Component.Checked := False;
+  FChecked := AChecked;
+end;
+
+{ TComponentListHelper }
+
+constructor TComponentListHelper.Create(AMetadataList: TComponentMetadataList; const ARootDir: TRootDir; AIDE: TIDE);
+begin
+  Self := [];
+  for var Metadata in AMetadataList do begin
+    var Component := TComponent.Create(Metadata, ARootDir, AIDE);
+    Self := Self + [@Component];
+  end;
+
+  InitDependencies;
+  for var Comp in Self do Comp.CheckError;
+end;
+
+procedure TComponentListHelper.InitDependencies;
+type
+  TPkgCompDict = TDictionary<string, PComponent>;
+var
+  Dict: TPkgCompDict;
+
+  procedure SetDependencies(AComponent: PComponent; APackages: TPackageList; const AIsRequiredPackage: Boolean);
+  var
+    Component: PComponent;
+  begin
+    for var Package in APackages do
+      for var Requires in Package.FRequires do
+        if Dict.TryGetValue(Requires.ToUpper, Component) then
+          if Component <> AComponent then
+            if not TArray.Contains(Package.Dependencies, Component) then begin
+              Package.FDependencies := Package.FDependencies + [Component];
+              if AIsRequiredPackage then
+                if not TArray.Contains(AComponent.Dependencies, Component) then begin
+                  AComponent.FDependencies := AComponent.FDependencies + [Component];
+                  Component.FDependents := Component.FDependents + [AComponent];
+                end;
+            end;
+  end;
+
+begin
+  Dict := TPkgCompDict.Create;
+  try
+    for var Comp in Self do
+      for var Package in Comp.Packages do
+        Dict.Add(UpperCase(Package.Name), Comp);
+
+    for var Comp in Self do begin
+      SetDependencies(Comp, Comp.RequiredPackages, True);
+      SetDependencies(Comp, Comp.OptionalPackages, False);
+    end;
+
+  finally
+    Dict.Free;
+  end;
+end;
+
+function TComponentListHelper.ValidCount: NativeInt;
+begin
+  Result := 0;
+  for var Comp in Self do if Comp.Valid then Inc(Result);
+end;
+
 { TPackageNameHelper }
 
 constructor TPackageNameHelper.Create(const APackageBaseName: string; AIDE: TIDE);
 begin
-  Self := APackageBaseName + AIDE.PackageVersionStr;
+  Self := APackageBaseName + AIDE.PackageVersionCode;
 end;
 
 function TPackageNameHelper.IsDesigntime: Boolean;
 begin
   Result := string.StartsText('dcl', Self);
+end;
+
+{ TComponentDirHelper }
+
+function TComponentDirHelper.PackagesDir: string;
+begin
+  Result := TPath.Combine(Self, 'Packages');
+end;
+
+function TComponentDirHelper.SourcesDir: string;
+begin
+  Result := TPath.Combine(Self, 'Sources');
+end;
+
+{ TRootDirHelper }
+
+function TRootDirHelper.ComponentDir(const AComponentName: string): TComponentDir;
+begin
+  Result := TPath.Combine(Self, AComponentName);
 end;
 
 end.
