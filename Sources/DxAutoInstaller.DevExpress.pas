@@ -19,7 +19,7 @@ uses
 type
   TComponentMetadata = record
     Name: string;
-    IsBase: Boolean;
+    Visible: Boolean;
     RequiredPackages: TArray<string>; // Install in component order.
     OptionalPackages: TArray<string>; // Install after the RequiredPackages for all components have been installed.
     OutdatedPackages: TArray<string>; // Uninstall only.
@@ -92,7 +92,7 @@ type
   TComponent = record
   private
     FName: string;
-    FIsBase: Boolean;
+    FVisible: Boolean;
     FDir: TComponentDir;
     FError: TError;
     FChecked: Boolean;
@@ -106,7 +106,7 @@ type
   public
     constructor Create(AMetadata: PComponentMetadata; const ARootDir: TRootDir; AIDE: TIDE);
     property Name: string read FName;
-    property IsBase: Boolean read FIsBase;
+    property Visible: Boolean read FVisible;
     property Dir: TComponentDir read FDir;
     property Error: TError read FError;
     property Checked: Boolean read FChecked write SetChecked;
@@ -125,8 +125,11 @@ type
   strict private
     procedure InitDependencies;
   public
-    constructor Create(AMetadataList: TComponentMetadataList; const ARootDir: TRootDir; AIDE: TIDE);
+    constructor Create(AManifest: TManifest; const ARootDir: TRootDir; AIDE: TIDE);
     function ValidCount: NativeInt;
+    function VisibleValidCount: NativeInt;
+    function CheckedCount: NativeInt;
+    function VisibleCheckedCount: NativeInt;
   end;
 
 implementation
@@ -176,7 +179,7 @@ begin
       for var Name in Names do begin
         var Component := Default(TComponentMetadata);
         Component.Name := Name;
-        Component.IsBase := IniFile.ReadBool(Name, 'IsBase', False);
+        Component.Visible := IniFile.ReadBool(Name, 'Visible', True);
         Component.RequiredPackages := IniFile.ReadString(Name, 'RequiredPackages', '').Split(Separators, TStringSplitOptions.ExcludeEmpty);
         Component.OptionalPackages := IniFile.ReadString(Name, 'OptionalPackages', '').Split(Separators, TStringSplitOptions.ExcludeEmpty);
         Component.OutdatedPackages := IniFile.ReadString(Name, 'OutdatedPackages', '').Split(Separators, TStringSplitOptions.ExcludeEmpty);
@@ -256,7 +259,7 @@ constructor TComponent.Create(AMetadata: PComponentMetadata; const ARootDir: TRo
 begin
   Self := Default(TComponent);
   FName := AMetadata.Name;
-  FIsBase := AMetadata.IsBase;
+  FVisible := AMetadata.Visible;
   FDir := ARootDir.ComponentDir(FName);
   FRequiredPackages := BuildPackageList(AMetadata.RequiredPackages);
   FOptionalPackages := BuildPackageList(AMetadata.OptionalPackages);
@@ -290,10 +293,10 @@ end;
 
 { TComponentListHelper }
 
-constructor TComponentListHelper.Create(AMetadataList: TComponentMetadataList; const ARootDir: TRootDir; AIDE: TIDE);
+constructor TComponentListHelper.Create(AManifest: TManifest; const ARootDir: TRootDir; AIDE: TIDE);
 begin
   Self := [];
-  for var Metadata in AMetadataList do begin
+  for var Metadata in AManifest.Components do begin
     var Component := TComponent.Create(Metadata, ARootDir, AIDE);
     Self := Self + [@Component];
   end;
@@ -347,6 +350,24 @@ function TComponentListHelper.ValidCount: NativeInt;
 begin
   Result := 0;
   for var Comp in Self do if Comp.Valid then Inc(Result);
+end;
+
+function TComponentListHelper.VisibleValidCount: NativeInt;
+begin
+  Result := 0;
+  for var Comp in Self do if Comp.Visible and Comp.Valid then Inc(Result);
+end;
+
+function TComponentListHelper.CheckedCount: NativeInt;
+begin
+  Result := 0;
+  for var Comp in Self do if Comp.Checked then Inc(Result);
+end;
+
+function TComponentListHelper.VisibleCheckedCount: NativeInt;
+begin
+  Result := 0;
+  for var Comp in Self do if Comp.Visible and Comp.Checked then Inc(Result);
 end;
 
 { TPackageNameHelper }
