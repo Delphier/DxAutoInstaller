@@ -23,6 +23,7 @@ type
   end;
 
   TJclIDE = TJclBDSInstallation;
+  TJclIDEs = TJclBorRADToolInstallations;
   TJclPlatform = TJclBDSPlatform;
   TJclCompiler = TJclBorlandCommandLineTool;
 
@@ -32,16 +33,29 @@ type
   TIDE = class
   private
     FIDE: TJclIDE;
+    FName: string;
     FPackageVersionCode: string;
     FDelphiInstalled: Boolean;
     FCppBuilderInstalled: Boolean;
     FSupportedPlatforms: TPlatforms;
   public
     constructor Create(AIDE: TJclIDE);
+    property Name: string read FName;
     property PackageVersionCode: string read FPackageVersionCode;
     property DelphiInstalled: Boolean read FDelphiInstalled;
     property CppBuilderInstalled: Boolean read FCppBuilderInstalled;
     property SupportedPlatforms: TPlatforms read FSupportedPlatforms;
+  end;
+
+  TIDEs = TArray<TIDE>;
+  TIDEsHelper = record helper for TIDEs
+  private
+    class var FJclIDEs: TJclIDEs;
+    class var FAll: TIDEs;
+  public
+    class constructor Create;
+    class destructor Destroy;
+    class property All: TIDEs read FAll;
   end;
 
   TCompiler = TJclCompiler;
@@ -75,17 +89,35 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, System.Generics.Collections;
 
 { TIDE }
 
 constructor TIDE.Create(AIDE: TJclIDE);
 begin
   FIDE := AIDE;
+  FName := FIDE.Name;
   FPackageVersionCode := FIDE.VersionNumberStr.Replace('d', 'RS');
   FDelphiInstalled := FIDE.Personalities * [bpDelphi32, bpDelphi64] <> [];
   FCppBuilderInstalled := FIDE.Personalities * [bpBCBuilder32, bpBCBuilder64] <> [];
   for var I := Low(TPlatform) to High(TPlatform) do if PlatformCommandLineTools[I] in FIDE.CommandLineTools then Include(FSupportedPlatforms, I);
+end;
+
+{ TIDEsHelper }
+
+class constructor TIDEsHelper.Create;
+begin
+  FJclIDEs := TJclIDEs.Create;
+  for var I := 0 to FJclIDEs.Count - 1 do begin
+    var JclIDE := FJclIDEs[I];
+    if JclIDE is TJclIDE then FAll := FAll + [TIDE.Create(JclIDE as TJclIDE)];
+  end;
+end;
+
+class destructor TIDEsHelper.Destroy;
+begin
+  TArray.FreeValues(FAll);
+  FJclIDEs.Free;
 end;
 
 { TPlatformHelper }
