@@ -88,8 +88,14 @@ type
     function ValidCount: NativeInt;
   end;
 
+  TVersion = type Cardinal;
+  TVersionHelper = record helper for TVersion
+    function ToText: string;
+  end;
+
   TRootDir = type string;
   TRootDirHelper = record helper for TRootDir
+    function Version: TVersion;
   end;
 
   TComponent = record
@@ -395,12 +401,33 @@ end;
 
 constructor TPackageNameHelper.Create(const APackageBaseName: string; AIDE: TIDE);
 begin
-  Self := APackageBaseName + AIDE.PackageVersionCode;
+  Self := APackageBaseName + AIDE.PackageVersionStr;
 end;
 
 function TPackageNameHelper.IsDesigntime: Boolean;
 begin
   Result := string.StartsText('dcl', Self);
+end;
+
+{ TVersionHelper }
+
+function TVersionHelper.ToText: string;
+begin
+  Result := if Self > 0 then Format('%d.%d.%d', [Self div 10000 mod 100, Self div 100 mod 100, Self mod 100]) else 'n/a';
+end;
+
+{ TRootDirHelper }
+
+function TRootDirHelper.Version: TVersion;
+begin
+  Result := 0;
+  var FileName := TPath.Combine(Self, 'ExpressCore Library\Sources\dxCore.pas');
+  if not TFile.Exists(FileName) then Exit;
+
+  for var Line in TFile.GetLinesEnumerator(FileName) do begin
+    var Match := TRegEx.Match(Line, 'dxVersion = (\d{8});');
+    if Match.Success then Exit(Match.Groups[1].Value.ToInteger);
+  end;
 end;
 
 end.

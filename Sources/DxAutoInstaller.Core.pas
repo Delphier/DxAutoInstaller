@@ -34,14 +34,14 @@ type
   private
     FIDE: TJclIDE;
     FName: string;
-    FPackageVersionCode: string;
+    FPackageVersionStr: string;
     FDelphiInstalled: Boolean;
     FCppBuilderInstalled: Boolean;
     FSupportedPlatforms: TPlatforms;
   public
     constructor Create(AIDE: TJclIDE);
     property Name: string read FName;
-    property PackageVersionCode: string read FPackageVersionCode;
+    property PackageVersionStr: string read FPackageVersionStr;
     property DelphiInstalled: Boolean read FDelphiInstalled;
     property CppBuilderInstalled: Boolean read FCppBuilderInstalled;
     property SupportedPlatforms: TPlatforms read FSupportedPlatforms;
@@ -97,7 +97,7 @@ constructor TIDE.Create(AIDE: TJclIDE);
 begin
   FIDE := AIDE;
   FName := FIDE.Name;
-  FPackageVersionCode := FIDE.VersionNumberStr.Replace('d', 'RS');
+  FPackageVersionStr := FIDE.VersionNumberStr.Replace('d', 'RS');
   FDelphiInstalled := FIDE.Personalities * [bpDelphi32, bpDelphi64] <> [];
   FCppBuilderInstalled := FIDE.Personalities * [bpBCBuilder32, bpBCBuilder64] <> [];
   for var I := Low(TPlatform) to High(TPlatform) do if PlatformCommandLineTools[I] in FIDE.CommandLineTools then Include(FSupportedPlatforms, I);
