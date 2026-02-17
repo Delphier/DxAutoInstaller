@@ -17,12 +17,22 @@ uses
   DxAutoInstaller.Core;
 
 type
+  TPackageMetadata = record
+    BaseName: string;
+    Dir: string;
+  end;
+
+  PPackageMetadata = ^TPackageMetadata;
+  TPackageMetadataList = TArray<PPackageMetadata>;
+
   TComponentMetadata = record
     Name: string;
     Visible: Boolean;
-    RequiredPackages: TArray<string>; // Install in component order.
-    OptionalPackages: TArray<string>; // Install after the RequiredPackages for all components have been installed.
-    OutdatedPackages: TArray<string>; // Uninstall only.
+    RequiredPackages: TPackageMetadataList; // Install in component order.
+    OptionalPackages: TPackageMetadataList; // Install after the RequiredPackages for all components have been installed.
+    OutdatedPackages: TPackageMetadataList; // Uninstall only.
+    Sources: TArray<string>; // Sources dirs.
+    Help: TArray<string>;    // Help dirs.
   end;
 
   PComponentMetadata = ^TComponentMetadata;
@@ -30,7 +40,7 @@ type
 
   TManifest = class
   const
-    CustomFileBaseName  = 'DevExpress.ini';
+    CustomFileBaseName  = 'DevExpress.yaml';
     ResourceName        = 'DevExpressManifest';
   private
     FIsCustom: Boolean;
@@ -78,22 +88,14 @@ type
     function ValidCount: NativeInt;
   end;
 
-  TComponentDir = type string;
-  TComponentDirHelper = record helper for TComponentDir
-    function PackagesDir: string;
-    function SourcesDir: string;
-  end;
-
   TRootDir = type string;
   TRootDirHelper = record helper for TRootDir
-    function ComponentDir(const AComponentName: string): TComponentDir;
   end;
 
   TComponent = record
   private
-    FName: string;
-    FVisible: Boolean;
-    FDir: TComponentDir;
+    FMetadata: PComponentMetadata;
+    FDir: string;
     FError: TError;
     FChecked: Boolean;
 
@@ -105,9 +107,8 @@ type
     procedure SetChecked(const AChecked: Boolean);
   public
     constructor Create(AMetadata: PComponentMetadata; const ARootDir: TRootDir; AIDE: TIDE);
-    property Name: string read FName;
-    property Visible: Boolean read FVisible;
-    property Dir: TComponentDir read FDir;
+    property Metadata: PComponentMetadata read FMetadata;
+    property Dir: string read FDir;
     property Error: TError read FError;
     property Checked: Boolean read FChecked write SetChecked;
 
@@ -136,14 +137,16 @@ implementation
 
 uses
   System.Classes, System.SysUtils, System.IOUtils,
-  System.IniFiles, System.RegularExpressions, System.Generics.Collections,
-  Vcl.Forms, DxAutoInstaller.Utils;
+  System.RegularExpressions, System.Generics.Collections,
+  Vcl.Forms,
+  DxAutoInstaller.Utils,
+  VSoft.YAML;
 
 { TManifest }
 
 class function TManifest.CustomFileName: string;
 begin
-  Result := TPath.Combine(ExtractFilePath(Application.ExeName), CustomFileBaseName);
+  Result := TPath.Combine(ExtractFileDir(Application.ExeName), CustomFileBaseName);
 end;
 
 class function TManifest.CustomFileExists: Boolean;
@@ -158,38 +161,57 @@ begin
 end;
 
 procedure TManifest.ReadComponents;
-const
-  Separators: TArray<Char> = [',', ' '];
 var
-  IniFile: TMemIniFile;
+  Doc: IYAMLDocument;
+  Value: IYAMLValue;
+
+  function ParsePackages(const ACompName: string; ACompValue: IYAMLValue; const AKey: string): TPackageMetadataList;
+  begin
+    Result := [];
+    var Packages := ACompValue.Values[AKey];
+    if Packages.IsNull then Exit;
+
+    for var I := 0 to Packages.Count - 1 do begin
+      var Path := Packages.AsSequence[I].AsString;
+      var Metadata := Default(TPackageMetadata);
+      Metadata.BaseName := TPath.GetFileName(Path);
+      Metadata.Dir := TPath.GetDirectoryName(Path);
+      if Metadata.Dir.IsEmpty then Metadata.Dir := TPath.Combine(ACompName, 'Packages');
+      Result := Result + [@Metadata];
+    end;
+  end;
+
+  function ParseStrings(ACompValue: IYAMLValue; const AKey: string): TArray<string>;
+  begin
+    Result := [];
+    var Strings := ACompValue.Values[AKey];
+    if Strings.IsNull then Exit;
+    for var I := 0 to Strings.Count - 1 do Result := Result + [Strings.AsSequence[I].AsString];
+  end;
+
 begin
-  if IsCustom then IniFile := TMemIniFile.Create(CustomFileName) else begin
+  if IsCustom then Doc := TYAML.LoadFromFile(CustomFileName) else begin
     var Stream := CreateResourceStream(ResourceName);
     try
-      IniFile := TMemIniFile.Create(Stream);
+      Doc := TYAML.LoadFromStream(Stream);
     finally
       Stream.Free;
     end;
   end;
 
-  try
-    var Names := TStringList.Create;
-    try
-      IniFile.ReadSections(Names);
-      for var Name in Names do begin
-        var Component := Default(TComponentMetadata);
-        Component.Name := Name;
-        Component.Visible := IniFile.ReadBool(Name, 'Visible', True);
-        Component.RequiredPackages := IniFile.ReadString(Name, 'RequiredPackages', '').Split(Separators, TStringSplitOptions.ExcludeEmpty);
-        Component.OptionalPackages := IniFile.ReadString(Name, 'OptionalPackages', '').Split(Separators, TStringSplitOptions.ExcludeEmpty);
-        Component.OutdatedPackages := IniFile.ReadString(Name, 'OutdatedPackages', '').Split(Separators, TStringSplitOptions.ExcludeEmpty);
-        FComponents := FComponents + [@Component];
-      end;
-    finally
-      Names.Free;
-    end;
-  finally
-    IniFile.Free;
+  var Root := Doc.Root.AsMapping;
+  for var I := 0 to Root.Count - 1 do begin
+    var CompName := Root.Keys[I];
+    var CompValue := Root[CompName];
+    var Metadata := Default(TComponentMetadata);
+    Metadata.Name := CompName;
+    Metadata.Visible := if CompValue.TryGetValue('Visible', Value) then Value.AsBoolean else True;
+    Metadata.RequiredPackages := ParsePackages(CompName, CompValue, 'RequiredPackages');
+    Metadata.OptionalPackages := ParsePackages(CompName, CompValue, 'OptionalPackages');
+    Metadata.OutdatedPackages := ParsePackages(CompName, CompValue, 'OutdatedPackages');
+    Metadata.Sources := [TPath.Combine(CompName, 'Sources')] + ParseStrings(CompValue, 'Sources');
+    Metadata.Help := [TPath.Combine(CompName, 'Help')] + ParseStrings(CompValue, 'Help');
+    FComponents := FComponents + [@Metadata];
   end;
 end;
 
@@ -245,12 +267,12 @@ end;
 { TComponent }
 
 constructor TComponent.Create(AMetadata: PComponentMetadata; const ARootDir: TRootDir; AIDE: TIDE);
-  function BuildPackageList(ABaseNames: TArray<string>): TPackageList;
+  function BuildPackageList(AMetadataList: TPackageMetadataList): TPackageList;
   begin
     Result := [];
-    for var BaseName in ABaseNames do begin
-      var PackageName := TPackageName.Create(BaseName, AIDE);
-      var FileName := TPath.Combine(FDir.PackagesDir, PackageName + '.dpk');
+    for var Metadata in AMetadataList do begin
+      var PackageName := TPackageName.Create(Metadata.BaseName, AIDE);
+      var FileName := TPath.Combine(ARootDir, Metadata.Dir, PackageName + '.dpk');
       var Package := TPackage.Create(PackageName, FileName);
       Result := Result + [@Package];
     end;
@@ -258,11 +280,10 @@ constructor TComponent.Create(AMetadata: PComponentMetadata; const ARootDir: TRo
 
 begin
   Self := Default(TComponent);
-  FName := AMetadata.Name;
-  FVisible := AMetadata.Visible;
-  FDir := ARootDir.ComponentDir(FName);
-  FRequiredPackages := BuildPackageList(AMetadata.RequiredPackages);
-  FOptionalPackages := BuildPackageList(AMetadata.OptionalPackages);
+  FMetadata := AMetadata;
+  FDir := TPath.Combine(ARootDir, FMetadata.Name);
+  FRequiredPackages := BuildPackageList(FMetadata.RequiredPackages);
+  FOptionalPackages := BuildPackageList(FMetadata.OptionalPackages);
 end;
 
 function TComponent.Packages: TPackageList;
@@ -355,7 +376,7 @@ end;
 function TComponentListHelper.VisibleValidCount: NativeInt;
 begin
   Result := 0;
-  for var Comp in Self do if Comp.Visible and Comp.Valid then Inc(Result);
+  for var Comp in Self do if Comp.Metadata.Visible and Comp.Valid then Inc(Result);
 end;
 
 function TComponentListHelper.CheckedCount: NativeInt;
@@ -367,7 +388,7 @@ end;
 function TComponentListHelper.VisibleCheckedCount: NativeInt;
 begin
   Result := 0;
-  for var Comp in Self do if Comp.Visible and Comp.Checked then Inc(Result);
+  for var Comp in Self do if Comp.Metadata.Visible and Comp.Checked then Inc(Result);
 end;
 
 { TPackageNameHelper }
@@ -380,25 +401,6 @@ end;
 function TPackageNameHelper.IsDesigntime: Boolean;
 begin
   Result := string.StartsText('dcl', Self);
-end;
-
-{ TComponentDirHelper }
-
-function TComponentDirHelper.PackagesDir: string;
-begin
-  Result := TPath.Combine(Self, 'Packages');
-end;
-
-function TComponentDirHelper.SourcesDir: string;
-begin
-  Result := TPath.Combine(Self, 'Sources');
-end;
-
-{ TRootDirHelper }
-
-function TRootDirHelper.ComponentDir(const AComponentName: string): TComponentDir;
-begin
-  Result := TPath.Combine(Self, AComponentName);
 end;
 
 end.
