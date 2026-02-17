@@ -305,7 +305,7 @@ end;
 procedure TComponent.CheckError;
 begin
   if not TDirectory.Exists(Dir) then FError := errComponentNotFound
-  else if RequiredPackages.ValidCount < 1 then FError := errComponentMissingPackages
+  else if Packages.ValidCount < 1 then FError := errComponentMissingPackages
   else if Dependencies.ValidCount < 1 then FError := errComponentMissingDependencies
   else FError := errNone;
 end;
@@ -313,6 +313,8 @@ end;
 procedure TComponent.SetChecked(const AChecked: Boolean);
 begin
   if not Valid then Exit;
+  if FChecked = AChecked then Exit;
+
   if AChecked then for var Component in Dependencies do Component.Checked := True
               else for var Component in Dependents do Component.Checked := False;
   FChecked := AChecked;
