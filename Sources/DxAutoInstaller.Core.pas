@@ -20,6 +20,8 @@ type
   TApp = class
   const
     {$I ..\Resources\App.inc}
+  public
+    class function Dir: string;
   end;
 
   TJclIDE = TJclBDSInstallation;
@@ -89,7 +91,15 @@ type
 implementation
 
 uses
-  System.SysUtils, System.Generics.Collections;
+  System.SysUtils, System.Generics.Collections, Vcl.Forms;
+
+
+{ TApp }
+
+class function TApp.Dir: string;
+begin
+  Result := ExtractFileDir(Application.ExeName);
+end;
 
 { TIDE }
 

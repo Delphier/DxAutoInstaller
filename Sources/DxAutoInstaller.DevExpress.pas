@@ -42,17 +42,22 @@ type
   const
     CustomFileBaseName  = 'DevExpress.yaml';
     ResourceName        = 'DevExpressManifest';
+  private class var
+    FInstance: TManifest;
   private
     FIsCustom: Boolean;
     FComponents: TComponentMetadataList;
     procedure ReadComponents;
   public
+    class destructor Destroy;
+    class property Instance: TManifest read FInstance;
+    class procedure CreateInstance;
+    class procedure Export;
     class function CustomFileName: string;
     class function CustomFileExists: Boolean;
     constructor Create(const AUseCustomFile: Boolean);
     property IsCustom: Boolean read FIsCustom;
     property Components: TComponentMetadataList read FComponents;
-    procedure Export;
   end;
 
   TPackageName = type string;
@@ -142,17 +147,35 @@ type
 implementation
 
 uses
-  System.Classes, System.SysUtils, System.IOUtils,
+  System.SysUtils, System.IOUtils,
   System.RegularExpressions, System.Generics.Collections,
-  Vcl.Forms,
   DxAutoInstaller.Utils,
   VSoft.YAML;
 
 { TManifest }
 
+class destructor TManifest.Destroy;
+begin
+  FInstance.Free;
+end;
+
+class procedure TManifest.CreateInstance;
+const
+  Message = 'Found [' + CustomFileBaseName + ']'#13#10 +
+            'Do you want to use this custom manifest file?';
+begin
+  if Assigned(FInstance) then Exit;
+  FInstance := Self.Create(CustomFileExists and TMessageBox.Confirm(Message));
+end;
+
+class procedure TManifest.Export;
+begin
+  ExportResourceToFile(CustomFileName, ResourceName);
+end;
+
 class function TManifest.CustomFileName: string;
 begin
-  Result := TPath.Combine(ExtractFileDir(Application.ExeName), CustomFileBaseName);
+  Result := TPath.Combine(TApp.Dir, CustomFileBaseName);
 end;
 
 class function TManifest.CustomFileExists: Boolean;
@@ -219,11 +242,6 @@ begin
     Metadata.Help := [TPath.Combine(CompName, 'Help')] + ParseStrings(CompValue, 'Help');
     FComponents := FComponents + [@Metadata];
   end;
-end;
-
-procedure TManifest.Export;
-begin
-  ExportResourceToFile(CustomFileName, ResourceName);
 end;
 
 { TPackage }
