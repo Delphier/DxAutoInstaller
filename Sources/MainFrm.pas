@@ -12,14 +12,11 @@ unit MainFrm;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, dxGDIPlusClasses, StdCtrls, ComCtrls, ImgList, cxGraphics,
-  ActnList, Buttons, DxQuantumTreeList, DxInstaller, DxProgress, DxIDE,
-  System.Actions, System.ImageList, cxLookAndFeels, cxLookAndFeelPainters,
-  Vcl.Menus, cxImageList, cxButtons, cxControls, cxContainer, cxEdit,
-  dxCoreGraphics, cxTextEdit, cxMaskEdit, cxButtonEdit;
-
-{$WARN UNIT_PLATFORM OFF}
+  System.Classes, System.Actions,
+  Vcl.Forms, Vcl.Controls, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.ActnList, Vcl.Menus,
+  cxControls, cxContainer, cxGraphics, dxCoreGraphics, cxLookAndFeels, cxLookAndFeelPainters,
+  cxButtons, cxEdit, cxTextEdit, cxMaskEdit, cxButtonEdit,
+  DxAutoInstaller.UI.TreeList;
 
 type
   TMainForm = class(TForm)
@@ -28,7 +25,7 @@ type
     LblAppName: TLabel;
     Label2: TLabel;
     LblVersion: TLabel;
-    PageFuns: TPageControl;
+    PageControl: TPageControl;
     TabInstall: TTabSheet;
     TabUninstall: TTabSheet;
     TabTools: TTabSheet;
@@ -36,60 +33,58 @@ type
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
-    LinkDownApp: TLinkLabel;
-    LinkDownDoc: TLinkLabel;
+    LinkGitHub: TLinkLabel;
+    LinkDevExpressDocs: TLinkLabel;
     LinkEmail: TLinkLabel;
     Label7: TLabel;
     Label8: TLabel;
-    EditInstallFileDir: TcxButtonEdit;
+    EditRootDir: TcxButtonEdit;
     EditVersion: TEdit;
     PanTreeList: TPanel;
-    ActionBase: TActionList;
-    ImageSmall: TcxImageList;
-    Install: TAction;
-    Uninstall: TAction;
-    ExitApp: TAction;
+    ActionList1: TActionList;
+    ActInstall: TAction;
+    ActUninstall: TAction;
+    ActExit: TAction;
     Label9: TLabel;
-    IDEListView: TListView;
-    ChkHideBaseComponents: TCheckBox;
+    ListViewUninstall: TListView;
+    ChkShowAllComponents: TCheckBox;
     GroupBox1: TGroupBox;
-    LblCurrentProfile: TLabel;
-    BtnProfile: TButton;
-    ProfileExport: TAction;
-    ProfileDelete: TAction;
-    LblCustomProfile: TLinkLabel;
-    Label1: TLabel;
+    BtnManifest: TcxButton;
+    ActManifestExport: TAction;
+    ActManifestDelete: TAction;
     MemoChangelog: TMemo;
     GroupBox2: TGroupBox;
-    Button1: TButton;
-    SearchNewPackages: TAction;
+    Button1: TcxButton;
+    ActSearchNewPackages: TAction;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel4: TPanel;
     Panel5: TPanel;
-    BtnRun: TcxButton;
+    BtnExecute: TcxButton;
     BtnExit: TcxButton;
     PanelBottom: TPanel;
+    LblCustomManifest: TLinkLabel;
+    LblCurrentManifest: TLabel;
+    LblCustomManifestNote: TLabel;
     procedure FormCreate(Sender: TObject);
-    procedure URLLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
-    procedure InstallExecute(Sender: TObject);
-    procedure UninstallExecute(Sender: TObject);
-    procedure ExitAppExecute(Sender: TObject);
-    procedure PageFunsChange(Sender: TObject);
-    procedure EditInstallFileDirPropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
     procedure FormDestroy(Sender: TObject);
-    procedure InitialIDEListView();
-    procedure InitialProfileInfo();
-    procedure RefreshTreeList(Sender: TObject);
-    procedure ProfileExportExecute(Sender: TObject);
-    procedure ProfileDeleteExecute(Sender: TObject);
-    procedure SearchNewPackagesExecute(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure LinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
+    procedure ActExitExecute(Sender: TObject);
+    procedure PageControlChange(Sender: TObject);
+    procedure EditInstallFileDirPropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
+    procedure ActManifestExportExecute(Sender: TObject);
+    procedure ActManifestDeleteExecute(Sender: TObject);
+    procedure ActSearchNewPackagesExecute(Sender: TObject);
+    procedure LblCustomManifestLinkClick(Sender: TObject; const Link: string;
+      LinkType: TSysLinkType);
+    procedure ActInstallExecute(Sender: TObject);
+    procedure ActUninstallExecute(Sender: TObject);
   private
     { Private declarations }
-    FInstaller: TDxInstaller;
-    FTreeList: TDxQuantumTreeList;
-    FProgressForm: TDxProgressForm;
-    procedure RunInstaller(Action: TDxInstallerAction; const IDEArray: TDxIDEArray);
+    FTreeList: TTreeList;
+    procedure ShowManifestStatus;
+    procedure FormatLinkLabel(ALinkLable: TLinkLabel; const AIsEmail: Boolean = False);
   public
     { Public declarations }
   end;
@@ -100,183 +95,121 @@ var
 implementation
 
 uses
-  ShellAPI, FileCtrl, IOUtils, DxAutoInstaller.Core, DxAutoInstaller.Utils, DxUtils;
+  System.SysUtils, System.StrUtils,
+  Winapi.Windows, Winapi.ShellAPI,
+  Vcl.FileCtrl,
+  DxAutoInstaller.Core,
+  DxAutoInstaller.DevExpress,
+  DxAutoInstaller.Utils,
+  DxAutoInstaller.Resources;
 
 {$R *.dfm}
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
-  if Height > Screen.WorkAreaHeight then Height := Screen.WorkAreaHeight;
   Caption := Application.Title;
   LblAppName.Caption := Application.Title;
   LblVersion.Caption := TApp.Version;
   LoadResourceToStream(ImageLogo.Picture.LoadFromStream, 'Logo');
-  PageFuns.ActivePage := TabInstall;
+  PageControl.ActivePage := TabInstall;
+  if Height > Screen.WorkAreaHeight then Height := Screen.WorkAreaHeight;
 
-  // Initial Install Page;
-  FInstaller := TDxInstaller.Create;
   PanTreeList.BevelKind := TBevelKind.bkNone;
-  FTreeList := TDxQuantumTreeList.Create(FInstaller, PanTreeList);
-  FProgressForm := TDxProgressForm.Create(nil);
-  FProgressForm.Installer := FInstaller;
-  FInstaller.OnUpdateProgress := FProgressForm.UpdateProgress;
-  FInstaller.OnUpdateProgressState := FProgressForm.UpdateProgressState;
-
-  // Initial Uninstall Page;
-  InitialIDEListView();
-
-  // Initial Tools Page;
-  InitialProfileInfo();
-
-  // Initial About Page;
-  LinkDownApp.Caption := Format('<a href="%s">%s</a>', [LinkDownApp.Caption, LinkDownApp.Caption]);
-  LinkDownDoc.Caption := Format('<a href="%s">%s</a>', [LinkDownDoc.Caption, LinkDownDoc.Caption]);
-  LinkEmail.Caption := Format('<a href="mailto:%s">%s</a>', [LinkEmail.Caption, LinkEmail.Caption]);
+  FTreeList := TTreeList.Create(PanTreeList);
+  for var IDE in TIDEs.All do ListViewUninstall.AddItem(IDE.Name, IDE);
+  FormatLinkLabel(LinkGitHub);
+  FormatLinkLabel(LinkDevExpressDocs);
+  FormatLinkLabel(LinkEmail, True);
   LoadResourceToStream(MemoChangelog.Lines.LoadFromStream, 'Changelog');
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
-  FProgressForm.Free;
   FTreeList.Free;
-  FInstaller.Free;
 end;
 
-procedure TMainForm.InitialIDEListView;
-var
-  I: Integer;
+procedure TMainForm.FormActivate(Sender: TObject);
 begin
-  IDEListView.Clear;
-  for I := 0 to FInstaller.IDEs.Count - 1 do IDEListView.AddItem(FInstaller.IDEs[I].Name, nil);
+  OnActivate := nil;
+  TManifest.CreateInstance;
+  ShowManifestStatus;
 end;
 
-procedure TMainForm.InitialProfileInfo;
-var
-  FileName: String;
+procedure TMainForm.PageControlChange(Sender: TObject);
 begin
-  if FInstaller.Profile.IsCustomProfile
-    then LblCurrentProfile.Caption := 'Current Profile: <Custom>'
-    else LblCurrentProfile.Caption := 'Current Profile: <Built-in>';
-
-  FileName := FInstaller.Profile.GetCustomProfileFileName;
-  LblCustomProfile.Caption := Format('Custom Profile: <a href="%s">%s</a>', [FileName, FileName]);
-  LblCustomProfile.Visible := FileExists(FileName);
-  if FileExists(FileName)
-    then BtnProfile.Action := ProfileDelete
-    else BtnProfile.Action := ProfileExport;
+  ChkShowAllComponents.Visible := PageControl.ActivePage = TabInstall;
+  if PageControl.ActivePage = TabInstall then BtnExecute.Action := ActInstall
+  else if PageControl.ActivePage = TabUninstall then BtnExecute.Action := ActUninstall
+  else BtnExecute.Visible := False;
 end;
 
-procedure TMainForm.PageFunsChange(Sender: TObject);
+procedure TMainForm.ShowManifestStatus;
 begin
-  if PageFuns.ActivePage = TabInstall then BtnRun.Action := Install
-  else if PageFuns.ActivePage = TabUninstall then BtnRun.Action := Uninstall
-  else BtnRun.Visible := False;
-  ChkHideBaseComponents.Visible := PageFuns.ActivePage = TabInstall;
+  LblCurrentManifest.Caption := Format('Current Manifest: <%s>', [IfThen(TManifest.Instance.IsCustom, 'Custom', 'Built-in')]);
+  LblCustomManifest.Caption := Format('Custom Manifest: <a href="%s">%s</a>', [TManifest.CustomFileName, TManifest.CustomFileName]);
+  LblCustomManifest.Hint := TManifest.CustomFileName;
+  BtnManifest.Action := if TManifest.CustomFileExists then ActManifestDelete else ActManifestExport;
+  LblCustomManifest.Visible := TManifest.CustomFileExists;
+  LblCustomManifestNote.Visible := LblCustomManifest.Visible;
 end;
 
-procedure TMainForm.ProfileDeleteExecute(Sender: TObject);
+procedure TMainForm.LblCustomManifestLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
 begin
-  DeleteFile(FInstaller.Profile.GetCustomProfileFileName);
-  InitialProfileInfo;
+  ShellExecute(Application.Handle, 'Open', 'explorer.exe', PChar(Format('/select,"%s"', [Link])), nil, SW_SHOWNORMAL);
 end;
 
-procedure TMainForm.ProfileExportExecute(Sender: TObject);
+procedure TMainForm.ActManifestDeleteExecute(Sender: TObject);
 begin
-  FInstaller.Profile.ExportBuiltInProfile(FInstaller.Profile.GetCustomProfileFileName);
-  InitialProfileInfo;
+  System.SysUtils.DeleteFile(TManifest.CustomFileName);
+  ShowManifestStatus;
 end;
 
-procedure TMainForm.RefreshTreeList(Sender: TObject);
+procedure TMainForm.ActManifestExportExecute(Sender: TObject);
 begin
-  FTreeList.DispData(TCheckBox(Sender).Checked);
-end;
-
-procedure TMainForm.RunInstaller(Action: TDxInstallerAction; const IDEArray: TDxIDEArray);
-begin
-  if FInstaller.IDEs.AnyInstanceRunning then begin
-    ShowInformation('Please close all running IDEs.');
-    Exit;
-  end;
-  Hide;
-  try
-    FProgressForm.Initial;
-    Action(IDEArray);
-  finally
-    Show;
-  end;
-end;
-
-procedure TMainForm.SearchNewPackagesExecute(Sender: TObject);
-var
-  List: TStringList;
-begin
-  Screen.Cursor := crHourGlass;
-  List := TStringList.Create;
-  try
-    FInstaller.SearchNewPackages(List);
-    if List.Count > 0 then ShowInformation(List.Text);
-  finally
-    List.Free;
-    Screen.Cursor := crDefault;
-  end;
-end;
-
-procedure TMainForm.InstallExecute(Sender: TObject);
-var
-  IDEs: TDxIDEArray;
-begin
-  IDEs := FTreeList.GetSelectedIDEs;
-  if Length(IDEs) = 0 then Exit;
-  RunInstaller(FInstaller.Install, IDEs);
-end;
-
-procedure TMainForm.UninstallExecute(Sender: TObject);
-var
-  IDEs: TDxIDEArray;
-  ListItem: TListItem;
-begin
-  for ListItem in IDEListView.Items do begin
-    if ListItem.Checked then begin
-      SetLength(IDEs, Length(IDEs) + 1);
-      IDEs[Length(IDEs) - 1] := FInstaller.IDEs[ListItem.Index];
-    end;
-  end;
-
-  if Length(IDEs) = 0 then Exit;
-  RunInstaller(FInstaller.Uninstall, IDEs);
+  TManifest.Export;
+  ShowManifestStatus;
 end;
 
 procedure TMainForm.EditInstallFileDirPropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
 var
-  Arr: TArray<String>;
-  Dir: String;
-  I: Integer;
+  Dirs: TArray<string>;
+  RootDir: TRootDir;
 begin
-  if Win32MajorVersion < 6 then begin
-    if not SelectDirectory('Select Installation File Directory:', '', Dir, [sdNewUI], Self) then Exit;
-  end else begin
-    if not SelectDirectory('', Arr) then Exit;
-    Dir := Arr[0];
-  end;
-  if not SysUtils.DirectoryExists(Dir) then Exit;
-  EditInstallFileDir.Text := Dir;
-  I := FInstaller.Profile.GetDxBuildNumber(Dir);
-  EditVersion.Text := FInstaller.Profile.GetDxBuildNumberAsVersion(I);
-  Screen.Cursor := crHourGlass;
-  try
-    FInstaller.InstallFileDir := Dir;
-  finally
-    Screen.Cursor := crDefault;
-  end;
-  RefreshTreeList(ChkHideBaseComponents);
+  if not SelectDirectory('', Dirs) then Exit;
+  RootDir := Dirs[0];
+  EditRootDir.Text := RootDir;
+  EditVersion.Text := RootDir.Version.ToText;
+
 end;
 
-procedure TMainForm.ExitAppExecute(Sender: TObject);
+procedure TMainForm.ActInstallExecute(Sender: TObject);
+begin
+//
+end;
+
+procedure TMainForm.ActUninstallExecute(Sender: TObject);
+begin
+//
+end;
+
+procedure TMainForm.ActSearchNewPackagesExecute(Sender: TObject);
+begin
+//
+end;
+
+procedure TMainForm.ActExitExecute(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TMainForm.URLLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
+procedure TMainForm.FormatLinkLabel(ALinkLable: TLinkLabel; const AIsEmail: Boolean);
+begin
+  ALinkLable.ShowHint := True;
+  ALinkLable.Hint := ALinkLable.Caption;
+  ALinkLable.Caption := Format('<a href="%s%s">%s</a>', [IfThen(AIsEmail, 'mailto:'), ALinkLable.Caption, ALinkLable.Caption]);
+end;
+
+procedure TMainForm.LinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
 begin
   ShellExecute(Application.Handle, 'Open', PChar(Link), nil, nil, SW_SHOWNORMAL);
 end;
