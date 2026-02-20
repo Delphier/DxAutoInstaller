@@ -1,10 +1,10 @@
 *.exe
-*.dll
-
-*.chm
-*.mdb
-*.rar
+*.rsm
 *.zip
+
+*.dres
+*.res
+*.rc
 
 *.dcu
 *.ddp
@@ -12,6 +12,5 @@
 *.local
 *.identcache
 *.stat
-*.dres
 
 Desktop.ini
