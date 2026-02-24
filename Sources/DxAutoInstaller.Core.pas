@@ -1,4 +1,4 @@
-{*******************************************************}
+﻿{*******************************************************}
 {                                                       }
 {             DxAutoInstaller Core Library              }
 {                                                       }
@@ -87,6 +87,14 @@ type
   TError = (errNone,
             errComponentNotFound, errComponentMissingPackages, errComponentMissingDependencies,
             errDelphiNotInstalled, errCppBuilderNotInstalled);
+const
+  ErrorImageIndexes: array[TError] of Integer = (-1, 6, 6, 6, 6, 6);
+  ErrorMessages:     array[TError] of string  = ('',
+                                                 'Component Not Found.',
+                                                 'Component Missing Packages.',
+                                                 'Component Missing Dependencies.',
+                                                 'Delphi is not Installed.',
+                                                 'C++Builder is not Installed.');
 
 implementation
 
