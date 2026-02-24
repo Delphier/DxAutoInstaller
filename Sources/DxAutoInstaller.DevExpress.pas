@@ -14,6 +14,7 @@ unit DxAutoInstaller.DevExpress;
 interface
 
 uses
+  System.Generics.Collections,
   DxAutoInstaller.Core;
 
 type
@@ -22,21 +23,16 @@ type
     Dir: string;
   end;
 
-  PPackageMetadata = ^TPackageMetadata;
-  TPackageMetadataList = TArray<PPackageMetadata>;
-
+  PComponentMetadata = ^TComponentMetadata;
   TComponentMetadata = record
     Name: string;
     Visible: Boolean;
-    RequiredPackages: TPackageMetadataList; // Install in component order.
-    OptionalPackages: TPackageMetadataList; // Install after the RequiredPackages for all components have been installed.
-    OutdatedPackages: TPackageMetadataList; // Uninstall only.
+    RequiredPackages: TArray<TPackageMetadata>; // Install in component order.
+    OptionalPackages: TArray<TPackageMetadata>; // Install after the RequiredPackages for all components have been installed.
+    OutdatedPackages: TArray<TPackageMetadata>; // Uninstall only.
     Sources: TArray<string>; // Sources dirs.
     Help: TArray<string>;    // Help dirs.
   end;
-
-  PComponentMetadata = ^TComponentMetadata;
-  TComponentMetadataList = TArray<PComponentMetadata>;
 
   TManifest = class
   const
@@ -46,7 +42,7 @@ type
     FInstance: TManifest;
   private
     FIsCustom: Boolean;
-    FComponents: TComponentMetadataList;
+    FComponents: TArray<TComponentMetadata>;
     procedure ReadComponents;
   public
     class destructor Destroy;
@@ -57,7 +53,7 @@ type
     class function CustomFileExists: Boolean;
     constructor Create(const AUseCustomFile: Boolean);
     property IsCustom: Boolean read FIsCustom;
-    property Components: TComponentMetadataList read FComponents;
+    property Components: TArray<TComponentMetadata> read FComponents;
   end;
 
   TPackageName = type string;
@@ -66,17 +62,16 @@ type
     function IsDesigntime: Boolean;
   end;
 
-  PComponent = ^TComponent;
-  TComponentList = TArray<PComponent>;
+  TComponent = class;
 
-  TPackage = record
+  TPackage = class
   private
     FName: TPackageName;
     FFileName: string;
     FExists: Boolean;
     FDescription: string;
     FRequires: TArray<string>;
-    FDependencies: TComponentList;
+    FDependencies: TArray<TComponent>;
   public
     class procedure ParseFile(const AFileName: string; out ADescription: string; out ARequires: TArray<string>); static;
     constructor Create(const AName: TPackageName; const AFileName: string);
@@ -84,13 +79,13 @@ type
     property FileName: string read FFileName;
     property Exists: Boolean read FExists;
     property Description: string read FDescription;
-    property Dependencies: TComponentList read FDependencies;
+    property Dependencies: TArray<TComponent> read FDependencies;
   end;
 
-  PPackage = ^TPackage;
-  TPackageList = TArray<PPackage>;
-  TPackageListHelper = record helper for TPackageList
-    function ValidCount: NativeInt;
+  TPackages = TObjectList<TPackage>;
+
+  TPackageListHelper = record helper for TArray<TPackage>
+    function ValidCount: NativeUInt;
   end;
 
   TVersion = type Cardinal;
@@ -103,52 +98,62 @@ type
     function Version: TVersion;
   end;
 
-  TComponent = record
+  TComponent = class
   private
     FMetadata: PComponentMetadata;
     FDir: string;
     FError: TError;
     FChecked: Boolean;
 
-    FRequiredPackages: TPackageList;
-    FOptionalPackages: TPackageList;
-    FDependencies: TComponentList;
-    FDependents: TComponentList;
+    FRequiredPackages: TPackages;
+    FOptionalPackages: TPackages;
+    FPackages: TArray<TPackage>;
+
+    FDependencies: TArray<TComponent>;
+    FDependents: TArray<TComponent>;
 
     procedure SetChecked(const AChecked: Boolean);
   public
-    constructor Create(AMetadata: PComponentMetadata; const ARootDir: TRootDir; AIDE: TIDE);
+    constructor Create(const AMetadata: PComponentMetadata; const ARootDir: TRootDir; AIDE: TIDE);
+    destructor Destroy; override;
     property Metadata: PComponentMetadata read FMetadata;
     property Dir: string read FDir;
     property Error: TError read FError;
     property Checked: Boolean read FChecked write SetChecked;
 
-    property RequiredPackages: TPackageList read FRequiredPackages;
-    property OptionalPackages: TPackageList read FOptionalPackages;
-    property Dependencies: TComponentList read FDependencies;
-    property Dependents: TComponentList read FDependents;
+    property RequiredPackages: TPackages read FRequiredPackages;
+    property OptionalPackages: TPackages read FOptionalPackages;
+    property Packages: TArray<TPackage> read FPackages;
 
-    function Packages: TPackageList;
+    property Dependencies: TArray<TComponent> read FDependencies;
+    property Dependents: TArray<TComponent> read FDependents;
+
     function Valid: Boolean;
     procedure CheckError;
   end;
 
-  TComponentListHelper = record helper for TComponentList
+  TComponents = class(TObjectList<TComponent>)
   strict private
     procedure InitDependencies;
   public
     constructor Create(AManifest: TManifest; const ARootDir: TRootDir; AIDE: TIDE);
-    function ValidCount: NativeInt;
-    function VisibleValidCount: NativeInt;
-    function CheckedCount: NativeInt;
-    function VisibleCheckedCount: NativeInt;
+    function ValidCount: NativeUInt;
+    function VisibleValidCount: NativeUInt;
+    function CheckedCount: NativeUInt;
+    function VisibleCheckedCount: NativeUInt;
+  end;
+
+  TComponentListHelper = record helper for TArray<TComponent>
+    function Count: NativeUInt;
+    function ValidCount: NativeUInt;
   end;
 
 implementation
 
 uses
-  System.SysUtils, System.IOUtils,
-  System.RegularExpressions, System.Generics.Collections,
+  System.SysUtils,
+  System.IOUtils,
+  System.RegularExpressions,
   DxAutoInstaller.Utils,
   VSoft.YAML;
 
@@ -194,7 +199,7 @@ var
   Doc: IYAMLDocument;
   Value: IYAMLValue;
 
-  function ParsePackages(const ACompName: string; ACompValue: IYAMLValue; const AKey: string): TPackageMetadataList;
+  function ParsePackages(const ACompName: string; ACompValue: IYAMLValue; const AKey: string): TArray<TPackageMetadata>;
   begin
     Result := [];
     var Packages := ACompValue.Values[AKey];
@@ -206,7 +211,7 @@ var
       Metadata.BaseName := TPath.GetFileName(Path);
       Metadata.Dir := TPath.GetDirectoryName(Path);
       if Metadata.Dir.IsEmpty then Metadata.Dir := TPath.Combine(ACompName, 'Packages');
-      Result := Result + [@Metadata];
+      Result := Result + [Metadata];
     end;
   end;
 
@@ -240,7 +245,7 @@ begin
     Metadata.OutdatedPackages := ParsePackages(CompName, CompValue, 'OutdatedPackages');
     Metadata.Sources := [TPath.Combine(CompName, 'Sources')] + ParseStrings(CompValue, 'Sources');
     Metadata.Help := [TPath.Combine(CompName, 'Help')] + ParseStrings(CompValue, 'Help');
-    FComponents := FComponents + [@Metadata];
+    FComponents := FComponents + [Metadata];
   end;
 end;
 
@@ -248,7 +253,6 @@ end;
 
 constructor TPackage.Create(const AName: TPackageName; const AFileName: string);
 begin
-  Self := Default(TPackage);
   FName := AName;
   FFileName := AFileName;
   FExists := TFile.Exists(FFileName);
@@ -282,7 +286,7 @@ end;
 
 { TPackageListHelper }
 
-function TPackageListHelper.ValidCount: NativeInt;
+function TPackageListHelper.ValidCount: NativeUInt;
 begin
   Result := 0;
   for var Package in Self do if Package.Exists then Inc(Result);
@@ -290,29 +294,31 @@ end;
 
 { TComponent }
 
-constructor TComponent.Create(AMetadata: PComponentMetadata; const ARootDir: TRootDir; AIDE: TIDE);
-  function BuildPackageList(AMetadataList: TPackageMetadataList): TPackageList;
+constructor TComponent.Create(const AMetadata: PComponentMetadata; const ARootDir: TRootDir; AIDE: TIDE);
+  function CreatePackages(const AMetadataList: TArray<TPackageMetadata>): TPackages;
   begin
-    Result := [];
+    Result := TPackages.Create;
     for var Metadata in AMetadataList do begin
       var PackageName := TPackageName.Create(Metadata.BaseName, AIDE);
       var FileName := TPath.Combine(ARootDir, Metadata.Dir, PackageName + '.dpk');
       var Package := TPackage.Create(PackageName, FileName);
-      Result := Result + [@Package];
+      Result.Add(Package);
     end;
   end;
 
 begin
-  Self := Default(TComponent);
   FMetadata := AMetadata;
   FDir := TPath.Combine(ARootDir, FMetadata.Name);
-  FRequiredPackages := BuildPackageList(FMetadata.RequiredPackages);
-  FOptionalPackages := BuildPackageList(FMetadata.OptionalPackages);
+  FRequiredPackages := CreatePackages(FMetadata.RequiredPackages);
+  FOptionalPackages := CreatePackages(FMetadata.OptionalPackages);
+  FPackages := FRequiredPackages.ToArray + FOptionalPackages.ToArray;
 end;
 
-function TComponent.Packages: TPackageList;
+destructor TComponent.Destroy;
 begin
-  Result := RequiredPackages + OptionalPackages;
+  FRequiredPackages.Free;
+  FOptionalPackages.Free;
+  inherited;
 end;
 
 function TComponent.Valid: Boolean;
@@ -323,8 +329,8 @@ end;
 procedure TComponent.CheckError;
 begin
   if not TDirectory.Exists(Dir) then FError := errComponentNotFound
-  else if Packages.ValidCount < 1 then FError := errComponentMissingPackages
-  else if Dependencies.ValidCount < 1 then FError := errComponentMissingDependencies
+  else if Packages.ValidCount = 0 then FError := errComponentMissingPackages
+  else if Dependencies.ValidCount <> Dependencies.Count then FError := errComponentMissingDependencies
   else FError := errNone;
 end;
 
@@ -333,38 +339,38 @@ begin
   if not Valid then Exit;
   if FChecked = AChecked then Exit;
 
-  if AChecked then for var Component in Dependencies do Component.Checked := True
-              else for var Component in Dependents do Component.Checked := False;
+  if AChecked then for var Comp in Dependencies do Comp.Checked := True
+              else for var Comp in Dependents do Comp.Checked := False;
   FChecked := AChecked;
 end;
 
-{ TComponentListHelper }
+{ TComponents }
 
-constructor TComponentListHelper.Create(AManifest: TManifest; const ARootDir: TRootDir; AIDE: TIDE);
+constructor TComponents.Create(AManifest: TManifest; const ARootDir: TRootDir; AIDE: TIDE);
 begin
-  Self := [];
-  for var Metadata in AManifest.Components do begin
-    var Component := TComponent.Create(Metadata, ARootDir, AIDE);
-    Self := Self + [@Component];
+  inherited Create;
+  for var I := 0 to High(AManifest.Components) do begin
+    var Component := TComponent.Create(@AManifest.Components[I], ARootDir, AIDE);
+    Add(Component);
   end;
 
   InitDependencies;
   for var Comp in Self do Comp.CheckError;
 end;
 
-procedure TComponentListHelper.InitDependencies;
+procedure TComponents.InitDependencies;
 type
-  TPkgCompDict = TDictionary<string, PComponent>;
+  TPkgCompDict = TDictionary<string, TComponent>;
 var
   Dict: TPkgCompDict;
 
-  procedure SetDependencies(AComponent: PComponent; APackages: TPackageList; const AIsRequiredPackage: Boolean);
+  procedure SetDependencies(AComponent: TComponent; APackages: TPackages; const AIsRequiredPackage: Boolean);
   var
-    Component: PComponent;
+    Component: TComponent;
   begin
     for var Package in APackages do
-      for var Requires in Package.FRequires do
-        if Dict.TryGetValue(Requires.ToUpper, Component) then
+      for var PkgName in Package.FRequires do
+        if Dict.TryGetValue(PkgName.ToUpper, Component) then
           if Component <> AComponent then
             if not TArray.Contains(Package.Dependencies, Component) then begin
               Package.FDependencies := Package.FDependencies + [Component];
@@ -393,28 +399,41 @@ begin
   end;
 end;
 
-function TComponentListHelper.ValidCount: NativeInt;
+function TComponents.ValidCount: NativeUInt;
 begin
   Result := 0;
   for var Comp in Self do if Comp.Valid then Inc(Result);
 end;
 
-function TComponentListHelper.VisibleValidCount: NativeInt;
+function TComponents.VisibleValidCount: NativeUInt;
 begin
   Result := 0;
   for var Comp in Self do if Comp.Metadata.Visible and Comp.Valid then Inc(Result);
 end;
 
-function TComponentListHelper.CheckedCount: NativeInt;
+function TComponents.CheckedCount: NativeUInt;
 begin
   Result := 0;
   for var Comp in Self do if Comp.Checked then Inc(Result);
 end;
 
-function TComponentListHelper.VisibleCheckedCount: NativeInt;
+function TComponents.VisibleCheckedCount: NativeUInt;
 begin
   Result := 0;
   for var Comp in Self do if Comp.Metadata.Visible and Comp.Checked then Inc(Result);
+end;
+
+{ TComponentListHelper }
+
+function TComponentListHelper.Count: NativeUInt;
+begin
+  Result := Length(Self);
+end;
+
+function TComponentListHelper.ValidCount: NativeUInt;
+begin
+  Result := 0;
+  for var Comp in Self do if Comp.Valid then Inc(Result);
 end;
 
 { TPackageNameHelper }
