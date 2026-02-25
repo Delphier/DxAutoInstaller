@@ -137,6 +137,7 @@ type
     procedure InitDependencies;
   public
     constructor Create(AManifest: TManifest; const ARootDir: TRootDir; AIDE: TIDE);
+    procedure CheckAll(const AChecked: Boolean);
     function ValidCount: NativeUInt;
     function VisibleValidCount: NativeUInt;
     function CheckedCount: NativeUInt;
@@ -397,6 +398,11 @@ begin
   finally
     Dict.Free;
   end;
+end;
+
+procedure TComponents.CheckAll(const AChecked: Boolean);
+begin
+  for var Comp in Self do Comp.Checked := AChecked;
 end;
 
 function TComponents.ValidCount: NativeUInt;
