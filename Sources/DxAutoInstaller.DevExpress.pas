@@ -330,8 +330,8 @@ end;
 procedure TComponent.CheckError;
 begin
   if not TDirectory.Exists(Dir) then FError := errComponentNotFound
-  else if Packages.ValidCount = 0 then FError := errComponentMissingPackages
-  else if Dependencies.ValidCount <> Dependencies.Count then FError := errComponentMissingDependencies
+  else if Packages.ValidCount = 0 then FError := errComponentPackagesMissing
+  else if Dependencies.ValidCount <> Dependencies.Count then FError := errComponentDependenciesMissing
   else FError := errNone;
 end;
 

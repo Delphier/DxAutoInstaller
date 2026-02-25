@@ -85,16 +85,16 @@ const
 
 type
   TError = (errNone,
-            errComponentNotFound, errComponentMissingPackages, errComponentMissingDependencies,
+            errComponentNotFound, errComponentPackagesMissing, errComponentDependenciesMissing,
             errDelphiNotInstalled, errCppBuilderNotInstalled);
 const
   ErrorImageIndexes: array[TError] of Integer = (-1, 6, 6, 6, 6, 6);
   ErrorMessages:     array[TError] of string  = ('',
-                                                 'Component Not Found.',
-                                                 'Component Missing Packages.',
-                                                 'Component Missing Dependencies.',
-                                                 'Delphi is not Installed.',
-                                                 'C++Builder is not Installed.');
+                                                 'Component Not Found',
+                                                 'Component Packages Missing',
+                                                 'Component Dependencies Missing',
+                                                 'Delphi Not Installed',
+                                                 'C++Builder Not Installed');
 
 implementation
 

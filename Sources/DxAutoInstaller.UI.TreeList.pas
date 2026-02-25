@@ -3,6 +3,7 @@
 interface
 
 uses
+  System.Classes,
   Vcl.Controls,
   cxTL, cxGraphics, cxEdit,
   DxAutoInstaller.DevExpress,
@@ -24,6 +25,7 @@ type
     procedure Refresh(AColumn: TcxTreeListColumn); overload;
     procedure RefreshColumn(const AIndex: NativeInt);
 
+    procedure TreeListMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure TreeListCustomDrawDataCell(Sender: TcxCustomTreeList; ACanvas: TcxCanvas; AViewInfo: TcxTreeListEditCellViewInfo; var ADone: Boolean);
     procedure TreeListEditing(Sender: TcxCustomTreeList; AColumn: TcxTreeListColumn; var Allow: Boolean);
     procedure TreeListEditValueChanged(Sender: TcxCustomTreeList; AColumn: TcxTreeListColumn);
@@ -59,8 +61,8 @@ type
 implementation
 
 uses
-  System.Classes, System.Variants, System.SysUtils, Vcl.Graphics,
-  cxStyles,
+  System.Types, System.Variants, System.SysUtils, Vcl.Graphics, Vcl.Forms,
+  cxStyles, cxImageComboBox,
   DxAutoInstaller.Core, DxAutoInstaller.Resources;
 
 { TTreeList }
@@ -82,6 +84,7 @@ begin
   FTreeList.Styles.Selection := TcxStyle.Create(FTreeList);
   FTreeList.Styles.Selection.Color := clWindow;
   FTreeList.Styles.Selection.TextColor := clWindowText;
+  FTreeList.OnMouseMove := TreeListMouseMove;
   FTreeList.OnCustomDrawDataCell := TreeListCustomDrawDataCell;
   FTreeList.OnEditing := TreeListEditing;
   FTreeList.OnEditValueChanged := TreeListEditValueChanged;
@@ -201,6 +204,29 @@ begin
       AColumn.Values[Node] := if Component.Valid then Variant(Component.Checked) else Variant(Component.Error);
     end;
   end;
+end;
+
+procedure TTreeList.TreeListMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+begin
+  var Pos := Point(X, Y);
+  var HitTest := FTreeList.HitTest;
+  HitTest.HitPoint := Pos;
+
+  if HitTest.HitAtNode and HitTest.HitAtColumn then
+    if HitTest.EditCellViewInfo.EditViewInfo.EditProperties = DMResources.ErrorEditor.Properties then begin
+      var ImageRect := (HitTest.EditCellViewInfo.EditViewInfo as TcxImageComboBoxViewInfo).ImageRect;
+      var Node := HitTest.HitNode;
+      var Column := HitTest.HitColumn;
+      ImageRect.Offset(FTreeList.CellRect(Node, Column).TopLeft);
+      if ImageRect.Contains(Pos) then begin
+        FTreeList.Hint := ErrorMessages[TError(Column.Values[Node])];
+        FTreeList.ShowHint := True;
+        Application.ActivateHint(FTreeList.ClientToScreen(Pos));
+        Exit;
+      end;
+    end;
+
+  FTreeList.ShowHint := False;
 end;
 
 procedure TTreeList.TreeListCustomDrawDataCell(Sender: TcxCustomTreeList; ACanvas: TcxCanvas; AViewInfo: TcxTreeListEditCellViewInfo; var ADone: Boolean);
