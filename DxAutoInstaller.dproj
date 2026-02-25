@@ -29,18 +29,6 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
-        <Cfg_1_Win32>true</Cfg_1_Win32>
-        <CfgParent>Cfg_1</CfgParent>
-        <Cfg_1>true</Cfg_1>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
-        <Cfg_1_Win64>true</Cfg_1_Win64>
-        <CfgParent>Cfg_1</CfgParent>
-        <Cfg_1>true</Cfg_1>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
         <Cfg_2>true</Cfg_2>
         <CfgParent>Base</CfgParent>
@@ -110,27 +98,21 @@
             <Form>MainForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Sources\DxComponent.pas"/>
-        <DCCReference Include="Sources\DxComponentFactory.pas"/>
-        <DCCReference Include="Sources\DxIDE.pas"/>
-        <DCCReference Include="Sources\DxInstaller.pas"/>
-        <DCCReference Include="Sources\DxProfile.pas"/>
-        <DCCReference Include="Sources\DxProgress.pas">
-            <Form>DxProgressForm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="Sources\DxQuantumTreeList.pas">
-            <Form>DxResourceModule</Form>
+        <DCCReference Include="Sources\DxAutoInstaller.Core.pas"/>
+        <DCCReference Include="Sources\DxAutoInstaller.Utils.pas"/>
+        <DCCReference Include="Sources\DxAutoInstaller.Options.pas"/>
+        <DCCReference Include="Sources\DxAutoInstaller.Resources.pas">
+            <Form>DMResources</Form>
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="Sources\DxUtils.pas"/>
-        <DCCReference Include="Sources\DxAutoInstaller.Core.pas"/>
-        <DCCReference Include="Sources\DxAutoInstaller.Utils.pas"/>
-        <RcItem Include="Resources\Profile.ini">
+        <DCCReference Include="Sources\DxAutoInstaller.DevExpress.pas"/>
+        <DCCReference Include="Sources\DxAutoInstaller.UI.TreeList.pas"/>
+        <DCCReference Include="Sources\DxAutoInstaller.Installations.pas"/>
+        <RcItem Include="Resources\DevExpress.yaml">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
-            <ResourceId>Profile</ResourceId>
+            <ResourceId>DevExpressManifest</ResourceId>
         </RcItem>
         <RcItem Include="Resources\Changelog.txt">
             <ContainerId>ResourceItem</ContainerId>
@@ -161,12 +143,7 @@
                 <Source>
                     <Source Name="MainSource">DxAutoInstaller.dpr</Source>
                 </Source>
-                <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k370.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp370.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k370.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp370.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                </Excluded_Packages>
+                <Excluded_Packages/>
             </Delphi.Personality>
             <Deployment Version="5">
                 <DeployClass Name="AdditionalDebugSymbols">

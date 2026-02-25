@@ -49,15 +49,15 @@ type
     property SupportedPlatforms: TPlatforms read FSupportedPlatforms;
   end;
 
-  TIDEs = TArray<TIDE>;
-  TIDEsHelper = record helper for TIDEs
-  private
+  TIDEList = TArray<TIDE>;
+  TIDEListHelper = record helper for TIDEList
+  strict private
     class var FJclIDEs: TJclIDEs;
-    class var FAll: TIDEs;
+    class var FDefault: TIDEList;
   public
     class constructor Create;
     class destructor Destroy;
-    class property All: TIDEs read FAll;
+    class property Default: TIDEList read FDefault;
   end;
 
   TCompiler = TJclCompiler;
@@ -121,20 +121,20 @@ begin
   for var I := Low(TPlatform) to High(TPlatform) do if PlatformCommandLineTools[I] in FIDE.CommandLineTools then Include(FSupportedPlatforms, I);
 end;
 
-{ TIDEsHelper }
+{ TIDEListHelper }
 
-class constructor TIDEsHelper.Create;
+class constructor TIDEListHelper.Create;
 begin
   FJclIDEs := TJclIDEs.Create;
   for var I := 0 to FJclIDEs.Count - 1 do begin
     var JclIDE := FJclIDEs[I];
-    if JclIDE is TJclIDE then FAll := FAll + [TIDE.Create(JclIDE as TJclIDE)];
+    if JclIDE is TJclIDE then FDefault := FDefault + [TIDE.Create(JclIDE as TJclIDE)];
   end;
 end;
 
-class destructor TIDEsHelper.Destroy;
+class destructor TIDEListHelper.Destroy;
 begin
-  TArray.FreeValues(FAll);
+  TArray.FreeValues(FDefault);
   FJclIDEs.Free;
 end;
 

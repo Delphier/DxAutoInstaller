@@ -1,4 +1,4 @@
-{*******************************************************}
+﻿{*******************************************************}
 {                                                       }
 {          DxAutoInstaller MainForm Classes             }
 {                                                       }
@@ -16,7 +16,8 @@ uses
   Vcl.Forms, Vcl.Controls, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.ActnList, Vcl.Menus,
   cxControls, cxContainer, cxGraphics, dxCoreGraphics, cxLookAndFeels, cxLookAndFeelPainters,
   cxButtons, cxEdit, cxTextEdit, cxMaskEdit, cxButtonEdit,
-  DxAutoInstaller.UI.TreeList;
+  DxAutoInstaller.UI.TreeList,
+  DxAutoInstaller.Installations;
 
 type
   TMainForm = class(TForm)
@@ -63,26 +64,27 @@ type
     BtnExecute: TcxButton;
     BtnExit: TcxButton;
     PanelBottom: TPanel;
-    LblCustomManifest: TLinkLabel;
     LblCurrentManifest: TLabel;
+    LblCustomManifest: TLinkLabel;
     LblCustomManifestNote: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormActivate(Sender: TObject);
-    procedure LinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
-    procedure ActExitExecute(Sender: TObject);
     procedure PageControlChange(Sender: TObject);
-    procedure EditInstallFileDirPropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
-    procedure ActManifestExportExecute(Sender: TObject);
-    procedure ActManifestDeleteExecute(Sender: TObject);
-    procedure ActSearchNewPackagesExecute(Sender: TObject);
-    procedure LblCustomManifestLinkClick(Sender: TObject; const Link: string;
-      LinkType: TSysLinkType);
+    procedure EditRootDirPropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
+    procedure ChkShowAllComponentsClick(Sender: TObject);
     procedure ActInstallExecute(Sender: TObject);
     procedure ActUninstallExecute(Sender: TObject);
+    procedure ActManifestDeleteExecute(Sender: TObject);
+    procedure ActManifestExportExecute(Sender: TObject);
+    procedure LblCustomManifestLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
+    procedure ActSearchNewPackagesExecute(Sender: TObject);
+    procedure LinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
+    procedure ActExitExecute(Sender: TObject);
   private
     { Private declarations }
     FTreeList: TTreeList;
+    FInstallations: TInstallations;
     procedure ShowManifestStatus;
     procedure FormatLinkLabel(ALinkLable: TLinkLabel; const AIsEmail: Boolean = False);
   public
@@ -112,11 +114,12 @@ begin
   LblVersion.Caption := TApp.Version;
   LoadResourceToStream(ImageLogo.Picture.LoadFromStream, 'Logo');
   PageControl.ActivePage := TabInstall;
+  PageControl.OnChange(PageControl);
   if Height > Screen.WorkAreaHeight then Height := Screen.WorkAreaHeight;
 
   PanTreeList.BevelKind := TBevelKind.bkNone;
   FTreeList := TTreeList.Create(PanTreeList);
-  for var IDE in TIDEs.All do ListViewUninstall.AddItem(IDE.Name, IDE);
+  for var IDE in TIDEList.Default do ListViewUninstall.AddItem(IDE.Name, IDE);
   FormatLinkLabel(LinkGitHub);
   FormatLinkLabel(LinkDevExpressDocs);
   FormatLinkLabel(LinkEmail, True);
@@ -126,6 +129,7 @@ end;
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   FTreeList.Free;
+  FInstallations.Free;
 end;
 
 procedure TMainForm.FormActivate(Sender: TObject);
@@ -143,6 +147,42 @@ begin
   else BtnExecute.Visible := False;
 end;
 
+procedure TMainForm.EditRootDirPropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
+var
+  Dirs: TArray<string>;
+  RootDir: TRootDir;
+begin
+  if not SelectDirectory('', Dirs) then Exit;
+  Screen.Cursor := crHourGlass;
+  try
+    RootDir := Dirs[0];
+    EditRootDir.Text := RootDir;
+    EditVersion.Text := RootDir.Version.ToText;
+
+    FInstallations.Free;
+    FInstallations := TInstallations.Create(RootDir, TManifest.Instance);
+    for var Installation in FInstallations do Installation.Components.CheckAll(True);
+    FTreeList.Installations := FInstallations;
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TMainForm.ChkShowAllComponentsClick(Sender: TObject);
+begin
+  FTreeList.ShowAllComponents := ChkShowAllComponents.Checked;
+end;
+
+procedure TMainForm.ActInstallExecute(Sender: TObject);
+begin
+//
+end;
+
+procedure TMainForm.ActUninstallExecute(Sender: TObject);
+begin
+//
+end;
+
 procedure TMainForm.ShowManifestStatus;
 begin
   LblCurrentManifest.Caption := Format('Current Manifest: <%s>', [IfThen(TManifest.Instance.IsCustom, 'Custom', 'Built-in')]);
@@ -151,11 +191,6 @@ begin
   BtnManifest.Action := if TManifest.CustomFileExists then ActManifestDelete else ActManifestExport;
   LblCustomManifest.Visible := TManifest.CustomFileExists;
   LblCustomManifestNote.Visible := LblCustomManifest.Visible;
-end;
-
-procedure TMainForm.LblCustomManifestLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
-begin
-  ShellExecute(Application.Handle, 'Open', 'explorer.exe', PChar(Format('/select,"%s"', [Link])), nil, SW_SHOWNORMAL);
 end;
 
 procedure TMainForm.ActManifestDeleteExecute(Sender: TObject);
@@ -170,36 +205,14 @@ begin
   ShowManifestStatus;
 end;
 
-procedure TMainForm.EditInstallFileDirPropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
-var
-  Dirs: TArray<string>;
-  RootDir: TRootDir;
+procedure TMainForm.LblCustomManifestLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
 begin
-  if not SelectDirectory('', Dirs) then Exit;
-  RootDir := Dirs[0];
-  EditRootDir.Text := RootDir;
-  EditVersion.Text := RootDir.Version.ToText;
-
-end;
-
-procedure TMainForm.ActInstallExecute(Sender: TObject);
-begin
-//
-end;
-
-procedure TMainForm.ActUninstallExecute(Sender: TObject);
-begin
-//
+  ShellExecute(Application.Handle, 'Open', 'explorer.exe', PChar(Format('/select,"%s"', [Link])), nil, SW_SHOWNORMAL);
 end;
 
 procedure TMainForm.ActSearchNewPackagesExecute(Sender: TObject);
 begin
 //
-end;
-
-procedure TMainForm.ActExitExecute(Sender: TObject);
-begin
-  Close;
 end;
 
 procedure TMainForm.FormatLinkLabel(ALinkLable: TLinkLabel; const AIsEmail: Boolean);
@@ -212,6 +225,11 @@ end;
 procedure TMainForm.LinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
 begin
   ShellExecute(Application.Handle, 'Open', PChar(Link), nil, nil, SW_SHOWNORMAL);
+end;
+
+procedure TMainForm.ActExitExecute(Sender: TObject);
+begin
+  Close;
 end;
 
 end.

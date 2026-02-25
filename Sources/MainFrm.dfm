@@ -94,6 +94,8 @@ object MainForm: TMainForm
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
+        ExplicitWidth = 592
+        ExplicitHeight = 667
         DesignSize = (
           594
           675)
@@ -123,8 +125,9 @@ object MainForm: TMainForm
               Kind = bkEllipsis
             end>
           Properties.ReadOnly = True
-          Properties.OnButtonClick = EditInstallFileDirPropertiesButtonClick
+          Properties.OnButtonClick = EditRootDirPropertiesButtonClick
           TabOrder = 0
+          ExplicitWidth = 507
           Width = 509
         end
         object EditVersion: TEdit
@@ -209,8 +212,6 @@ object MainForm: TMainForm
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
-        ExplicitWidth = 592
-        ExplicitHeight = 667
         object GroupBox1: TGroupBox
           AlignWithMargins = True
           Left = 8
@@ -223,8 +224,6 @@ object MainForm: TMainForm
           Align = alClient
           Caption = 'Manifest'
           TabOrder = 1
-          ExplicitWidth = 576
-          ExplicitHeight = 555
           DesignSize = (
             578
             563)
@@ -262,7 +261,6 @@ object MainForm: TMainForm
             ShowHint = True
             TabOrder = 1
             OnLinkClick = LblCustomManifestLinkClick
-            ExplicitWidth = 551
           end
         end
         object GroupBox2: TGroupBox
@@ -278,7 +276,6 @@ object MainForm: TMainForm
           Align = alTop
           Caption = 'Packages'
           TabOrder = 0
-          ExplicitWidth = 576
           object Button1: TcxButton
             Left = 16
             Top = 32
@@ -379,24 +376,24 @@ object MainForm: TMainForm
       618
       40)
     object BtnExit: TcxButton
-      Left = 515
+      Left = 511
       Top = 7
-      Width = 75
+      Width = 85
       Height = 25
       Action = ActExit
       Anchors = [akTop, akRight]
       TabOrder = 2
-      ExplicitLeft = 513
+      ExplicitLeft = 509
     end
     object BtnExecute: TcxButton
-      Left = 433
+      Left = 420
       Top = 7
-      Width = 75
+      Width = 85
       Height = 25
-      Action = ActInstall
       Anchors = [akTop, akRight]
+      Caption = 'BtnExecute'
       TabOrder = 1
-      ExplicitLeft = 431
+      ExplicitLeft = 418
     end
     object ChkShowAllComponents: TCheckBox
       Left = 20
@@ -405,6 +402,7 @@ object MainForm: TMainForm
       Height = 17
       Caption = 'Show All Components'
       TabOrder = 0
+      OnClick = ChkShowAllComponentsClick
     end
   end
   object ActionList1: TActionList

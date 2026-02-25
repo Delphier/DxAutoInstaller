@@ -26,7 +26,7 @@ type
   private
     FManifest: TManifest;
   public
-    constructor Create(AIDEs: TIDEs; const ARootDir: TRootDir; AManifest: TManifest); overload;
+    constructor Create(const AIDEList: TIDEList; const ARootDir: TRootDir; AManifest: TManifest); overload;
     constructor Create(const ARootDir: TRootDir; AManifest: TManifest); overload;
     property Manifest: TManifest read FManifest;
   end;
@@ -51,16 +51,16 @@ end;
 
 { TInstallations }
 
-constructor TInstallations.Create(AIDEs: TIDEs; const ARootDir: TRootDir; AManifest: TManifest);
+constructor TInstallations.Create(const AIDEList: TIDEList; const ARootDir: TRootDir; AManifest: TManifest);
 begin
   inherited Create;
   FManifest := AManifest;
-  for var IDE in AIDEs do Add(TInstallation.Create(IDE, ARootDir, AManifest));
+  for var IDE in AIDEList do Add(TInstallation.Create(IDE, ARootDir, AManifest));
 end;
 
 constructor TInstallations.Create(const ARootDir: TRootDir; AManifest: TManifest);
 begin
-  Create(TIDEs.All, ARootDir, AManifest);
+  Create(TIDEList.Default, ARootDir, AManifest);
 end;
 
 end.
