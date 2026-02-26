@@ -226,6 +226,7 @@ begin
       end;
     end;
 
+  FTreeList.Hint := '';
   FTreeList.ShowHint := False;
 end;
 
