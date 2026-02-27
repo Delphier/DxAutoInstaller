@@ -1,13 +1,15 @@
 ﻿{*******************************************************}
 {                                                       }
-{          DxAutoInstaller MainForm Classes             }
+{               DxAutoInstaller Library                 }
 {                                                       }
-{        http://www.delphier.com/DxAutoIntaller         }
-{        Copyright(c) 2014 by faceker@gmail.com         }
+{      https://github.com/Delphier/DxAutoInstaller      }
+{                                                       }
+{      Copyright(c) 2014-2026 faceker@gmail.com         }
+{              All rights reserved                      }
 {                                                       }
 {*******************************************************}
 
-unit MainFrm;
+unit DxAutoInstaller.UI.FormMain;
 
 interface
 
@@ -20,7 +22,7 @@ uses
   DxAutoInstaller.Installations;
 
 type
-  TMainForm = class(TForm)
+  TFormMain = class(TForm)
     PanelTop: TPanel;
     ImageLogo: TImage;
     LblAppName: TLabel;
@@ -92,7 +94,7 @@ type
   end;
 
 var
-  MainForm: TMainForm;
+  FormMain: TFormMain;
 
 implementation
 
@@ -107,7 +109,7 @@ uses
 
 {$R *.dfm}
 
-procedure TMainForm.FormCreate(Sender: TObject);
+procedure TFormMain.FormCreate(Sender: TObject);
 begin
   Caption := Application.Title;
   LblAppName.Caption := Application.Title;
@@ -126,20 +128,20 @@ begin
   LoadResourceToStream(MemoChangelog.Lines.LoadFromStream, 'Changelog');
 end;
 
-procedure TMainForm.FormDestroy(Sender: TObject);
+procedure TFormMain.FormDestroy(Sender: TObject);
 begin
   FTreeList.Free;
   FInstallations.Free;
 end;
 
-procedure TMainForm.FormActivate(Sender: TObject);
+procedure TFormMain.FormActivate(Sender: TObject);
 begin
   OnActivate := nil;
   TManifest.CreateInstance;
   ShowManifestStatus;
 end;
 
-procedure TMainForm.PageControlChange(Sender: TObject);
+procedure TFormMain.PageControlChange(Sender: TObject);
 begin
   ChkShowAllComponents.Visible := PageControl.ActivePage = TabInstall;
   if PageControl.ActivePage = TabInstall then BtnExecute.Action := ActInstall
@@ -147,7 +149,7 @@ begin
   else BtnExecute.Visible := False;
 end;
 
-procedure TMainForm.EditRootDirPropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
+procedure TFormMain.EditRootDirPropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
 var
   Dirs: TArray<string>;
   RootDir: TRootDir;
@@ -168,22 +170,22 @@ begin
   end;
 end;
 
-procedure TMainForm.ChkShowAllComponentsClick(Sender: TObject);
+procedure TFormMain.ChkShowAllComponentsClick(Sender: TObject);
 begin
   FTreeList.ShowAllComponents := ChkShowAllComponents.Checked;
 end;
 
-procedure TMainForm.ActInstallExecute(Sender: TObject);
+procedure TFormMain.ActInstallExecute(Sender: TObject);
 begin
 //
 end;
 
-procedure TMainForm.ActUninstallExecute(Sender: TObject);
+procedure TFormMain.ActUninstallExecute(Sender: TObject);
 begin
 //
 end;
 
-procedure TMainForm.ShowManifestStatus;
+procedure TFormMain.ShowManifestStatus;
 begin
   LblCurrentManifest.Caption := Format('Current Manifest: <%s>', [IfThen(TManifest.Instance.IsCustom, 'Custom', 'Built-in')]);
   LblCustomManifest.Caption := Format('Custom Manifest: <a href="%s">%s</a>', [TManifest.CustomFileName, TManifest.CustomFileName]);
@@ -193,41 +195,41 @@ begin
   LblCustomManifestNote.Visible := LblCustomManifest.Visible;
 end;
 
-procedure TMainForm.ActManifestDeleteExecute(Sender: TObject);
+procedure TFormMain.ActManifestDeleteExecute(Sender: TObject);
 begin
   System.SysUtils.DeleteFile(TManifest.CustomFileName);
   ShowManifestStatus;
 end;
 
-procedure TMainForm.ActManifestExportExecute(Sender: TObject);
+procedure TFormMain.ActManifestExportExecute(Sender: TObject);
 begin
   TManifest.Export;
   ShowManifestStatus;
 end;
 
-procedure TMainForm.LblCustomManifestLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
+procedure TFormMain.LblCustomManifestLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
 begin
   ShellExecute(Application.Handle, 'Open', 'explorer.exe', PChar(Format('/select,"%s"', [Link])), nil, SW_SHOWNORMAL);
 end;
 
-procedure TMainForm.ActSearchNewPackagesExecute(Sender: TObject);
+procedure TFormMain.ActSearchNewPackagesExecute(Sender: TObject);
 begin
 //
 end;
 
-procedure TMainForm.FormatLinkLabel(ALinkLable: TLinkLabel; const AIsEmail: Boolean);
+procedure TFormMain.FormatLinkLabel(ALinkLable: TLinkLabel; const AIsEmail: Boolean);
 begin
   ALinkLable.ShowHint := True;
   ALinkLable.Hint := ALinkLable.Caption;
   ALinkLable.Caption := Format('<a href="%s%s">%s</a>', [IfThen(AIsEmail, 'mailto:'), ALinkLable.Caption, ALinkLable.Caption]);
 end;
 
-procedure TMainForm.LinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
+procedure TFormMain.LinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
 begin
   ShellExecute(Application.Handle, 'Open', PChar(Link), nil, nil, SW_SHOWNORMAL);
 end;
 
-procedure TMainForm.ActExitExecute(Sender: TObject);
+procedure TFormMain.ActExitExecute(Sender: TObject);
 begin
   Close;
 end;

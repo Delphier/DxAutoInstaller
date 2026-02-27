@@ -94,8 +94,8 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="Sources\MainFrm.pas">
-            <Form>MainForm</Form>
+        <DCCReference Include="Sources\DxAutoInstaller.UI.FormMain.pas">
+            <Form>FormMain</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Sources\DxAutoInstaller.Core.pas"/>
