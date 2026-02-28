@@ -90,6 +90,8 @@ type
     function CppBuilderPlatforms: TPlatforms;
     function AddBrowsingPath: Boolean;
     function UseNativeLookAndFeel: Boolean;
+
+    function Platforms: TPlatforms;
   end;
 
 implementation
@@ -166,7 +168,7 @@ end;
 
 procedure TOptionDelphiPlatforms.Init;
 begin
-  DoInit(FIDE.DelphiInstalled, DelphiPlatforms, DelphiPlatformsDefault, errDelphiNotInstalled);
+  DoInit(FIDE.DelphiInstalled, DelphiSupportedPlatforms, DelphiSupportedPlatformsDefault, errDelphiNotInstalled);
 end;
 
 { TOptionCppBuilderPlatforms }
@@ -178,7 +180,7 @@ end;
 
 procedure TOptionCppBuilderPlatforms.Init;
 begin
-  DoInit(FIDE.CppBuilderInstalled, CppBuilderPlatforms, CppBuilderPlatformsDefault, errCppBuilderNotInstalled);
+  DoInit(FIDE.CppBuilderInstalled, CppBuilderSupportedPlatforms, CppBuilderSupportedPlatformsDefault, errCppBuilderNotInstalled);
 end;
 
 { TOptionAddBrowsingPath }
@@ -228,6 +230,11 @@ end;
 function TOptions.UseNativeLookAndFeel: Boolean;
 begin
   Result := Find(TOptionUseNativeLookAndFeel).Value;
+end;
+
+function TOptions.Platforms: TPlatforms;
+begin
+  Result := DelphiPlatforms + CppBuilderPlatforms;
 end;
 
 { TOptionValueHelper }

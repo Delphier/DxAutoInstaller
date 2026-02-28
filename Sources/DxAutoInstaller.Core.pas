@@ -40,6 +40,7 @@ type
     FDelphiInstalled: Boolean;
     FCppBuilderInstalled: Boolean;
     FSupportedPlatforms: TPlatforms;
+    FSupportedDesigntimePlatforms: TPlatforms;
   public
     constructor Create(AIDE: TJclIDE);
     property Name: string read FName;
@@ -47,6 +48,8 @@ type
     property DelphiInstalled: Boolean read FDelphiInstalled;
     property CppBuilderInstalled: Boolean read FCppBuilderInstalled;
     property SupportedPlatforms: TPlatforms read FSupportedPlatforms;
+    property SupportedDesigntimePlatforms: TPlatforms read FSupportedDesigntimePlatforms;
+    procedure CheckRunning;
   end;
 
   TIDEList = TArray<TIDE>;
@@ -72,16 +75,30 @@ type
     function Compiler(AIDE: TIDE): TCompiler;
   end;
 
+  TPlatformsHelper = record helper for TPlatforms
+    function ToString: string;
+  end;
+
 const
-  PlatformJclValues          : array[TPlatform] of TJclPlatform      = (bpWin32, bpWin64, bpWin64x);
-  PlatformNames              : array[TPlatform] of string            = ('Win32', 'Win64', 'Win64x');
-  PlatformDescriptions       : array[TPlatform] of string            = ('Windows 32-bit', 'Windows 64-bit', 'Windows 64-bit (Modern)');
-  PlatformCompilers          : array[TPlatform] of TCompilerGetter   = (TPlatform.DCC32Compiler, TPlatform.DCC64Compiler, TPlatform.DCC64Compiler);
-  PlatformCommandLineTools   : array[TPlatform] of TCommandLineTool  = (clDcc32, clDcc64, clBcc64x);
-  DelphiPlatforms            = [pfWin32, pfWin64];
-  DelphiPlatformsDefault     = [pfWin32];
-  CppBuilderPlatforms        = [pfWin32, pfWin64, pfWin64x];
-  CppBuilderPlatformsDefault = [pfWin64x];
+  PlatformJclValues    : array[TPlatform] of TJclPlatform = (bpWin32, bpWin64, bpWin64x);
+  PlatformNames        : array[TPlatform] of string       = ('Win32', 'Win64', 'Win64x');
+  PlatformDescriptions : array[TPlatform] of string       = ('Windows 32-bit', 'Windows 64-bit', 'Windows 64-bit (Modern)');
+
+  PlatformCompilers        : array[TPlatform] of TCompilerGetter  = (TPlatform.DCC32Compiler, TPlatform.DCC64Compiler, TPlatform.DCC64Compiler);
+  PlatformCompilerOptions  : array[TPlatform] of string           = ('', '', '');
+  PlatformCommandLineTools : array[TPlatform] of TCommandLineTool = (clDcc32, clDcc64, clBcc64x);
+
+  DelphiSupportedPlatforms            = [pfWin32, pfWin64];
+  DelphiSupportedPlatformsDefault     = [pfWin32];
+  CppBuilderSupportedPlatforms        = [pfWin32, pfWin64, pfWin64x];
+  CppBuilderSupportedPlatformsDefault = [pfWin64x];
+
+  // 32-bit/64-bit IDE. Requires a synchronized update to IDE.SupportedDesigntimePlatforms.
+  DesigntimeSupportedPlatforms = [pfWin32, pfWin64];
+  // 64-bit IDE only supports Delphi Win64 and WinARM64EC.
+  PlatformSupportedDesigntimePlatformsDelphi    : array[TPlatform] of TPlatforms = ([pfWin32], [pfWin32, pfWin64], []);
+  // 64-bit IDE only supports C++Builder Win64x.
+  PlatformSupportedDesigntimePlatformsCppBuilder: array[TPlatform] of TPlatforms = ([pfWin32], [pfWin32], [pfWin64]);
 
 type
   TError = (errNone,
@@ -119,6 +136,16 @@ begin
   FDelphiInstalled := FIDE.Personalities * [bpDelphi32, bpDelphi64] <> [];
   FCppBuilderInstalled := FIDE.Personalities * [bpBCBuilder32, bpBCBuilder64] <> [];
   for var I := Low(TPlatform) to High(TPlatform) do if PlatformCommandLineTools[I] in FIDE.CommandLineTools then Include(FSupportedPlatforms, I);
+  FSupportedDesigntimePlatforms := [pfWin32];
+  // 64-bit IDE: RAD Studio 12.3+
+  if FileExists(FIDE.IdeExeFileName[True]) then Include(FSupportedDesigntimePlatforms, pfWin64);
+end;
+
+procedure TIDE.CheckRunning;
+const
+  Message = '%s is currently running. Please close it to proceed';
+begin
+  if FIDE.AnyInstanceRunning then raise Exception.CreateFmt(Message, [Name]);
 end;
 
 { TIDEListHelper }
@@ -158,6 +185,15 @@ end;
 class function TPlatformHelper.DCC64Compiler(AIDE: TIDE): TCompiler;
 begin
   Result := AIDE.FIDE.DCC64;
+end;
+
+{ TPlatformsHelper }
+
+function TPlatformsHelper.ToString: string;
+begin
+  var Strings: TArray<string> := [];
+  for var I in Self do Strings := Strings + [PlatformNames[I]];
+  Result := string.Join(',', Strings);
 end;
 
 end.
