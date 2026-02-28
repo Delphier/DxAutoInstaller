@@ -95,7 +95,15 @@ type
 
   TRootDir = type string;
   TRootDirHelper = record helper for TRootDir
+  strict private
+    function LibraryDir: string;
+    procedure DeleteLibraryDir;
+  public
     function Version: TVersion;
+    function SourcesDir: string;
+    function OutputDir(AIDE: TIDE; const APlatform: TPlatform): string;
+    procedure CreateSourcesDir(AManifest: TManifest);
+    procedure DeleteOutputDir(AIDE: TIDE; const APlatform: TPlatform);
   end;
 
   TComponent = class
@@ -473,6 +481,52 @@ begin
     var Match := TRegEx.Match(Line, 'dxVersion = (\d{8});');
     if Match.Success then Exit(Match.Groups[1].Value.ToInteger);
   end;
+end;
+
+function TRootDirHelper.LibraryDir: string;
+begin
+  Result := TPath.Combine(Self, 'Library');
+end;
+
+function TRootDirHelper.SourcesDir: string;
+begin
+  Result := TPath.Combine(LibraryDir, 'Sources');
+end;
+
+function TRootDirHelper.OutputDir(AIDE: TIDE; const APlatform: TPlatform): string;
+begin
+  Result := TPath.Combine(LibraryDir, AIDE.PackageVersionStr, PlatformNames[APlatform]);
+end;
+
+procedure TRootDirHelper.CreateSourcesDir(AManifest: TManifest);
+begin
+  if TDirectory.Exists(SourcesDir) and not TDirectory.IsEmpty(SourcesDir) then Exit;
+  TDirectory.CreateDirectory(SourcesDir);
+
+  for var Metadata in AManifest.Components do
+    for var DirName in Metadata.Sources do begin
+      var Dir := TPath.Combine(Self, DirName);
+      if TDirectory.Exists(Dir) then
+        for var FileName in TDirectory.GetFilesEnumerator(Dir) do
+          TFile.Copy(FileName, ChangeFilePath(FileName, SourcesDir));
+    end;
+end;
+
+procedure TRootDirHelper.DeleteOutputDir(AIDE: TIDE; const APlatform: TPlatform);
+begin
+  var Dir := OutputDir(AIDE, APlatform);
+  var Parent := TDirectory.GetParent(Dir);
+  if TDirectory.Exists(Dir) then TDirectory.Delete(Dir, True);
+  if TDirectory.Exists(Parent) and TDirectory.IsEmpty(Parent) then TDirectory.Delete(Parent);
+  DeleteLibraryDir;
+end;
+
+procedure TRootDirHelper.DeleteLibraryDir;
+begin
+  if not TDirectory.Exists(LibraryDir) then Exit;
+  var Dirs := TDirectory.GetDirectories(LibraryDir);
+  if (Length(Dirs) = 1) and SameFileName(Dirs[0], SourcesDir) then
+    TDirectory.Delete(if Length(TDirectory.GetFiles(LibraryDir)) = 0 then LibraryDir else SourcesDir, True);
 end;
 
 end.
