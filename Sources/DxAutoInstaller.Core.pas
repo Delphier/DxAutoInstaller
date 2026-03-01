@@ -35,8 +35,8 @@ type
   TIDE = class
   const
     EnvironmentVariableSectionName = 'Environment Variables';
-  private
-    FIDE: TJclIDE;
+  strict private
+    FCore: TJclIDE;
     FName: string;
     FPackageVersionStr: string;
     FDelphiInstalled: Boolean;
@@ -44,7 +44,8 @@ type
     FSupportedPlatforms: TPlatforms;
     FSupportedDesigntimePlatforms: TPlatforms;
   public
-    constructor Create(AIDE: TJclIDE);
+    constructor Create(ACore: TJclIDE);
+    property Core: TJclIDE read FCore;
     property Name: string read FName;
     property PackageVersionStr: string read FPackageVersionStr;
     property DelphiInstalled: Boolean read FDelphiInstalled;
@@ -89,7 +90,7 @@ const
   PlatformDescriptions : array[TPlatform] of string       = ('Windows 32-bit', 'Windows 64-bit', 'Windows 64-bit (Modern)');
 
   PlatformCompilers        : array[TPlatform] of TCompilerGetter  = (TPlatform.DCC32Compiler, TPlatform.DCC64Compiler, TPlatform.DCC64Compiler);
-  PlatformCompilerOptions  : array[TPlatform] of string           = ('', '', '');
+  PlatformCompilerOptions  : array[TPlatform] of string           = ('', '', '-jf:coffi');
   PlatformCommandLineTools : array[TPlatform] of TCommandLineTool = (clDcc32, clDcc64, clBcc64x);
 
   DelphiSupportedPlatforms            = [pfWin32, pfWin64];
@@ -100,9 +101,9 @@ const
   // 32-bit/64-bit IDE. Requires a synchronized update to IDE.SupportedDesigntimePlatforms.
   DesigntimeSupportedPlatforms = [pfWin32, pfWin64];
   // 64-bit IDE only supports Delphi Win64 and WinARM64EC.
-  PlatformSupportedDesigntimePlatformsDelphi    : array[TPlatform] of TPlatforms = ([pfWin32], [pfWin32, pfWin64], []);
+  DelphiSupportedDesigntimePlatforms     : array[TPlatform] of TPlatforms = ([pfWin32], [pfWin32, pfWin64], []);
   // 64-bit IDE only supports C++Builder Win64x.
-  PlatformSupportedDesigntimePlatformsCppBuilder: array[TPlatform] of TPlatforms = ([pfWin32], [pfWin32], [pfWin64]);
+  CppBuilderSupportedDesigntimePlatforms : array[TPlatform] of TPlatforms = ([pfWin32], [pfWin32], [pfWin32, pfWin64]);
 
 type
   TError = (errNone,
@@ -132,37 +133,37 @@ end;
 
 { TIDE }
 
-constructor TIDE.Create(AIDE: TJclIDE);
+constructor TIDE.Create(ACore: TJclIDE);
 begin
-  FIDE := AIDE;
-  FName := FIDE.Name;
-  FPackageVersionStr := FIDE.VersionNumberStr.Replace('d', 'RS');
-  FDelphiInstalled := FIDE.Personalities * [bpDelphi32, bpDelphi64] <> [];
-  FCppBuilderInstalled := FIDE.Personalities * [bpBCBuilder32, bpBCBuilder64] <> [];
-  for var I := Low(TPlatform) to High(TPlatform) do if PlatformCommandLineTools[I] in FIDE.CommandLineTools then Include(FSupportedPlatforms, I);
+  FCore := ACore;
+  FName := FCore.Name;
+  FPackageVersionStr := FCore.VersionNumberStr.Replace('d', 'RS');
+  FDelphiInstalled := FCore.Personalities * [bpDelphi32, bpDelphi64] <> [];
+  FCppBuilderInstalled := FCore.Personalities * [bpBCBuilder32, bpBCBuilder64] <> [];
+  for var I := Low(TPlatform) to High(TPlatform) do if PlatformCommandLineTools[I] in FCore.CommandLineTools then Include(FSupportedPlatforms, I);
   FSupportedDesigntimePlatforms := [pfWin32];
   // 64-bit IDE: RAD Studio 12.3+
-  if FileExists(FIDE.IdeExeFileName[True]) then Include(FSupportedDesigntimePlatforms, pfWin64);
+  if FileExists(FCore.IdeExeFileName[True]) then Include(FSupportedDesigntimePlatforms, pfWin64);
 end;
 
 procedure TIDE.CheckRunning;
 const
   Message = '%s is currently running. Please close it to proceed';
 begin
-  if FIDE.AnyInstanceRunning then raise Exception.CreateFmt(Message, [Name]);
+  if FCore.AnyInstanceRunning then raise Exception.CreateFmt(Message, [Name]);
 end;
 
 function TIDE.ReadEnvironmentVariable(const AKey: string): string;
 begin
-  Result := FIDE.ConfigData.ReadString(EnvironmentVariableSectionName, AKey, '');
+  Result := FCore.ConfigData.ReadString(EnvironmentVariableSectionName, AKey, '');
 end;
 
 procedure TIDE.WriteEnvironmentVariable(const AKey, AValue: string);
 begin
   if AValue.IsEmpty then
-    FIDE.ConfigData.DeleteKey(EnvironmentVariableSectionName, AKey)
+    FCore.ConfigData.DeleteKey(EnvironmentVariableSectionName, AKey)
   else
-    FIDE.ConfigData.WriteString(EnvironmentVariableSectionName, AKey, AValue);
+    FCore.ConfigData.WriteString(EnvironmentVariableSectionName, AKey, AValue);
 end;
 
 { TIDEListHelper }
@@ -196,12 +197,12 @@ end;
 
 class function TPlatformHelper.DCC32Compiler(AIDE: TIDE): TCompiler;
 begin
-  Result := AIDE.FIDE.DCC32;
+  Result := AIDE.Core.DCC32;
 end;
 
 class function TPlatformHelper.DCC64Compiler(AIDE: TIDE): TCompiler;
 begin
-  Result := AIDE.FIDE.DCC64;
+  Result := AIDE.Core.DCC64;
 end;
 
 { TPlatformsHelper }
