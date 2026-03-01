@@ -33,6 +33,8 @@ type
   TPlatforms = set of TPlatform;
 
   TIDE = class
+  const
+    EnvironmentVariableSectionName = 'Environment Variables';
   private
     FIDE: TJclIDE;
     FName: string;
@@ -50,6 +52,8 @@ type
     property SupportedPlatforms: TPlatforms read FSupportedPlatforms;
     property SupportedDesigntimePlatforms: TPlatforms read FSupportedDesigntimePlatforms;
     procedure CheckRunning;
+    function ReadEnvironmentVariable(const AKey: string): string;
+    procedure WriteEnvironmentVariable(const AKey, AValue: string);
   end;
 
   TIDEList = TArray<TIDE>;
@@ -146,6 +150,19 @@ const
   Message = '%s is currently running. Please close it to proceed';
 begin
   if FIDE.AnyInstanceRunning then raise Exception.CreateFmt(Message, [Name]);
+end;
+
+function TIDE.ReadEnvironmentVariable(const AKey: string): string;
+begin
+  Result := FIDE.ConfigData.ReadString(EnvironmentVariableSectionName, AKey, '');
+end;
+
+procedure TIDE.WriteEnvironmentVariable(const AKey, AValue: string);
+begin
+  if AValue.IsEmpty then
+    FIDE.ConfigData.DeleteKey(EnvironmentVariableSectionName, AKey)
+  else
+    FIDE.ConfigData.WriteString(EnvironmentVariableSectionName, AKey, AValue);
 end;
 
 { TIDEListHelper }

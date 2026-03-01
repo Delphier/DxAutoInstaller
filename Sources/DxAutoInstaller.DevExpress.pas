@@ -95,6 +95,8 @@ type
 
   TRootDir = type string;
   TRootDirHelper = record helper for TRootDir
+  const
+    DXVCL = 'DXVCL';
   strict private
     function LibraryDir: string;
     procedure DeleteLibraryDir;
@@ -104,6 +106,9 @@ type
     function OutputDir(AIDE: TIDE; const APlatform: TPlatform): string;
     procedure CreateSourcesDir(AManifest: TManifest);
     procedure DeleteOutputDir(AIDE: TIDE; const APlatform: TPlatform);
+
+    constructor ReadFromIDEEnvironmentVariable(AIDE: TIDE);
+    procedure WriteToIDEEnvironmentVariable(AIDE: TIDE);
   end;
 
   TComponent = class
@@ -527,6 +532,16 @@ begin
   var Dirs := TDirectory.GetDirectories(LibraryDir);
   if (Length(Dirs) = 1) and SameFileName(Dirs[0], SourcesDir) then
     TDirectory.Delete(if Length(TDirectory.GetFiles(LibraryDir)) = 0 then LibraryDir else SourcesDir, True);
+end;
+
+constructor TRootDirHelper.ReadFromIDEEnvironmentVariable(AIDE: TIDE);
+begin
+  Self := AIDE.ReadEnvironmentVariable(DXVCL);
+end;
+
+procedure TRootDirHelper.WriteToIDEEnvironmentVariable(AIDE: TIDE);
+begin
+  AIDE.WriteEnvironmentVariable(DXVCL, Self);
 end;
 
 end.
