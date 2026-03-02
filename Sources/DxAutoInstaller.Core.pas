@@ -27,7 +27,9 @@ type
   TJclIDE = TJclBDSInstallation;
   TJclIDEs = TJclBorRADToolInstallations;
   TJclPlatform = TJclBDSPlatform;
-  TJclCompiler = TJclBorlandCommandLineTool;
+  TJclDCCCompiler = TJclDCC32;
+
+  TCompiler = TJclDCCCompiler;
 
   TPlatform = (pfWin32, pfWin64, pfWin64x);
   TPlatforms = set of TPlatform;
@@ -43,6 +45,9 @@ type
     FCppBuilderInstalled: Boolean;
     FSupportedPlatforms: TPlatforms;
     FSupportedDesigntimePlatforms: TPlatforms;
+  private
+    class function DCC32(AIDE: TIDE): TCompiler; static;
+    class function DCC64(AIDE: TIDE): TCompiler; static;
   public
     constructor Create(ACore: TJclIDE);
     property Core: TJclIDE read FCore;
@@ -55,6 +60,7 @@ type
     procedure CheckRunning;
     function ReadEnvironmentVariable(const AKey: string): string;
     procedure WriteEnvironmentVariable(const AKey, AValue: string);
+    procedure SwitchCompiler(const APlatform: TPlatform);
   end;
 
   TIDEList = TArray<TIDE>;
@@ -68,28 +74,23 @@ type
     class property Default: TIDEList read FDefault;
   end;
 
-  TCompiler = TJclCompiler;
-  TCompilerGetter = function(AIDE: TIDE): TCompiler;
-
   TPlatformHelper = record helper for TPlatform
-  private
-    class function DCC32Compiler(AIDE: TIDE): TCompiler; static;
-    class function DCC64Compiler(AIDE: TIDE): TCompiler; static;
   public
     function ToJclValue: TJclPlatform;
-    function Compiler(AIDE: TIDE): TCompiler;
   end;
 
   TPlatformsHelper = record helper for TPlatforms
     function ToString: string;
   end;
 
+  TCompilerGetter = function(AIDE: TIDE): TCompiler;
+
 const
   PlatformJclValues    : array[TPlatform] of TJclPlatform = (bpWin32, bpWin64, bpWin64x);
   PlatformNames        : array[TPlatform] of string       = ('Win32', 'Win64', 'Win64x');
   PlatformDescriptions : array[TPlatform] of string       = ('Windows 32-bit', 'Windows 64-bit', 'Windows 64-bit (Modern)');
 
-  PlatformCompilers        : array[TPlatform] of TCompilerGetter  = (TPlatform.DCC32Compiler, TPlatform.DCC64Compiler, TPlatform.DCC64Compiler);
+  PlatformCompilers        : array[TPlatform] of TCompilerGetter  = (TIDE.DCC32, TIDE.DCC64, TIDE.DCC64);
   PlatformCompilerOptions  : array[TPlatform] of string           = ('', '', '-jf:coffi');
   PlatformCommandLineTools : array[TPlatform] of TCommandLineTool = (clDcc32, clDcc64, clBcc64x);
 
@@ -166,6 +167,21 @@ begin
     FCore.ConfigData.WriteString(EnvironmentVariableSectionName, AKey, AValue);
 end;
 
+procedure TIDE.SwitchCompiler(const APlatform: TPlatform);
+begin
+  FCore.DCC := PlatformCompilers[APlatform](Self);
+end;
+
+class function TIDE.DCC32(AIDE: TIDE): TCompiler;
+begin
+  Result := AIDE.FCore.DCC32;
+end;
+
+class function TIDE.DCC64(AIDE: TIDE): TCompiler;
+begin
+  Result := AIDE.FCore.DCC64;
+end;
+
 { TIDEListHelper }
 
 class constructor TIDEListHelper.Create;
@@ -188,21 +204,6 @@ end;
 function TPlatformHelper.ToJclValue: TJclPlatform;
 begin
   Result := PlatformJclValues[Self];
-end;
-
-function TPlatformHelper.Compiler(AIDE: TIDE): TCompiler;
-begin
-  Result := PlatformCompilers[Self](AIDE);
-end;
-
-class function TPlatformHelper.DCC32Compiler(AIDE: TIDE): TCompiler;
-begin
-  Result := AIDE.Core.DCC32;
-end;
-
-class function TPlatformHelper.DCC64Compiler(AIDE: TIDE): TCompiler;
-begin
-  Result := AIDE.Core.DCC64;
 end;
 
 { TPlatformsHelper }
