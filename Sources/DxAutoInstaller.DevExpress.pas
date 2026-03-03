@@ -103,6 +103,7 @@ type
   public
     function Version: TVersion;
     function SourcesDir: string;
+    function ResourcesDir: string;
     function OutputDir(AIDE: TIDE; const APlatform: TPlatform): string;
     procedure CreateSourcesDir(AManifest: TManifest);
     procedure DeleteOutputDir(AIDE: TIDE; const APlatform: TPlatform);
@@ -167,6 +168,7 @@ implementation
 uses
   System.SysUtils,
   System.IOUtils,
+  System.StrUtils,
   System.RegularExpressions,
   DxAutoInstaller.Utils,
   VSoft.YAML;
@@ -498,6 +500,11 @@ begin
   Result := TPath.Combine(LibraryDir, 'Sources');
 end;
 
+function TRootDirHelper.ResourcesDir: string;
+begin
+  Result := TPath.Combine(SourcesDir, 'Resources');
+end;
+
 function TRootDirHelper.OutputDir(AIDE: TIDE; const APlatform: TPlatform): string;
 begin
   Result := TPath.Combine(LibraryDir, AIDE.PackageVersionStr, PlatformNames[APlatform]);
@@ -505,15 +512,15 @@ end;
 
 procedure TRootDirHelper.CreateSourcesDir(AManifest: TManifest);
 begin
-  if TDirectory.Exists(SourcesDir) and not TDirectory.IsEmpty(SourcesDir) then Exit;
-  TDirectory.CreateDirectory(SourcesDir);
+  if TDirectory.Exists(ResourcesDir) and not TDirectory.IsEmpty(ResourcesDir) then Exit;
+  TDirectory.CreateDirectory(ResourcesDir);
 
   for var Metadata in AManifest.Components do
     for var DirName in Metadata.Sources do begin
       var Dir := TPath.Combine(Self, DirName);
       if TDirectory.Exists(Dir) then
         for var FileName in TDirectory.GetFilesEnumerator(Dir) do
-          TFile.Copy(FileName, ChangeFilePath(FileName, SourcesDir));
+          TFile.Copy(FileName, ChangeFilePath(FileName, if MatchText(ExtractFileExt(FileName), ['.dfm', '.res', '.dcr']) then ResourcesDir else SourcesDir));
     end;
 end;
 
