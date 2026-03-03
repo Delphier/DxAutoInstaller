@@ -14,14 +14,20 @@ unit DxAutoInstaller.Core;
 interface
 
 uses
-  JclIDEUtils, JclCompilerUtils;
+  JclIDEUtils, JclCompilerUtils, DxAutoInstaller.Utils;
 
 type
   TApp = class
   const
     {$I ..\Resources\App.inc}
+  strict private
+    class var FDir: string;
+    class var FLog: TLog;
   public
-    class function Dir: string;
+    class constructor Create;
+    class destructor Destroy;
+    class property Dir: string read FDir;
+    class property Log: TLog read FLog;
   end;
 
   TJclIDE = TJclBDSInstallation;
@@ -127,9 +133,15 @@ uses
 
 { TApp }
 
-class function TApp.Dir: string;
+class constructor TApp.Create;
 begin
-  Result := ExtractFileDir(Application.ExeName);
+  FDir := ExtractFileDir(Application.ExeName);
+  FLog := TLog.Create;
+end;
+
+class destructor TApp.Destroy;
+begin
+  FLog.Free;
 end;
 
 { TIDE }

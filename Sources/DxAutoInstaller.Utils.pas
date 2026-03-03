@@ -14,9 +14,24 @@ unit DxAutoInstaller.Utils;
 interface
 
 uses
-  System.Classes, System.Win.Registry;
+  System.Classes, System.Win.Registry, JclSysUtils;
 
 type
+  TLog = class
+  const
+    Separator = '-------------------------------------------------------------';
+  private
+    FFile: TJclSimpleLog;
+    FLast: TStrings;
+    procedure DoWrite(const AText: string);
+  public
+    constructor Create;
+    destructor Destroy; override;
+    property Last: TStrings read FLast;
+    procedure Write(const AText: string);
+    procedure WriteSeparator;
+  end;
+
   TMessageBox = record
     class function Confirm(const AMessage: string; AButtonCaptions: TArray<string> = []): Boolean; static;
   end;
@@ -46,7 +61,40 @@ procedure ExportResourceToFile(const AFileName, AResName: string);
 implementation
 
 uses
-  System.SysUtils, System.UITypes, Winapi.Windows, Winapi.Messages, Vcl.Dialogs;
+  System.SysUtils, System.UITypes, Winapi.Windows, Winapi.Messages,
+  Vcl.Forms, Vcl.Dialogs;
+
+{ TLog }
+
+constructor TLog.Create;
+begin
+  FFile := TJclSimpleLog.Create(ChangeFileExt(Application.ExeName, '.log'));
+  FLast := TStringList.Create;
+end;
+
+destructor TLog.Destroy;
+begin
+  FFile.Free;
+  FLast.Free;
+  inherited;
+end;
+
+procedure TLog.DoWrite(const AText: string);
+begin
+  FFile.Write(AText);
+end;
+
+procedure TLog.Write(const AText: string);
+begin
+  DoWrite(AText);
+  FLast.Add(AText);
+end;
+
+procedure TLog.WriteSeparator;
+begin
+  DoWrite(Separator);
+  FLast.Clear;
+end;
 
 { TMessageBox }
 
@@ -71,7 +119,7 @@ end;
 
 class function TUserEnvironmentVariablePath.Read: TArray<string>;
 begin
-  Registry.OpenKeyReadOnly(ENVIRONMENT);
+  Registry.OpenKey(ENVIRONMENT, False);
   Result := Registry.ReadString(PATH).Split([';']);
   Registry.CloseKey;
 end;
