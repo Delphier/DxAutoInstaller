@@ -18,6 +18,7 @@ uses
   DxAutoInstaller.Core;
 
 type
+  PPackageMetadata = ^TPackageMetadata;
   TPackageMetadata = record
     BaseName: string;
     Dir: string;
@@ -43,6 +44,7 @@ type
   private
     FIsCustom: Boolean;
     FComponents: TArray<TComponentMetadata>;
+    FPackages: TArray<PPackageMetadata>;
     procedure ReadComponents;
   public
     class destructor Destroy;
@@ -54,6 +56,7 @@ type
     constructor Create(const AUseCustomFile: Boolean);
     property IsCustom: Boolean read FIsCustom;
     property Components: TArray<TComponentMetadata> read FComponents;
+    property Packages: TArray<PPackageMetadata> read FPackages;
   end;
 
   TPackageName = type string;
@@ -215,28 +218,27 @@ var
   Doc: IYAMLDocument;
   Value: IYAMLValue;
 
-  function ParsePackages(const ACompName: string; ACompValue: IYAMLValue; const AKey: string): TArray<TPackageMetadata>;
+  procedure ParsePackages(const ACompName: string; ACompValue: IYAMLValue; const AKey: string; var AResult: TArray<TPackageMetadata>);
   begin
-    Result := [];
     var Packages := ACompValue.Values[AKey];
+    SetLength(AResult, Packages.Count);
     if Packages.IsNull then Exit;
 
     for var I := 0 to Packages.Count - 1 do begin
       var Path := Packages.AsSequence[I].AsString;
-      var Metadata := Default(TPackageMetadata);
-      Metadata.BaseName := TPath.GetFileName(Path);
-      Metadata.Dir := TPath.GetDirectoryName(Path);
-      if Metadata.Dir.IsEmpty then Metadata.Dir := TPath.Combine(ACompName, 'Packages');
-      Result := Result + [Metadata];
+      var Dir := TPath.GetDirectoryName(Path);
+      AResult[I].BaseName := TPath.GetFileName(Path);
+      AResult[I].Dir := if Dir.IsEmpty then TPath.Combine(ACompName, 'Packages') else Dir;
+      FPackages := FPackages + [@AResult[I]];
     end;
   end;
 
   function ParseStrings(ACompValue: IYAMLValue; const AKey: string): TArray<string>;
   begin
-    Result := [];
     var Strings := ACompValue.Values[AKey];
+    SetLength(Result, Strings.Count);
     if Strings.IsNull then Exit;
-    for var I := 0 to Strings.Count - 1 do Result := Result + [Strings.AsSequence[I].AsString];
+    for var I := 0 to Strings.Count - 1 do Result[I] := Strings.AsSequence[I].AsString;
   end;
 
 begin
@@ -250,18 +252,17 @@ begin
   end;
 
   var Root := Doc.Root.AsMapping;
+  SetLength(FComponents, Root.Count);
   for var I := 0 to Root.Count - 1 do begin
     var CompName := Root.Keys[I];
     var CompValue := Root[CompName];
-    var Metadata := Default(TComponentMetadata);
-    Metadata.Name := CompName;
-    Metadata.Visible := if CompValue.TryGetValue('Visible', Value) then Value.AsBoolean else True;
-    Metadata.RequiredPackages := ParsePackages(CompName, CompValue, 'RequiredPackages');
-    Metadata.OptionalPackages := ParsePackages(CompName, CompValue, 'OptionalPackages');
-    Metadata.OutdatedPackages := ParsePackages(CompName, CompValue, 'OutdatedPackages');
-    Metadata.Sources := [TPath.Combine(CompName, 'Sources')] + ParseStrings(CompValue, 'Sources');
-    Metadata.Help := [TPath.Combine(CompName, 'Help')] + ParseStrings(CompValue, 'Help');
-    FComponents := FComponents + [Metadata];
+    FComponents[I].Name := CompName;
+    FComponents[I].Visible := if CompValue.TryGetValue('Visible', Value) then Value.AsBoolean else True;
+    ParsePackages(CompName, CompValue, 'RequiredPackages', FComponents[I].RequiredPackages);
+    ParsePackages(CompName, CompValue, 'OptionalPackages', FComponents[I].OptionalPackages);
+    ParsePackages(CompName, CompValue, 'OutdatedPackages', FComponents[I].OutdatedPackages);
+    FComponents[I].Sources := [TPath.Combine(CompName, 'Sources')] + ParseStrings(CompValue, 'Sources');
+    FComponents[I].Help := [TPath.Combine(CompName, 'Help')] + ParseStrings(CompValue, 'Help');
   end;
 end;
 
