@@ -11,7 +11,9 @@ uses
   DxAutoInstaller.Resources in 'Sources\DxAutoInstaller.Resources.pas' {DMResources: TDataModule},
   DxAutoInstaller.DevExpress in 'Sources\DxAutoInstaller.DevExpress.pas',
   DxAutoInstaller.UI.TreeList in 'Sources\DxAutoInstaller.UI.TreeList.pas',
-  DxAutoInstaller.Installations in 'Sources\DxAutoInstaller.Installations.pas';
+  DxAutoInstaller.Installations in 'Sources\DxAutoInstaller.Installations.pas',
+  DxAutoInstaller.Tasks in 'Sources\DxAutoInstaller.Tasks.pas',
+  DxAutoInstaller.UI.ProgressForm in 'Sources\DxAutoInstaller.UI.ProgressForm.pas' {ProgressForm};
 
 {$R *.res}
 

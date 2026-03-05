@@ -128,7 +128,8 @@ const
 implementation
 
 uses
-  System.SysUtils, System.Generics.Collections, Vcl.Forms;
+  System.SysUtils, System.Generics.Collections, Vcl.Forms,
+  DxAutoInstaller.Tasks;
 
 
 { TApp }
@@ -149,6 +150,7 @@ end;
 constructor TIDE.Create(ACore: TJclIDE);
 begin
   FCore := ACore;
+  FCore.OutputCallback := TTask.WriteLog;
   FName := FCore.Name;
   FPackageVersionStr := FCore.VersionNumberStr.Replace('d', 'RS');
   FDelphiInstalled := FCore.Personalities * [bpDelphi32, bpDelphi64] <> [];

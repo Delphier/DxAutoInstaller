@@ -109,6 +109,11 @@
         <DCCReference Include="Sources\DxAutoInstaller.DevExpress.pas"/>
         <DCCReference Include="Sources\DxAutoInstaller.UI.TreeList.pas"/>
         <DCCReference Include="Sources\DxAutoInstaller.Installations.pas"/>
+        <DCCReference Include="Sources\DxAutoInstaller.Tasks.pas"/>
+        <DCCReference Include="Sources\DxAutoInstaller.UI.ProgressForm.pas">
+            <Form>ProgressForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <RcItem Include="Resources\DevExpress.yaml">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
