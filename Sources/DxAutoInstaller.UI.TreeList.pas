@@ -211,12 +211,12 @@ begin
   var Pos := Point(X, Y);
   var HitTest := FTreeList.HitTest;
   HitTest.HitPoint := Pos;
+  var Node := HitTest.HitNode;
+  var Column := HitTest.HitColumn;
 
-  if HitTest.HitAtNode and HitTest.HitAtColumn then
+  if Assigned(Node) and Assigned(Column) and Assigned(HitTest.EditCellViewInfo) and Assigned(HitTest.EditCellViewInfo.EditViewInfo) then
     if HitTest.EditCellViewInfo.EditViewInfo.EditProperties = DMResources.ErrorEditor.Properties then begin
       var ImageRect := (HitTest.EditCellViewInfo.EditViewInfo as TcxImageComboBoxViewInfo).ImageRect;
-      var Node := HitTest.HitNode;
-      var Column := HitTest.HitColumn;
       ImageRect.Offset(FTreeList.CellRect(Node, Column).TopLeft);
       if ImageRect.Contains(Pos) then begin
         FTreeList.Hint := ErrorMessages[TError(Column.Values[Node])];
