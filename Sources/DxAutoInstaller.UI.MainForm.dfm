@@ -1,7 +1,7 @@
-object FormMain: TFormMain
+object MainForm: TMainForm
   Left = 0
   Top = 0
-  Caption = 'FormMain'
+  Caption = 'MainForm'
   ClientHeight = 854
   ClientWidth = 618
   Color = clBtnFace
@@ -411,6 +411,7 @@ object FormMain: TFormMain
     Top = 288
     object ActInstall: TAction
       Caption = '&Install'
+      Enabled = False
       ImageIndex = 0
       OnExecute = ActInstallExecute
     end
@@ -426,6 +427,7 @@ object FormMain: TFormMain
     end
     object ActSearchNewPackages: TAction
       Caption = 'Search New Packages'
+      Enabled = False
       ImageIndex = 3
       OnExecute = ActSearchNewPackagesExecute
     end

@@ -9,7 +9,7 @@
 {                                                       }
 {*******************************************************}
 
-unit DxAutoInstaller.UI.FormMain;
+unit DxAutoInstaller.UI.MainForm;
 
 interface
 
@@ -22,7 +22,7 @@ uses
   DxAutoInstaller.Installations;
 
 type
-  TFormMain = class(TForm)
+  TMainForm = class(TForm)
     PanelTop: TPanel;
     ImageLogo: TImage;
     LblAppName: TLabel;
@@ -94,12 +94,12 @@ type
   end;
 
 var
-  FormMain: TFormMain;
+  MainForm: TMainForm;
 
 implementation
 
 uses
-  System.SysUtils, System.StrUtils,
+  System.SysUtils, System.StrUtils, System.IOUtils, System.RegularExpressions,
   Winapi.Windows, Winapi.ShellAPI,
   Vcl.FileCtrl,
   DxAutoInstaller.Core,
@@ -109,7 +109,7 @@ uses
 
 {$R *.dfm}
 
-procedure TFormMain.FormCreate(Sender: TObject);
+procedure TMainForm.FormCreate(Sender: TObject);
 begin
   Caption := Application.Title;
   LblAppName.Caption := Application.Title;
@@ -122,26 +122,27 @@ begin
   PanTreeList.BevelKind := TBevelKind.bkNone;
   FTreeList := TTreeList.Create(PanTreeList);
   for var IDE in TIDEList.Default do ListViewUninstall.AddItem(IDE.Name, IDE);
+  ActUninstall.Enabled := ListViewUninstall.Items.Count > 0;
   FormatLinkLabel(LinkGitHub);
   FormatLinkLabel(LinkDevExpressDocs);
   FormatLinkLabel(LinkEmail, True);
   LoadResourceToStream(MemoChangelog.Lines.LoadFromStream, 'Changelog');
 end;
 
-procedure TFormMain.FormDestroy(Sender: TObject);
+procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   FTreeList.Free;
   FInstallations.Free;
 end;
 
-procedure TFormMain.FormActivate(Sender: TObject);
+procedure TMainForm.FormActivate(Sender: TObject);
 begin
   OnActivate := nil;
   TManifest.CreateInstance;
   ShowManifestStatus;
 end;
 
-procedure TFormMain.PageControlChange(Sender: TObject);
+procedure TMainForm.PageControlChange(Sender: TObject);
 begin
   ChkShowAllComponents.Visible := PageControl.ActivePage = TabInstall;
   if PageControl.ActivePage = TabInstall then BtnExecute.Action := ActInstall
@@ -149,7 +150,7 @@ begin
   else BtnExecute.Visible := False;
 end;
 
-procedure TFormMain.EditRootDirPropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
+procedure TMainForm.EditRootDirPropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
 var
   Dirs: TArray<string>;
   RootDir: TRootDir;
@@ -162,30 +163,35 @@ begin
     EditVersion.Text := RootDir.Version.ToText;
 
     FInstallations.Free;
-    FInstallations := TInstallations.Create(RootDir, TManifest.Instance);
+    FInstallations := TInstallations.Create(TIDEList.Default, RootDir, TManifest.Instance);
     for var Installation in FInstallations do Installation.Components.CheckAll(True);
     FTreeList.Installations := FInstallations;
   finally
     Screen.Cursor := crDefault;
   end;
+
+  ActInstall.Enabled := True;
+  ActSearchNewPackages.Enabled := True;
 end;
 
-procedure TFormMain.ChkShowAllComponentsClick(Sender: TObject);
+procedure TMainForm.ChkShowAllComponentsClick(Sender: TObject);
 begin
   FTreeList.ShowAllComponents := ChkShowAllComponents.Checked;
 end;
 
-procedure TFormMain.ActInstallExecute(Sender: TObject);
+procedure TMainForm.ActInstallExecute(Sender: TObject);
 begin
-//
+  if Assigned(FInstallations) then FInstallations.Execute;
 end;
 
-procedure TFormMain.ActUninstallExecute(Sender: TObject);
+procedure TMainForm.ActUninstallExecute(Sender: TObject);
 begin
-//
+  var IDEList: TIDEList := [];
+  for var Item in ListViewUninstall.Items do if Item.Checked then IDEList := IDEList + [TIDE(Item.Data)];
+  TUninstallation.Execute(IDEList, TManifest.Instance);
 end;
 
-procedure TFormMain.ShowManifestStatus;
+procedure TMainForm.ShowManifestStatus;
 begin
   LblCurrentManifest.Caption := Format('Current Manifest: <%s>', [IfThen(TManifest.Instance.IsCustom, 'Custom', 'Built-in')]);
   LblCustomManifest.Caption := Format('Custom Manifest: <a href="%s">%s</a>', [TManifest.CustomFileName, TManifest.CustomFileName]);
@@ -195,41 +201,65 @@ begin
   LblCustomManifestNote.Visible := LblCustomManifest.Visible;
 end;
 
-procedure TFormMain.ActManifestDeleteExecute(Sender: TObject);
+procedure TMainForm.ActManifestDeleteExecute(Sender: TObject);
 begin
   System.SysUtils.DeleteFile(TManifest.CustomFileName);
   ShowManifestStatus;
 end;
 
-procedure TFormMain.ActManifestExportExecute(Sender: TObject);
+procedure TMainForm.ActManifestExportExecute(Sender: TObject);
 begin
   TManifest.Export;
   ShowManifestStatus;
 end;
 
-procedure TFormMain.LblCustomManifestLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
+procedure TMainForm.LblCustomManifestLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
 begin
   ShellExecute(Application.Handle, 'Open', 'explorer.exe', PChar(Format('/select,"%s"', [Link])), nil, SW_SHOWNORMAL);
 end;
 
-procedure TFormMain.ActSearchNewPackagesExecute(Sender: TObject);
+function SearchNewPackages(const ADir: string): TArray<string>;
 begin
-//
+  Result := [];
+  var Names := TStringList.Create(dupIgnore, True, False);
+  try
+    for var Package in TManifest.Instance.Packages do Names.Add(Package.BaseName);
+    for var FileName in TDirectory.GetFilesEnumerator(ADir, '*.dpk', TSearchOption.soAllDirectories) do begin
+      var Match := TRegEx.Match(TPath.GetFileNameWithoutExtension(FileName), '^(.+)RS\d+$');
+      if Match.Success and not Names.Contains(Match.Groups[1].Value) then Result := Result + [FileName];
+    end;
+  finally
+    Names.Free;
+  end;
 end;
 
-procedure TFormMain.FormatLinkLabel(ALinkLable: TLinkLabel; const AIsEmail: Boolean);
+procedure TMainForm.ActSearchNewPackagesExecute(Sender: TObject);
+begin
+  Screen.Cursor := crHourGlass;
+  ActSearchNewPackages.Enabled := False;
+  try
+    var List := SearchNewPackages(EditRootDir.Text);
+    TMessageBox.Information(if Length(List) > 0 then string.Join(sLineBreak, List) else 'No new packages found in ' + EditRootDir.Text);
+  finally
+    ActSearchNewPackages.Enabled := True;
+    Screen.Cursor := crDefault;
+  end;
+
+end;
+
+procedure TMainForm.FormatLinkLabel(ALinkLable: TLinkLabel; const AIsEmail: Boolean);
 begin
   ALinkLable.ShowHint := True;
   ALinkLable.Hint := ALinkLable.Caption;
   ALinkLable.Caption := Format('<a href="%s%s">%s</a>', [IfThen(AIsEmail, 'mailto:'), ALinkLable.Caption, ALinkLable.Caption]);
 end;
 
-procedure TFormMain.LinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
+procedure TMainForm.LinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
 begin
   ShellExecute(Application.Handle, 'Open', PChar(Link), nil, nil, SW_SHOWNORMAL);
 end;
 
-procedure TFormMain.ActExitExecute(Sender: TObject);
+procedure TMainForm.ActExitExecute(Sender: TObject);
 begin
   Close;
 end;

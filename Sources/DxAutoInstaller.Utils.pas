@@ -33,6 +33,7 @@ type
   end;
 
   TMessageBox = record
+    class procedure Information(const AMessage: string); static;
     class function Confirm(const AMessage: string; AButtonCaptions: TArray<string> = []): Boolean; static;
   end;
 
@@ -97,6 +98,11 @@ begin
 end;
 
 { TMessageBox }
+
+class procedure TMessageBox.Information(const AMessage: string);
+begin
+  ShowMessage(AMessage);
+end;
 
 class function TMessageBox.Confirm(const AMessage: string; AButtonCaptions: TArray<string>): Boolean;
 begin

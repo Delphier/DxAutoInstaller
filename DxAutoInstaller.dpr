@@ -4,7 +4,7 @@ program DxAutoInstaller;
 
 uses
   Vcl.Forms,
-  DxAutoInstaller.UI.FormMain in 'Sources\DxAutoInstaller.UI.FormMain.pas' {FormMain},
+  DxAutoInstaller.UI.MainForm in 'Sources\DxAutoInstaller.UI.MainForm.pas' {MainForm},
   DxAutoInstaller.Core in 'Sources\DxAutoInstaller.Core.pas',
   DxAutoInstaller.Utils in 'Sources\DxAutoInstaller.Utils.pas',
   DxAutoInstaller.Options in 'Sources\DxAutoInstaller.Options.pas',
@@ -21,6 +21,6 @@ begin
   Application.MainFormOnTaskbar := True;
   Application.Title := TApp.Name;
   Application.CreateForm(TDMResources, DMResources);
-  Application.CreateForm(TFormMain, FormMain);
+  Application.CreateForm(TMainForm, MainForm);
   Application.Run;
 end.
