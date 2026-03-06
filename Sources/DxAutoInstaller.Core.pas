@@ -98,7 +98,7 @@ const
   PlatformDescriptions : array[TPlatform] of string       = ('Windows 32-bit', 'Windows 64-bit', 'Windows 64-bit (Modern)');
 
   PlatformCompilers        : array[TPlatform] of TCompilerGetter  = (TIDE.DCC32, TIDE.DCC64, TIDE.DCC64);
-  PlatformCompilerOptions  : array[TPlatform] of string           = ('', '', '-jf:coffi');
+  PlatformCompilerOptions  : array[TPlatform] of string           = ('', '', '-jf:coffi -DDX_WIN64_MODERN');
   PlatformCommandLineTools : array[TPlatform] of TCommandLineTool = (clDcc32, clDcc64, clBcc64x);
 
   DelphiSupportedPlatforms            = [pfWin32, pfWin64];
