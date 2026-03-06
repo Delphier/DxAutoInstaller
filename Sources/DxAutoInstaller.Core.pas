@@ -86,6 +86,7 @@ type
   end;
 
   TPlatformsHelper = record helper for TPlatforms
+    function Count: Integer;
     function ToString: string;
   end;
 
@@ -221,6 +222,12 @@ begin
 end;
 
 { TPlatformsHelper }
+
+function TPlatformsHelper.Count: Integer;
+begin
+  Result := 0;
+  for var I in Self do Inc(Result);
+end;
 
 function TPlatformsHelper.ToString: string;
 begin

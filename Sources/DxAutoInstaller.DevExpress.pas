@@ -164,6 +164,7 @@ type
   TComponentListHelper = record helper for TArray<TComponent>
     function Count: NativeUInt;
     function ValidCount: NativeUInt;
+    function CheckedCount: NativeUInt;
   end;
 
 implementation
@@ -172,6 +173,7 @@ uses
   System.SysUtils,
   System.IOUtils,
   System.StrUtils,
+  System.Generics.Defaults,
   System.RegularExpressions,
   DxAutoInstaller.Utils,
   VSoft.YAML;
@@ -387,7 +389,7 @@ var
   begin
     for var Package in APackages do
       for var PkgName in Package.FRequires do
-        if Dict.TryGetValue(PkgName.ToUpper, Component) then
+        if Dict.TryGetValue(PkgName, Component) then
           if Component <> AComponent then
             if not TArray.Contains(Package.Dependencies, Component) then begin
               Package.FDependencies := Package.FDependencies + [Component];
@@ -400,11 +402,11 @@ var
   end;
 
 begin
-  Dict := TPkgCompDict.Create;
+  Dict := TPkgCompDict.Create(TIStringComparer.Ordinal);
   try
     for var Comp in Self do
       for var Package in Comp.Packages do
-        Dict.Add(UpperCase(Package.Name), Comp);
+        Dict.Add(Package.Name, Comp);
 
     for var Comp in Self do begin
       SetDependencies(Comp, Comp.RequiredPackages, True);
@@ -456,6 +458,13 @@ function TComponentListHelper.ValidCount: NativeUInt;
 begin
   Result := 0;
   for var Comp in Self do if Comp.Valid then Inc(Result);
+end;
+
+function TComponentListHelper.CheckedCount: NativeUInt;
+begin
+  Result := 0;
+  for var Comp in Self do if Comp.Checked then Inc(Result);
+
 end;
 
 { TPackageNameHelper }

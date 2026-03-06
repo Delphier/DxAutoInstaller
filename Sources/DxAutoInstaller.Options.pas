@@ -92,6 +92,8 @@ type
     function UseNativeLookAndFeel: Boolean;
 
     function Platforms: TPlatforms;
+    function DesigntimePlatforms: TPlatforms;
+    function InstallPlatforms: TPlatforms;
   end;
 
 implementation
@@ -235,6 +237,19 @@ end;
 function TOptions.Platforms: TPlatforms;
 begin
   Result := DelphiPlatforms + CppBuilderPlatforms;
+end;
+
+function TOptions.DesigntimePlatforms: TPlatforms;
+begin
+  Result := [];
+  for var I in DelphiPlatforms do Result := Result + DelphiSupportedDesigntimePlatforms[I];
+  for var I in CppBuilderPlatforms do Result := Result + CppBuilderSupportedDesigntimePlatforms[I];
+  Result := Result * FIDE.SupportedDesigntimePlatforms * DesigntimeSupportedPlatforms;
+end;
+
+function TOptions.InstallPlatforms: TPlatforms;
+begin
+  Result := Platforms + DesigntimePlatforms;
 end;
 
 { TOptionValueHelper }
