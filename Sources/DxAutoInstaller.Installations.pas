@@ -86,7 +86,8 @@ begin
   try
     CompilerOptions.LineBreak := ' ';
     CompilerOptions.Add(PlatformCompilerOptions[APlatform]);
-    if Options.UseNativeLookAndFeel then CompilerOptions.Add('-DUSENATIVELOOKANDFEELASDEFAULT');
+    if Options.UseNativeLookAndFeel then CompilerOptions.Add('-D' + TOptions.DefineUseNativeLookAndFeel);
+    if Options.ApplyGlobalTheme then CompilerOptions.Add('-D' + TOptions.DefineApplyGlobalTheme);
     // -U   Unit Search Paths
     // -R   Resource Search Paths
     CompilerOptions.Add(Format('-U"%s" -R"%s"', [FRootDir.SourcesDir, FRootDir.ResourcesDir]));

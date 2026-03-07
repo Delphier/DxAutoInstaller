@@ -75,12 +75,21 @@ type
     class function Name: string; override;
   end;
 
+  TOptionApplyGlobalTheme = class(TOption)
+  public
+    class function Name: string; override;
+  end;
+
   TOptions = class(TObjectList<TOption>)
   const
-    Classes: array[0..3] of TOptionClass = (TOptionDelphiPlatforms,
+    Classes: array[0..4] of TOptionClass = (TOptionDelphiPlatforms,
                                             TOptionCppBuilderPlatforms,
                                             TOptionAddBrowsingPath,
-                                            TOptionUseNativeLookAndFeel);
+                                            TOptionUseNativeLookAndFeel,
+                                            TOptionApplyGlobalTheme);
+    DefineUseNativeLookAndFeel = 'USENATIVELOOKANDFEELASDEFAULT';
+    DefineApplyGlobalTheme     = 'USEGLOBALSKINASDEFAULT';
+    Defines: array[0..1] of string = (DefineUseNativeLookAndFeel, DefineApplyGlobalTheme);
   private
     FIDE: TIDE;
     function Find(AClass: TOptionClass): TOption;
@@ -90,6 +99,7 @@ type
     function CppBuilderPlatforms: TPlatforms;
     function AddBrowsingPath: Boolean;
     function UseNativeLookAndFeel: Boolean;
+    function ApplyGlobalTheme: Boolean;
 
     function Platforms: TPlatforms;
     function DesigntimePlatforms: TPlatforms;
@@ -199,6 +209,13 @@ begin
   Result := 'Use Native Look and Feel as Default';
 end;
 
+{ TOptionApplyGlobalTheme }
+
+class function TOptionApplyGlobalTheme.Name: string;
+begin
+  Result := 'Apply Global Theme Settings';
+end;
+
 { TOptions }
 
 constructor TOptions.Create(AIDE: TIDE);
@@ -232,6 +249,11 @@ end;
 function TOptions.UseNativeLookAndFeel: Boolean;
 begin
   Result := Find(TOptionUseNativeLookAndFeel).Value;
+end;
+
+function TOptions.ApplyGlobalTheme: Boolean;
+begin
+  Result := Find(TOptionApplyGlobalTheme).Value;
 end;
 
 function TOptions.Platforms: TPlatforms;

@@ -175,6 +175,7 @@ uses
   System.StrUtils,
   System.Generics.Defaults,
   System.RegularExpressions,
+  DxAutoInstaller.Options,
   DxAutoInstaller.Utils,
   VSoft.YAML;
 
@@ -532,6 +533,17 @@ begin
         for var FileName in TDirectory.GetFilesEnumerator(Dir) do
           TFile.Copy(FileName, ChangeFilePath(FileName, if MatchText(ExtractFileExt(FileName), ['.dfm', '.res', '.dcr']) then ResourcesDir else SourcesDir));
     end;
+
+  var cxVerFileName := TPath.Combine(SourcesDir, 'cxVer.inc');
+  if not TFile.Exists(cxVerFileName) then Exit;
+  var cxVer := TFile.ReadAllLines(cxVerFileName);
+  for var I := 0 to High(cxVer) do
+    for var Define in TOptions.Defines do
+      if SameText(cxVer[I].Trim, Format('{$DEFINE %s}', [Define])) then begin
+        cxVer[I] := '';
+        Break;
+      end;
+  TFile.WriteAllLines(cxVerFileName, cxVer);
 end;
 
 procedure TRootDirHelper.DeleteOutputDir(AIDE: TIDE; const APlatform: TPlatform);
