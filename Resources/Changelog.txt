@@ -1,5 +1,17 @@
 Changelog
 --------------------------
+v3.13	2026/03/07
+	Added support for RAD Studio 13 Florence.
+	Added support for 64-bit IDE.
+	Added support for C++Builder Windows 64-bit Modern(Win64x).
+	Added support to select Delphi and C++Builder target platforms for install.
+	Added async threading execution for install/uninstall.
+	Added progress bar and elapsed time for install/uninstall.
+	Added new install option: Apply Global Theme Settings.
+	Added log file.
+	Added separate x86 and x64 binary releases.
+	Updated manifest file to DevExpress VCL 25.2.3.
+
 v2.3.8	2024/06/15
 	Update profile to DevExpress VCL 24.1.3.
 
