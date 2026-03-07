@@ -139,6 +139,7 @@ begin
     end;
 
     if Platform in Options.CppBuilderPlatforms then begin
+      IDE.Core.AddToCppIncludePath(OutputDir, Platform.ToJclValue);
       IDE.Core.AddToCppLibraryPath(OutputDir, Platform.ToJclValue);
       IDE.Core.AddToCppLibraryPath(FRootDir.ResourcesDir, Platform.ToJclValue);
       if Options.AddBrowsingPath then IDE.Core.AddToCppBrowsingPath(FRootDir.SourcesDir, Platform.ToJclValue) else IDE.Core.AddToCppLibraryPath(FRootDir.SourcesDir, Platform.ToJclValue);
@@ -227,6 +228,7 @@ begin
     AIDE.Core.RemoveFromLibrarySearchPath(RootDir.ResourcesDir, Platform.ToJclValue);
     AIDE.Core.RemoveFromLibraryBrowsingPath(RootDir.SourcesDir, Platform.ToJclValue);
     if AIDE.CppBuilderInstalled and (Platform in CppBuilderSupportedPlatforms) then begin
+      AIDE.Core.RemoveFromCppIncludePath(OutputDir, Platform.ToJclValue);
       AIDE.Core.RemoveFromCppLibraryPath(OutputDir, Platform.ToJclValue);
       AIDE.Core.RemoveFromCppLibraryPath(RootDir.SourcesDir, Platform.ToJclValue);
       AIDE.Core.RemoveFromCppLibraryPath(RootDir.ResourcesDir, Platform.ToJclValue);
