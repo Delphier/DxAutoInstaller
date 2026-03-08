@@ -100,6 +100,7 @@ type
   TRootDirHelper = record helper for TRootDir
   const
     DXVCL = 'DXVCL';
+    RegKeyDevExpressVCLProducts = 'Software\Developer Express VCL Products';
   strict private
     function LibraryDir: string;
     procedure DeleteLibraryDir;
@@ -175,6 +176,7 @@ uses
   System.StrUtils,
   System.Generics.Defaults,
   System.RegularExpressions,
+  System.Win.Registry,
   DxAutoInstaller.Options,
   DxAutoInstaller.Utils,
   VSoft.YAML;
@@ -535,15 +537,28 @@ begin
     end;
 
   var cxVerFileName := TPath.Combine(SourcesDir, 'cxVer.inc');
-  if not TFile.Exists(cxVerFileName) then Exit;
-  var cxVer := TFile.ReadAllLines(cxVerFileName);
-  for var I := 0 to High(cxVer) do
-    for var Define in TOptions.Defines do
-      if SameText(cxVer[I].Trim, Format('{$DEFINE %s}', [Define])) then begin
-        cxVer[I] := '';
-        Break;
-      end;
-  TFile.WriteAllLines(cxVerFileName, cxVer);
+  if TFile.Exists(cxVerFileName) then begin
+    var cxVer := TFile.ReadAllText(cxVerFileName);
+    for var Define in TOptions.Defines do cxVer := cxVer.Replace(Format('{$DEFINE %s}', [Define]), '');
+    TFile.WriteAllText(cxVerFileName, cxVer);
+  end;
+
+  var dxOnlineHelpViewerFileName := TPath.Combine(SourcesDir, 'dxOnlineHelpViewer.pas');
+  if TFile.Exists(dxOnlineHelpViewerFileName) then begin
+    var Registry := TRegistry.Create;
+    try
+      Registry.OpenKey(RegKeyDevExpressVCLProducts, True);
+      Registry.WriteString('RootDirectory', Self);
+      Registry.CloseKey;
+    finally
+      Registry.Free;
+    end;
+
+    var dxOnlineHelpViewer := TFile.ReadAllText(dxOnlineHelpViewerFileName);
+    dxOnlineHelpViewer := dxOnlineHelpViewer.Replace('(KEY_WOW64_32KEY)', '');
+    dxOnlineHelpViewer := dxOnlineHelpViewer.Replace('HKEY_LOCAL_MACHINE', 'HKEY_CURRENT_USER');
+    TFile.WriteAllText(dxOnlineHelpViewerFileName, dxOnlineHelpViewer);
+  end;
 end;
 
 procedure TRootDirHelper.DeleteOutputDir(AIDE: TIDE; const APlatform: TPlatform);
@@ -559,8 +574,15 @@ procedure TRootDirHelper.DeleteLibraryDir;
 begin
   if not TDirectory.Exists(LibraryDir) then Exit;
   var Dirs := TDirectory.GetDirectories(LibraryDir);
-  if (Length(Dirs) = 1) and SameFileName(Dirs[0], SourcesDir) then
+  if (Length(Dirs) = 1) and SameFileName(Dirs[0], SourcesDir) then begin
     TDirectory.Delete(if Length(TDirectory.GetFiles(LibraryDir)) = 0 then LibraryDir else SourcesDir, True);
+    var Registry := TRegistry.Create;
+    try
+      Registry.DeleteKey(RegKeyDevExpressVCLProducts);
+    finally
+      Registry.Free;
+    end;
+  end;
 end;
 
 constructor TRootDirHelper.ReadFromIDEEnvironmentVariable(AIDE: TIDE);

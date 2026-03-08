@@ -1,4 +1,15 @@
-﻿unit DxAutoInstaller.UI.TreeList;
+﻿{*******************************************************}
+{                                                       }
+{               DxAutoInstaller Library                 }
+{                                                       }
+{      https://github.com/Delphier/DxAutoInstaller      }
+{                                                       }
+{      Copyright(c) 2014-2026 faceker@gmail.com         }
+{              All rights reserved                      }
+{                                                       }
+{*******************************************************}
+
+unit DxAutoInstaller.UI.TreeList;
 
 interface
 

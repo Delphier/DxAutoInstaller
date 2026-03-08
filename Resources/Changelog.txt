@@ -1,5 +1,8 @@
 Changelog
 --------------------------
+v3.13.1	Pre-release
+	Added support for pressing F1 in the IDE to open corresponding DevExpress VCL online help.
+
 v3.13	2026/03/07
 	Added support for RAD Studio 13 Florence.
 	Added support for 64-bit IDE.
@@ -11,6 +14,7 @@ v3.13	2026/03/07
 	Added log file.
 	Added separate x86 and x64 binary releases.
 	Updated manifest file to DevExpress VCL 25.2.3.
+	* Breaking Changes in V3: https://github.com/Delphier/DxAutoInstaller/releases/tag/v3.13
 
 v2.3.8	2024/06/15
 	Update profile to DevExpress VCL 24.1.3.
