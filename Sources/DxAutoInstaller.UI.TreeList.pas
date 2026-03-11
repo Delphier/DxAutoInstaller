@@ -140,9 +140,8 @@ begin
   Column := FTreeList.CreateColumn;
   Column.Tag := -1;
   Column.Caption.Text := 'Name';
-  Column.Width := 300;
   Column.Options.Editing := False;
-  Column.Options.Sizing := False;
+  Column.Options.Sizing := Installations.Count = 0;
 
   for var I := 0 to Installations.Count - 1 do begin
     Column := FTreeList.CreateColumn;
@@ -180,6 +179,7 @@ begin
 
     Refresh;
     FTreeList.FullExpand;
+    FTreeList.Columns[0].ApplyBestFit;
   finally
     FTreeList.EndUpdate;
   end;
