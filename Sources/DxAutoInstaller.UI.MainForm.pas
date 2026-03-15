@@ -17,7 +17,7 @@ uses
   System.Classes, System.Actions,
   Vcl.Forms, Vcl.Controls, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.ActnList, Vcl.Menus,
   cxControls, cxContainer, cxGraphics, dxCoreGraphics, cxLookAndFeels, cxLookAndFeelPainters,
-  cxButtons, cxEdit, cxTextEdit, cxMaskEdit, cxButtonEdit,
+  cxButtons, cxMemo, cxEdit, cxTextEdit, cxMaskEdit, cxButtonEdit,
   DxAutoInstaller.UI.TreeList,
   DxAutoInstaller.Installations;
 
@@ -55,7 +55,7 @@ type
     BtnManifest: TcxButton;
     ActManifestExport: TAction;
     ActManifestDelete: TAction;
-    MemoChangelog: TMemo;
+    MemoChangelog: TcxMemo;
     GroupBox2: TGroupBox;
     Button1: TcxButton;
     ActSearchNewPackages: TAction;

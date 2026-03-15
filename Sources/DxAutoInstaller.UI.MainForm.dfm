@@ -349,14 +349,14 @@ object MainForm: TMainForm
           TabOrder = 2
           OnLinkClick = LinkClick
         end
-        object MemoChangelog: TMemo
+        object MemoChangelog: TcxMemo
           Left = 8
           Top = 172
           Width = 576
           Height = 493
           Anchors = [akLeft, akTop, akRight, akBottom]
-          ReadOnly = True
-          ScrollBars = ssVertical
+          Properties.ReadOnly = True
+          Properties.ScrollBars = ssVertical
           TabOrder = 3
         end
       end
