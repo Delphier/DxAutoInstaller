@@ -2,6 +2,7 @@ Changelog
 --------------------------
 v3.13.1	Pre-release
 	Added support for pressing F1 in the IDE to open corresponding DevExpress VCL online help.
+	Updated manifest file to DevExpress VCL 25.2.5 with ExpressReports and ExpressDashboards support.
 
 v3.13	2026/03/07
 	Added support for RAD Studio 13 Florence.

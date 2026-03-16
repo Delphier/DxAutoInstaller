@@ -356,7 +356,7 @@ object MainForm: TMainForm
           Height = 493
           Anchors = [akLeft, akTop, akRight, akBottom]
           Properties.ReadOnly = True
-          Properties.ScrollBars = ssVertical
+          Properties.ScrollBars = ssBoth
           TabOrder = 3
         end
       end

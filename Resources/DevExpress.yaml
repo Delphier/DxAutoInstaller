@@ -2,7 +2,7 @@
 #                                                        #
 #                     DxAutoInstaller                    #
 #         DevExpress VCL Components Manifest File        #
-#                         v25.2.3                        #
+#                         v25.2.5                        #
 #                                                        #
 #       https://github.com/Delphier/DxAutoInstaller      #
 #                                                        #
@@ -298,6 +298,11 @@ ExpressSkins Library:
     - dcldxSkinsdxRibbonPainters
     - dcldxSkinsFluentDesignFormWizard
 
+ExpressPDFViewer:
+  RequiredPackages:
+    - dxPDFViewer
+    - dcldxPDFViewer
+
 ExpressPrinting System:
   RequiredPackages:
     - dxPSCore
@@ -317,6 +322,8 @@ ExpressPrinting System:
     - dcldxPSDBTeeChart
     - dcldxPSPrVwAdv
     - dcldxPSPrVwRibbon
+    - dxPSdxPDFViewerLnk
+    - dcldxPSdxPDFViewerLnk    
   OptionalPackages:
     - dxPSdxLCLnk
     - dcldxPSdxLCLnk
@@ -344,8 +351,6 @@ ExpressPrinting System:
     - dcldxPSdxGaugeControlLnk
     - dxPSRichEditControlLnk
     - dcldxPSRichEditControlLnk
-    - dxPSdxPDFViewerLnk
-    - dcldxPSdxPDFViewerLnk
     - dxPSdxMapControlLnk
     - dcldxPSdxMapControlLnk
     - dxPSdxChartControlLnk
@@ -393,11 +398,6 @@ ExpressMap Control:
     - dxMapControl
     - dcldxMapControl
 
-ExpressPDFViewer:
-  RequiredPackages:
-    - dxPDFViewer
-    - dcldxPDFViewer
-
 ExpressEntityMapping Framework:
   RequiredPackages:
     - dxEMF
@@ -419,3 +419,19 @@ ExpressCharts:
   RequiredPackages:
     - dxChartControl
     - dcldxChartControl
+
+ExpressBackend:
+  Visible: false
+  RequiredPackages:
+    - dxBackend
+    - dcldxBackend
+
+ExpressReports:
+  RequiredPackages:
+    - dxReports
+    - dcldxReports
+
+ExpressDashboards:
+  RequiredPackages:
+    - dxDashboards
+    - dcldxDashboards
