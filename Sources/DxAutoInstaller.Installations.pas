@@ -61,7 +61,8 @@ type
 implementation
 
 uses
-  System.Classes, System.IOUtils, DxAutoInstaller.Tasks, DxAutoInstaller.Utils;
+  System.Classes, System.IOUtils, System.RegularExpressions,
+  DxAutoInstaller.Tasks, DxAutoInstaller.Utils;
 
 { TInstallation }
 
@@ -131,7 +132,11 @@ procedure TInstallation.Execute;
   begin
     for var Package in APackages do begin
       if TTask.Aborted then Exit;
-      if Package.Exists then InstallPackage(Package, APlatform);
+      if Package.Exists then
+        if not InstallPackage(Package, APlatform) then
+          if not TRegEx.IsMatch(Package.Name, '^.+(BDE|IBX|TeeChart).+$') then TThread.Synchronize(nil, procedure begin
+            if not TMessageBox.Confirm({$IFNDEF CONSOLE}TTask.LastLog + {$ENDIF}#13#10'An error occurred. Do you want to continue?', ['Continue', 'Abort']) then TTask.Aborted := True;
+          end);
       TTask.StepIt;
     end;
   end;

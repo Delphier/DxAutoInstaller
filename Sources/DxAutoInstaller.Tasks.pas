@@ -27,6 +27,7 @@ type
     class property Instance: ITask read FInstance;
     class property Aborted: Boolean read FAborted write FAborted;
     class procedure Execute(const ATitle: string; const AStepCount: Cardinal; AProc: TProc);
+    class function LastLog: string;
     class procedure WriteLog(const AText: string);
     class procedure WriteLogSeparator;
     class procedure StepIt;
@@ -85,6 +86,11 @@ begin
       TThread.Queue(nil, procedure begin FProgressForm.Done end);
     end;
   end);
+end;
+
+class function TTask.LastLog: string;
+begin
+  Result := TApp.Log.Last.Text;
 end;
 
 class procedure TTask.WriteLog(const AText: string);
