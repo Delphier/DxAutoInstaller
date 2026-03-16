@@ -533,10 +533,10 @@ begin
       var Dir := TPath.Combine(Self, DirName);
       if TDirectory.Exists(Dir) then
         for var FileName in TDirectory.GetFilesEnumerator(Dir) do
-          TFile.Copy(FileName, ChangeFilePath(FileName, if MatchText(ExtractFileExt(FileName), ['.dfm', '.res', '.dcr']) then ResourcesDir else SourcesDir));
+          TFile.Copy(FileName, ChangeFilePath(FileName, if MatchText(ExtractFileExt(FileName), ['.dfm', '.res', '.dcr', '.inc']) then ResourcesDir else SourcesDir));
     end;
 
-  var cxVerFileName := TPath.Combine(SourcesDir, 'cxVer.inc');
+  var cxVerFileName := TPath.Combine(ResourcesDir, 'cxVer.inc');
   if TFile.Exists(cxVerFileName) then begin
     var cxVer := TFile.ReadAllText(cxVerFileName);
     for var Define in TOptions.Defines do cxVer := cxVer.Replace(Format('{$DEFINE %s}', [Define]), '');

@@ -102,7 +102,8 @@ begin
     if Options.ApplyGlobalTheme then CompilerOptions.Add('-D' + TOptions.DefineApplyGlobalTheme);
     // -U   Unit Search Paths
     // -R   Resource Search Paths
-    CompilerOptions.Add(Format('-U"%s" -R"%s"', [FRootDir.SourcesDir, FRootDir.ResourcesDir]));
+    // -I   Include Search Paths
+    CompilerOptions.Add(Format('-U"%s" -R"%s" -I"%s"', [FRootDir.SourcesDir, FRootDir.ResourcesDir, FRootDir.ResourcesDir]));
     // -B   Build All Units
     // -NU  Unit .dcu Output Directory
     CompilerOptions.Add(Format('-B -NU"%s"', [OutputDir]));
