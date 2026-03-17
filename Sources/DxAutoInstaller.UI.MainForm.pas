@@ -19,6 +19,7 @@ uses
   cxControls, cxContainer, cxGraphics, dxCoreGraphics, cxLookAndFeels, cxLookAndFeelPainters,
   cxButtons, cxMemo, cxEdit, cxTextEdit, cxMaskEdit, cxButtonEdit,
   DxAutoInstaller.UI.TreeList,
+  DxAutoInstaller.DevExpress,
   DxAutoInstaller.Installations;
 
 type
@@ -88,6 +89,7 @@ type
     FTreeList: TTreeList;
     FInstallations: TInstallations;
     procedure ShowManifestStatus;
+    procedure CreateInstallations(const ARootDir: TRootDir = '');
     procedure FormatLinkLabel(ALinkLable: TLinkLabel; const AIsEmail: Boolean = False);
   public
     { Public declarations }
@@ -103,7 +105,6 @@ uses
   Winapi.Windows, Winapi.ShellAPI,
   Vcl.FileCtrl,
   DxAutoInstaller.Core,
-  DxAutoInstaller.DevExpress,
   DxAutoInstaller.Utils,
   DxAutoInstaller.Resources;
 
@@ -140,6 +141,8 @@ begin
   OnActivate := nil;
   TManifest.CreateInstance;
   ShowManifestStatus;
+  Refresh;
+  CreateInstallations;
 end;
 
 procedure TMainForm.PageControlChange(Sender: TObject);
@@ -150,17 +153,17 @@ begin
   else BtnExecute.Visible := False;
 end;
 
-procedure TMainForm.EditRootDirPropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
-var
-  Dirs: TArray<string>;
-  RootDir: TRootDir;
+procedure TMainForm.CreateInstallations(const ARootDir: TRootDir);
 begin
-  if not SelectDirectory('', Dirs) then Exit;
+  var RootDir := if ARootDir <> '' then ARootDir else TApp.Dir;
+
   Screen.Cursor := crHourGlass;
   try
-    RootDir := Dirs[0];
+    var Version := RootDir.Version;
+    if (Version = 0) and (ARootDir = '') then Exit;
+
     EditRootDir.Text := RootDir;
-    EditVersion.Text := RootDir.Version.ToText;
+    EditVersion.Text := Version.ToText;
 
     FInstallations.Free;
     FInstallations := TInstallations.Create(TIDEList.Default, RootDir, TManifest.Instance);
@@ -172,6 +175,13 @@ begin
 
   ActInstall.Enabled := True;
   ActSearchNewPackages.Enabled := True;
+end;
+
+procedure TMainForm.EditRootDirPropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
+var
+  Dirs: TArray<string>;
+begin
+  if SelectDirectory(EditRootDir.Text, Dirs) then CreateInstallations(Dirs[0]);
 end;
 
 procedure TMainForm.ChkShowAllComponentsClick(Sender: TObject);
