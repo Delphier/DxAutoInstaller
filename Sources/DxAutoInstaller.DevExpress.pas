@@ -61,6 +61,10 @@ type
 
   TPackageName = type string;
   TPackageNameHelper = record helper for TPackageName
+  const
+    RS      = 'RS';
+    Pattern = '^(.+)' + RS + '\d+$';
+  public
     constructor Create(const APackageBaseName: string; AIDE: TIDE);
     function IsDesigntime: Boolean;
   end;
@@ -526,8 +530,14 @@ end;
 procedure TRootDirHelper.CreateSourcesDir(AManifest: TManifest);
 begin
   if TDirectory.Exists(ResourcesDir) and not TDirectory.IsEmpty(ResourcesDir) then Exit;
-  TDirectory.CreateDirectory(ResourcesDir);
 
+  // TODO: Delete this when DevExpress removes {$REFERENCEINFO OFF} from all *.dpk
+  // Fixed the issue where Ctrl+Click on DevExpress units in the IDE could not navigate.
+  for var FileName in TDirectory.GetFilesEnumerator(Self, '*.dpk', TSearchOption.soAllDirectories) do
+    if TRegEx.IsMatch(TPath.GetFileNameWithoutExtension(FileName), TPackageName.Pattern) then
+      TFile.WriteAllText(FileName, TFile.ReadAllText(FileName).Replace('{$REFERENCEINFO OFF}', ''));
+
+  TDirectory.CreateDirectory(ResourcesDir);
   for var Metadata in AManifest.Components do
     for var DirName in Metadata.Sources do begin
       var Dir := TPath.Combine(Self, DirName);

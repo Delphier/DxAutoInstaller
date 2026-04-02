@@ -1,8 +1,10 @@
 Changelog
 --------------------------
 v3.13.1	Pre-release
-	Added support for pressing F1 in the IDE to open corresponding DevExpress VCL online help.
-	Updated manifest file to DevExpress VCL 25.2.5 with ExpressReports and ExpressDashboards support.
+	Added support for DevExpress VCL online help: pressing F1 in the IDE to open topic.
+	Added support for auto-loading current dir as DevExpress root dir on startup if valid.
+	Added support for ExpressReports and ExpressDashboards.
+	Fixed the issue where Ctrl+Click on DevExpress units in the IDE could not navigate.
 
 v3.13	2026/03/07
 	Added support for RAD Studio 13 Florence.
