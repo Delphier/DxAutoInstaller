@@ -97,6 +97,10 @@ begin
   var CompilerOptions := TStringList.Create;
   try
     CompilerOptions.LineBreak := ' ';
+    // -A<unit>=<alias> = Set unit alias
+    // -NS<namespaces>  = Namespace search path
+    CompilerOptions.Add('-AGenerics.Collections=System.Generics.Collections;Generics.Defaults=System.Generics.Defaults;WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE');
+    CompilerOptions.Add('-NSWinapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;IBX;VclTee;');
     CompilerOptions.Add(PlatformCompilerOptions[APlatform]);
     if Options.UseNativeLookAndFeel then CompilerOptions.Add('-D' + TOptions.DefineUseNativeLookAndFeel);
     if Options.ApplyGlobalTheme then CompilerOptions.Add('-D' + TOptions.DefineApplyGlobalTheme);
