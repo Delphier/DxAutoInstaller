@@ -61,6 +61,10 @@ type
 
   TPackageName = type string;
   TPackageNameHelper = record helper for TPackageName
+  const
+    RS      = 'RS';
+    Pattern = '^(.+)' + RS + '\d+$';
+  public
     constructor Create(const APackageBaseName: string; AIDE: TIDE);
     function IsDesigntime: Boolean;
   end;

@@ -235,7 +235,7 @@ begin
   try
     for var Package in TManifest.Instance.Packages do Names.Add(Package.BaseName);
     for var FileName in TDirectory.GetFilesEnumerator(ADir, '*.dpk', TSearchOption.soAllDirectories) do begin
-      var Match := TRegEx.Match(TPath.GetFileNameWithoutExtension(FileName), '^(.+)RS\d+$');
+      var Match := TRegEx.Match(TPath.GetFileNameWithoutExtension(FileName), TPackageName.Pattern);
       if Match.Success and not Names.Contains(Match.Groups[1].Value) then Result := Result + [FileName];
     end;
   finally

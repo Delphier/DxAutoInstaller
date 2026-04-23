@@ -130,7 +130,7 @@ implementation
 
 uses
   System.SysUtils, System.Generics.Collections, Vcl.Forms,
-  DxAutoInstaller.Tasks;
+  DxAutoInstaller.Tasks, DxAutoInstaller.DevExpress;
 
 
 { TApp }
@@ -153,7 +153,7 @@ begin
   FCore := ACore;
   FCore.OutputCallback := TTask.WriteLog;
   FName := FCore.Name;
-  FPackageVersionStr := FCore.VersionNumberStr.Replace('d', 'RS');
+  FPackageVersionStr := FCore.IDEVersionNumberStr.Replace('d', TPackageName.RS);
   FDelphiInstalled := FCore.Personalities * [bpDelphi32, bpDelphi64] <> [];
   FCppBuilderInstalled := FCore.Personalities * [bpBCBuilder32, bpBCBuilder64] <> [];
   for var I := Low(TPlatform) to High(TPlatform) do if PlatformCommandLineTools[I] in FCore.CommandLineTools then Include(FSupportedPlatforms, I);
