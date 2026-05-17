@@ -102,6 +102,7 @@ type
     function ApplyGlobalTheme: Boolean;
 
     function Platforms: TPlatforms;
+    function CppBuilderDesigntimePlatforms: TPlatforms;
     function DesigntimePlatforms: TPlatforms;
     function InstallPlatforms: TPlatforms;
   end;
@@ -149,7 +150,7 @@ end;
 procedure TOptionPlatforms.DoInit(APersonalityInstalled: Boolean; const APlatforms, ADefaults: TPlatforms; const AError: TError);
 begin
   if APersonalityInstalled then begin
-    FValue := Byte(ADefaults * APlatforms * FIDE.SupportedPlatforms);
+    FValue := Byte(ADefaults * APlatforms * FIDE.Platforms);
 
     var Properties := TcxCheckComboBoxProperties.Create(nil);
     FEditProperties := Properties;
@@ -162,7 +163,7 @@ begin
       var Item := Properties.Items.Add;
       Item.Description := PlatformDescriptions[I];
       Item.ShortDescription := PlatformNames[I];
-      Item.Enabled := I in FIDE.SupportedPlatforms;
+      Item.Enabled := I in FIDE.Platforms;
     end;
   end else begin
     FValue := 0;
@@ -261,12 +262,18 @@ begin
   Result := DelphiPlatforms + CppBuilderPlatforms;
 end;
 
-function TOptions.DesigntimePlatforms: TPlatforms;
+function TOptions.CppBuilderDesigntimePlatforms: TPlatforms;
 begin
   Result := [];
-  for var I in DelphiPlatforms do Result := Result + DelphiSupportedDesigntimePlatforms[I];
-  for var I in CppBuilderPlatforms do Result := Result + CppBuilderSupportedDesigntimePlatforms[I];
-  Result := Result * FIDE.SupportedDesigntimePlatforms * DesigntimeSupportedPlatforms;
+  for var I in CppBuilderPlatforms do Result := Result + CppBuilderSupportedArchitectures[I].ToPlatforms;
+  Result := Result * FIDE.Architectures.ToPlatforms;
+end;
+
+function TOptions.DesigntimePlatforms: TPlatforms;
+begin
+  Result := CppBuilderDesigntimePlatforms;
+  for var I in DelphiPlatforms do Result := Result + DelphiSupportedArchitectures[I].ToPlatforms;
+  Result := Result * FIDE.Architectures.ToPlatforms;
 end;
 
 function TOptions.InstallPlatforms: TPlatforms;

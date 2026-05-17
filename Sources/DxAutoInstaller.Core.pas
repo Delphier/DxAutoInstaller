@@ -40,6 +40,9 @@ type
   TPlatform = (pfWin32, pfWin64, pfWin64x);
   TPlatforms = set of TPlatform;
 
+  TArchitecture = (arIntelX86, arIntelX64); // 32-bit/64-bit IDE
+  TArchitectures = set of TArchitecture;
+
   TIDE = class
   const
     EnvironmentVariableSectionName = 'Environment Variables';
@@ -49,8 +52,8 @@ type
     FPackageVersionStr: string;
     FDelphiInstalled: Boolean;
     FCppBuilderInstalled: Boolean;
-    FSupportedPlatforms: TPlatforms;
-    FSupportedDesigntimePlatforms: TPlatforms;
+    FPlatforms: TPlatforms;
+    FArchitectures: TArchitectures;
   private
     class function DCC32(AIDE: TIDE): TCompiler; static;
     class function DCC64(AIDE: TIDE): TCompiler; static;
@@ -61,8 +64,8 @@ type
     property PackageVersionStr: string read FPackageVersionStr;
     property DelphiInstalled: Boolean read FDelphiInstalled;
     property CppBuilderInstalled: Boolean read FCppBuilderInstalled;
-    property SupportedPlatforms: TPlatforms read FSupportedPlatforms;
-    property SupportedDesigntimePlatforms: TPlatforms read FSupportedDesigntimePlatforms;
+    property Platforms: TPlatforms read FPlatforms;
+    property Architectures: TArchitectures read FArchitectures;
     procedure CheckRunning;
     function ReadEnvironmentVariable(const AKey: string): string;
     procedure WriteEnvironmentVariable(const AKey, AValue: string);
@@ -90,6 +93,10 @@ type
     function ToString: string;
   end;
 
+  TArchitecturesHelper = record helper for TArchitectures
+    function ToPlatforms: TPlatforms;
+  end;
+
   TCompilerGetter = function(AIDE: TIDE): TCompiler;
 
 const
@@ -106,12 +113,12 @@ const
   CppBuilderSupportedPlatforms        = [pfWin32, pfWin64, pfWin64x];
   CppBuilderSupportedPlatformsDefault = [pfWin64x];
 
-  // 32-bit/64-bit IDE. Requires a synchronized update to IDE.SupportedDesigntimePlatforms.
-  DesigntimeSupportedPlatforms = [pfWin32, pfWin64];
-  // 64-bit IDE only supports Delphi Win64 and WinARM64EC.
-  DelphiSupportedDesigntimePlatforms     : array[TPlatform] of TPlatforms = ([pfWin32], [pfWin32, pfWin64], []);
-  // 64-bit IDE only supports C++Builder Win64x.
-  CppBuilderSupportedDesigntimePlatforms : array[TPlatform] of TPlatforms = ([pfWin32], [pfWin32], [pfWin32, pfWin64]);
+  // New architecture requires a synchronized update to IDE.Architectures
+  ArchitecturePlatforms: array[TArchitecture] of TPlatform = (pfWin32, pfWin64);
+  // 64-bit IDE only supports Delphi Win64 and WinARM64EC
+  DelphiSupportedArchitectures     : array[TPlatform] of TArchitectures = ([arIntelX86], [arIntelX86, arIntelX64], []);
+  // 64-bit IDE only supports C++Builder Win64x
+  CppBuilderSupportedArchitectures : array[TPlatform] of TArchitectures = ([arIntelX86], [arIntelX86], [arIntelX86, arIntelX64]);
 
 type
   TError = (errNone,
@@ -156,10 +163,9 @@ begin
   FPackageVersionStr := FCore.IDEVersionNumberStr.Replace('d', TPackageName.RS);
   FDelphiInstalled := FCore.Personalities * [bpDelphi32, bpDelphi64] <> [];
   FCppBuilderInstalled := FCore.Personalities * [bpBCBuilder32, bpBCBuilder64] <> [];
-  for var I := Low(TPlatform) to High(TPlatform) do if PlatformCommandLineTools[I] in FCore.CommandLineTools then Include(FSupportedPlatforms, I);
-  FSupportedDesigntimePlatforms := [pfWin32];
-  // 64-bit IDE: RAD Studio 12.3+
-  if FileExists(FCore.IdeExeFileName[True]) then Include(FSupportedDesigntimePlatforms, pfWin64);
+  for var I := Low(TPlatform) to High(TPlatform) do if PlatformCommandLineTools[I] in FCore.CommandLineTools then Include(FPlatforms, I);
+  FArchitectures := [arIntelX86];
+  if FileExists(FCore.IdeExeFileName[True]) then Include(FArchitectures, arIntelX64); // 64-bit IDE: RAD Studio 12.3+
 end;
 
 procedure TIDE.CheckRunning;
@@ -234,6 +240,14 @@ begin
   var Strings: TArray<string> := [];
   for var I in Self do Strings := Strings + [PlatformNames[I]];
   Result := string.Join(',', Strings);
+end;
+
+{ TArchitecturesHelper }
+
+function TArchitecturesHelper.ToPlatforms: TPlatforms;
+begin
+  Result := [];
+  for var I in Self do Include(Result, ArchitecturePlatforms[I]);
 end;
 
 end.

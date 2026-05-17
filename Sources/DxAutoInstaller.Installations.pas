@@ -117,9 +117,7 @@ begin
     // -NB  C/C++ .bpi output directory
     // -NH  C/C++ .hpp output directory
     // -NO  C/C++ .obj/.lib output directory
-    if Options.CppBuilderPlatforms <> [] then
-      if APlatform in Options.CppBuilderPlatforms + Options.DesigntimePlatforms * CppBuilderSupportedDesigntimePlatforms[APlatform] then
-        CompilerOptions.Add(Format('-JL -NB"%s" -NH"%s" -NO"%s"', [OutputDir, OutputDir, OutputDir]));
+    if APlatform in Options.CppBuilderPlatforms + Options.CppBuilderDesigntimePlatforms then CompilerOptions.Add(Format('-JL -NB"%s" -NH"%s" -NO"%s"', [OutputDir, OutputDir, OutputDir]));
 
     TTask.WriteLogSeparator;
     Result := IDE.Core.CompilePackage(APackage.FileName, OutputDir, OutputDir, CompilerOptions.Text);
@@ -222,7 +220,7 @@ class procedure TUninstallation.Execute(AIDE: TIDE; AManifest: TManifest);
 begin
   var RootDir := TRootDir.ReadFromIDEEnvironmentVariable(AIDE);
 
-  for var Platform in AIDE.SupportedPlatforms do begin
+  for var Platform in AIDE.Platforms do begin
     AIDE.SwitchCompiler(Platform);
     var OutputDir := RootDir.OutputDir(AIDE, Platform);
 
@@ -233,7 +231,7 @@ begin
       var DefaultBplFileName := TPath.Combine(AIDE.Core.BPLOutputPath[Platform.ToJclValue], Name + '.bpl');
       var DefaultDcpFileName := TPath.Combine(AIDE.Core.DCPOutputPath[Platform.ToJclValue], Name + '.dcp');
 
-      if Name.IsDesigntime and (Platform in AIDE.SupportedDesigntimePlatforms) then begin
+      if Name.IsDesigntime and (Platform in AIDE.Architectures.ToPlatforms) then begin
         TTask.WriteLogSeparator;
         AIDE.Core.UnregisterPackage(DefaultBplFileName);
         if RootDir <> '' then AIDE.Core.UnregisterPackage(ChangeFilePath(DefaultBplFileName, OutputDir));
@@ -285,7 +283,7 @@ end;
 class function TUninstallation.StepCount(AIDEList: TIDEList; AManifest: TManifest): Integer;
 begin
   Result := 0;
-  for var IDE in AIDEList do Inc(Result, IDE.SupportedPlatforms.Count);
+  for var IDE in AIDEList do Inc(Result, IDE.Platforms.Count);
   Result := Result * Length(AManifest.Packages);
 end;
 
