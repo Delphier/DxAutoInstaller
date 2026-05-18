@@ -591,12 +591,15 @@ end;
 
 constructor TRootDirHelper.ReadFromIDEEnvironmentVariable(AIDE: TIDE);
 begin
-  Self := AIDE.ReadEnvironmentVariable(DXVCL);
+  for var Arch in AIDE.Architectures do begin
+    Self := AIDE.ReadEnvironmentVariable(Arch, DXVCL);
+    if Self <> '' then Break;
+  end;
 end;
 
 procedure TRootDirHelper.WriteToIDEEnvironmentVariable(AIDE: TIDE);
 begin
-  AIDE.WriteEnvironmentVariable(DXVCL, Self);
+  for var Arch in AIDE.Architectures do AIDE.WriteEnvironmentVariable(Arch, DXVCL, Self);
 end;
 
 end.

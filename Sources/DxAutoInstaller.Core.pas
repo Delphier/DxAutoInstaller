@@ -45,7 +45,8 @@ type
 
   TIDE = class
   const
-    EnvironmentVariableSectionName = 'Environment Variables';
+    EnvironmentVariables = 'Environment Variables';
+    EnvironmentVariablesKeys: array[TArchitecture] of string = (EnvironmentVariables, EnvironmentVariables + ' x64');
   strict private
     FCore: TJclIDE;
     FName: string;
@@ -67,8 +68,8 @@ type
     property Platforms: TPlatforms read FPlatforms;
     property Architectures: TArchitectures read FArchitectures;
     procedure CheckRunning;
-    function ReadEnvironmentVariable(const AKey: string): string;
-    procedure WriteEnvironmentVariable(const AKey, AValue: string);
+    function ReadEnvironmentVariable(const AArchitecture: TArchitecture; const AName: string): string;
+    procedure WriteEnvironmentVariable(const AArchitecture: TArchitecture; const AName, AValue: string);
     procedure SwitchCompiler(const APlatform: TPlatform);
   end;
 
@@ -175,17 +176,15 @@ begin
   if FCore.AnyInstanceRunning then raise Exception.CreateFmt(Message, [Name]);
 end;
 
-function TIDE.ReadEnvironmentVariable(const AKey: string): string;
+function TIDE.ReadEnvironmentVariable(const AArchitecture: TArchitecture; const AName: string): string;
 begin
-  Result := FCore.ConfigData.ReadString(EnvironmentVariableSectionName, AKey, '');
+  Result := FCore.ConfigData.ReadString(EnvironmentVariablesKeys[AArchitecture], AName, '');
 end;
 
-procedure TIDE.WriteEnvironmentVariable(const AKey, AValue: string);
+procedure TIDE.WriteEnvironmentVariable(const AArchitecture: TArchitecture; const AName, AValue: string);
 begin
-  if AValue.IsEmpty then
-    FCore.ConfigData.DeleteKey(EnvironmentVariableSectionName, AKey)
-  else
-    FCore.ConfigData.WriteString(EnvironmentVariableSectionName, AKey, AValue);
+  var Key := EnvironmentVariablesKeys[AArchitecture];
+  if AValue.IsEmpty then FCore.ConfigData.DeleteKey(Key, AName) else FCore.ConfigData.WriteString(Key, AName, AValue);
 end;
 
 procedure TIDE.SwitchCompiler(const APlatform: TPlatform);
