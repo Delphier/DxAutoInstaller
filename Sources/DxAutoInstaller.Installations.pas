@@ -90,7 +90,7 @@ end;
 function TInstallation.InstallPackage(APackage: TPackage; const APlatform: TPlatform): Boolean;
 begin
   Result := True;
-  if APackage.Name.IsDesigntime and (APlatform not in Options.DesigntimePlatforms) then Exit;
+  if APackage.Name.IsDesigntime and (APlatform not in Options.Architectures.ToPlatforms) then Exit;
   if APackage.Dependencies.CheckedCount <> APackage.Dependencies.Count then Exit;
 
   var OutputDir := FRootDir.OutputDir(IDE, APlatform);
@@ -117,7 +117,7 @@ begin
     // -NB  C/C++ .bpi output directory
     // -NH  C/C++ .hpp output directory
     // -NO  C/C++ .obj/.lib output directory
-    if APlatform in Options.CppBuilderPlatforms + Options.CppBuilderDesigntimePlatforms then CompilerOptions.Add(Format('-JL -NB"%s" -NH"%s" -NO"%s"', [OutputDir, OutputDir, OutputDir]));
+    if APlatform in Options.CppBuilderPlatforms + Options.CppBuilderArchitectures.ToPlatforms then CompilerOptions.Add(Format('-JL -NB"%s" -NH"%s" -NO"%s"', [OutputDir, OutputDir, OutputDir]));
 
     TTask.WriteLogSeparator;
     Result := IDE.Core.CompilePackage(APackage.FileName, OutputDir, OutputDir, CompilerOptions.Text);

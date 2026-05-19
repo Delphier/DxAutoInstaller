@@ -102,8 +102,8 @@ type
     function ApplyGlobalTheme: Boolean;
 
     function Platforms: TPlatforms;
-    function CppBuilderDesigntimePlatforms: TPlatforms;
-    function DesigntimePlatforms: TPlatforms;
+    function CppBuilderArchitectures: TArchitectures;
+    function Architectures: TArchitectures;
     function InstallPlatforms: TPlatforms;
   end;
 
@@ -262,23 +262,23 @@ begin
   Result := DelphiPlatforms + CppBuilderPlatforms;
 end;
 
-function TOptions.CppBuilderDesigntimePlatforms: TPlatforms;
+function TOptions.CppBuilderArchitectures: TArchitectures;
 begin
   Result := [];
-  for var I in CppBuilderPlatforms do Result := Result + CppBuilderSupportedArchitectures[I].ToPlatforms;
-  Result := Result * FIDE.Architectures.ToPlatforms;
+  for var I in CppBuilderPlatforms do Result := Result + CppBuilderSupportedArchitectures[I];
+  Result := Result * FIDE.Architectures;
 end;
 
-function TOptions.DesigntimePlatforms: TPlatforms;
+function TOptions.Architectures: TArchitectures;
 begin
-  Result := CppBuilderDesigntimePlatforms;
-  for var I in DelphiPlatforms do Result := Result + DelphiSupportedArchitectures[I].ToPlatforms;
-  Result := Result * FIDE.Architectures.ToPlatforms;
+  Result := CppBuilderArchitectures;
+  for var I in DelphiPlatforms do Result := Result + DelphiSupportedArchitectures[I];
+  Result := Result * FIDE.Architectures;
 end;
 
 function TOptions.InstallPlatforms: TPlatforms;
 begin
-  Result := Platforms + DesigntimePlatforms;
+  Result := Platforms + Architectures.ToPlatforms;
 end;
 
 { TOptionValueHelper }
