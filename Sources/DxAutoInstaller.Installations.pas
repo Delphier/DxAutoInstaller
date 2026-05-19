@@ -145,7 +145,7 @@ procedure TInstallation.Execute;
   end;
 
 begin
-  FRootDir.WriteToIDEEnvironmentVariable(IDE);
+  FRootDir.WriteToIDEEnvironmentVariable(IDE, Options.Architectures);
   for var Platform in Options.InstallPlatforms do begin
     IDE.SwitchCompiler(Platform);
     var OutputDir := FRootDir.OutputDir(IDE, Platform);
@@ -259,7 +259,7 @@ begin
   end;
 
   RootDir := '';
-  RootDir.WriteToIDEEnvironmentVariable(AIDE);
+  RootDir.WriteToIDEEnvironmentVariable(AIDE, AIDE.Architectures);
 end;
 
 class procedure TUninstallation.Execute(AIDEList: TIDEList; AManifest: TManifest);
