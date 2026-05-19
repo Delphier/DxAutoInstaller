@@ -29,7 +29,8 @@ type
     class procedure Execute(const ATitle: string; const AStepCount: Cardinal; AProc: TProc);
     class function LastLog: string;
     class procedure WriteLog(const AText: string);
-    class procedure WriteLogSeparator;
+    class procedure WriteLogSeparator; overload;
+    class procedure WriteLogSeparator(const AStartText, AEndText: string; AProc: TProc); overload;
     class procedure StepIt;
   end;
 
@@ -103,6 +104,16 @@ class procedure TTask.WriteLogSeparator;
 begin
   TApp.Log.WriteSeparator;
   TThread.Queue(nil, procedure begin FProgressForm.Log.Lines.Add(TApp.Log.Separator) end);
+end;
+
+class procedure TTask.WriteLogSeparator(const AStartText, AEndText: string; AProc: TProc);
+begin
+  WriteLogSeparator;
+  WriteLog(AStartText);
+  var Stopwatch := TStopwatch.StartNew;
+  AProc;
+  Stopwatch.Stop;
+  WriteLog(Format('%s (Elapsed Time: %s)', [AEndText, Stopwatch.Elapsed.ToString]));
 end;
 
 class procedure TTask.StepIt;

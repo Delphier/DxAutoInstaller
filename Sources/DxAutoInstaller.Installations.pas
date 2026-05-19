@@ -198,7 +198,7 @@ begin
 
   TTask.Execute(MsgTaskTitle + string.Join(', ', IDENames), StepCount, procedure begin
     for var Installation in Self do if TTask.Aborted then Exit else if Installation.Valid then TUninstallation.Execute(Installation.IDE, Manifest);
-    FRootDir.CreateSourcesDir(Manifest);
+    TTask.WriteLogSeparator('Creating directory ' + FRootDir.SourcesDir, 'Created', procedure begin FRootDir.CreateSourcesDir(Manifest) end);
     for var Installation in Self do if TTask.Aborted then Exit else if Installation.Valid then Installation.Execute;
   end);
 end;
@@ -255,7 +255,7 @@ begin
       AIDE.Core.RemoveFromCppLibraryPath(RootDir.ResourcesDir, Platform.ToJclValue);
       AIDE.Core.RemoveFromCppBrowsingPath(RootDir.SourcesDir, Platform.ToJclValue);
     end;
-    if TDirectory.Exists(RootDir) then RootDir.DeleteOutputDir(AIDE, Platform);
+    if TDirectory.Exists(RootDir) then TTask.WriteLogSeparator('Deleting directory ' + OutputDir, 'Deleted', procedure begin RootDir.DeleteOutputDir(AIDE, Platform) end);
   end;
 
   for var Arch in AIDE.Architectures do AIDE.EnvironmentVariablePathRemove(Arch, RootDir.OutputDir(AIDE, ArchitecturePlatforms[Arch]));
