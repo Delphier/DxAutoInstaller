@@ -530,8 +530,13 @@ end;
 procedure TRootDirHelper.CreateSourcesDir(AManifest: TManifest);
 begin
   if TDirectory.Exists(ResourcesDir) and not TDirectory.IsEmpty(ResourcesDir) then Exit;
-  TDirectory.CreateDirectory(ResourcesDir);
 
+  // TODO: Delete this when DevExpress removes {$REFERENCEINFO OFF} from all *.dpk
+  // Fixed the issue where Ctrl+Click on DevExpress units in the IDE could not navigate.
+  for var FileName in TDirectory.GetFilesEnumerator(Self, '*.dpk', TSearchOption.soAllDirectories) do
+    TFile.WriteAllText(FileName, TFile.ReadAllText(FileName).Replace('{$REFERENCEINFO OFF}', ''));
+
+  TDirectory.CreateDirectory(ResourcesDir);
   for var Metadata in AManifest.Components do
     for var DirName in Metadata.Sources do begin
       var Dir := TPath.Combine(Self, DirName);
