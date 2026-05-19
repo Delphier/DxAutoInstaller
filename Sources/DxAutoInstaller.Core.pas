@@ -45,6 +45,7 @@ type
 
   TIDE = class
   const
+    PATH = 'PATH';
     EnvironmentVariables = 'Environment Variables';
     EnvironmentVariablesKeys: array[TArchitecture] of string = (EnvironmentVariables, EnvironmentVariables + ' x64');
   strict private
@@ -58,6 +59,8 @@ type
   private
     class function DCC32(AIDE: TIDE): TCompiler; static;
     class function DCC64(AIDE: TIDE): TCompiler; static;
+    function GetEnvironmentVariablePath(const AArchitecture: TArchitecture): TArray<string>;
+    procedure SetEnvironmentVariablePath(const AArchitecture: TArchitecture; const AValue: TArray<string>);
   public
     constructor Create(ACore: TJclIDE);
     property Core: TJclIDE read FCore;
@@ -68,8 +71,10 @@ type
     property Platforms: TPlatforms read FPlatforms;
     property Architectures: TArchitectures read FArchitectures;
     procedure CheckRunning;
-    function ReadEnvironmentVariable(const AArchitecture: TArchitecture; const AName: string): string;
-    procedure WriteEnvironmentVariable(const AArchitecture: TArchitecture; const AName, AValue: string);
+    function GetEnvironmentVariable(const AArchitecture: TArchitecture; const AName: string): string;
+    procedure SetEnvironmentVariable(const AArchitecture: TArchitecture; const AName, AValue: string);
+    procedure EnvironmentVariablePathAdd(const AArchitecture: TArchitecture; const AItem: string);
+    procedure EnvironmentVariablePathRemove(const AArchitecture: TArchitecture; const AItem: string);
     procedure SwitchCompiler(const APlatform: TPlatform);
   end;
 
@@ -176,15 +181,44 @@ begin
   if FCore.AnyInstanceRunning then raise Exception.CreateFmt(Message, [Name]);
 end;
 
-function TIDE.ReadEnvironmentVariable(const AArchitecture: TArchitecture; const AName: string): string;
+function TIDE.GetEnvironmentVariable(const AArchitecture: TArchitecture; const AName: string): string;
 begin
   Result := FCore.ConfigData.ReadString(EnvironmentVariablesKeys[AArchitecture], AName, '');
 end;
 
-procedure TIDE.WriteEnvironmentVariable(const AArchitecture: TArchitecture; const AName, AValue: string);
+procedure TIDE.SetEnvironmentVariable(const AArchitecture: TArchitecture; const AName, AValue: string);
 begin
   var Key := EnvironmentVariablesKeys[AArchitecture];
   if AValue.IsEmpty then FCore.ConfigData.DeleteKey(Key, AName) else FCore.ConfigData.WriteString(Key, AName, AValue);
+end;
+
+function TIDE.GetEnvironmentVariablePath(const AArchitecture: TArchitecture): TArray<string>;
+begin
+  Result := GetEnvironmentVariable(AArchitecture, PATH).Split([';']);
+end;
+
+procedure TIDE.SetEnvironmentVariablePath(const AArchitecture: TArchitecture; const AValue: TArray<string>);
+begin
+  SetEnvironmentVariable(AArchitecture, PATH, string.Join(';', AValue));
+end;
+
+function SamePathItem(const A, B: string): Boolean;
+begin
+  Result := SameFileName(ExcludeTrailingPathDelimiter(A.Trim), ExcludeTrailingPathDelimiter(B.Trim));
+end;
+
+procedure TIDE.EnvironmentVariablePathAdd(const AArchitecture: TArchitecture; const AItem: string);
+begin
+  var Items := GetEnvironmentVariablePath(AArchitecture);
+  for var Item in Items do if SamePathItem(Item, AItem) then Exit;
+  SetEnvironmentVariablePath(AArchitecture, Items + [AItem]);
+end;
+
+procedure TIDE.EnvironmentVariablePathRemove(const AArchitecture: TArchitecture; const AItem: string);
+begin
+  var Items := GetEnvironmentVariablePath(AArchitecture);
+  for var I := High(Items) downto Low(Items) do if SamePathItem(Items[I], AItem) then Delete(Items, I, 1);
+  SetEnvironmentVariablePath(AArchitecture, Items);
 end;
 
 procedure TIDE.SwitchCompiler(const APlatform: TPlatform);

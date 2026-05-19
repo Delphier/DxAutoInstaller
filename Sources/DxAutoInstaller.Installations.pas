@@ -146,11 +146,12 @@ procedure TInstallation.Execute;
 
 begin
   FRootDir.WriteToIDEEnvironmentVariable(IDE, Options.Architectures);
+  for var Arch in Options.Architectures do IDE.EnvironmentVariablePathAdd(Arch, FRootDir.OutputDir(IDE, ArchitecturePlatforms[Arch]));
+
   for var Platform in Options.InstallPlatforms do begin
     IDE.SwitchCompiler(Platform);
     var OutputDir := FRootDir.OutputDir(IDE, Platform);
     TDirectory.CreateDirectory(OutputDir);
-    TUserEnvironmentVariablePath.Add(OutputDir);
 
     if Platform in Options.DelphiPlatforms then begin
       IDE.Core.AddToLibrarySearchPath(OutputDir, Platform.ToJclValue);
@@ -254,10 +255,10 @@ begin
       AIDE.Core.RemoveFromCppLibraryPath(RootDir.ResourcesDir, Platform.ToJclValue);
       AIDE.Core.RemoveFromCppBrowsingPath(RootDir.SourcesDir, Platform.ToJclValue);
     end;
-    TUserEnvironmentVariablePath.Remove(OutputDir);
     if TDirectory.Exists(RootDir) then RootDir.DeleteOutputDir(AIDE, Platform);
   end;
 
+  for var Arch in AIDE.Architectures do AIDE.EnvironmentVariablePathRemove(Arch, RootDir.OutputDir(AIDE, ArchitecturePlatforms[Arch]));
   RootDir := '';
   RootDir.WriteToIDEEnvironmentVariable(AIDE, AIDE.Architectures);
 end;
