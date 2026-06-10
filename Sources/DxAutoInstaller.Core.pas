@@ -115,7 +115,7 @@ const
   PlatformCommandLineTools : array[TPlatform] of TCommandLineTool = (clDcc32, clDcc64, clBcc64x);
 
   DelphiSupportedPlatforms            = [pfWin32, pfWin64];
-  DelphiSupportedPlatformsDefault     = [pfWin32];
+  DelphiSupportedPlatformsDefault     = [pfWin32, pfWin64];
   CppBuilderSupportedPlatforms        = [pfWin32, pfWin64, pfWin64x];
   CppBuilderSupportedPlatformsDefault = [pfWin64x];
 
