@@ -2,7 +2,7 @@
 #                                                        #
 #                     DxAutoInstaller                    #
 #         DevExpress VCL Components Manifest File        #
-#                         v25.2.5                        #
+#                         v26.1.3                        #
 #                                                        #
 #       https://github.com/Delphier/DxAutoInstaller      #
 #                                                        #
@@ -435,3 +435,8 @@ ExpressDashboards:
   RequiredPackages:
     - dxDashboards
     - dcldxDashboards
+
+ExpressSplashForms:
+  RequiredPackages:
+    - dxSplashForms
+    - dcldxSplashForms
