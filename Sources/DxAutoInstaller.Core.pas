@@ -117,7 +117,7 @@ const
   DelphiSupportedPlatforms            = [pfWin32, pfWin64];
   DelphiSupportedPlatformsDefault     = [pfWin32, pfWin64];
   CppBuilderSupportedPlatforms        = [pfWin32, pfWin64, pfWin64x];
-  CppBuilderSupportedPlatformsDefault = [pfWin64x];
+  CppBuilderSupportedPlatformsDefault = [];
 
   // New architecture requires a synchronized update to IDE.Architectures
   ArchitecturePlatforms: array[TArchitecture] of TPlatform = (pfWin32, pfWin64);
