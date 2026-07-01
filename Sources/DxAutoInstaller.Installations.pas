@@ -147,6 +147,7 @@ procedure TInstallation.Execute;
 begin
   FRootDir.WriteToIDEEnvironmentVariable(IDE, Options.Architectures);
   for var Arch in Options.Architectures do IDE.EnvironmentVariablePathAdd(Arch, FRootDir.OutputDir(IDE, ArchitecturePlatforms[Arch]));
+  for var Comp in Components do RegistryWriteBool(TRootDir.DevExpressVCLProductsRegRoot, TRootDir.DevExpressVCLProductsRegKey + Comp.Metadata.Name, IDE.PackageVersionStr, Comp.Checked);
 
   for var Platform in Options.InstallPlatforms do begin
     IDE.SwitchCompiler(Platform);
@@ -258,6 +259,7 @@ begin
     if TDirectory.Exists(RootDir) then TTask.WriteLogSeparator('Deleting directory ' + OutputDir, 'Deleted', procedure begin RootDir.DeleteOutputDir(AIDE, Platform) end);
   end;
 
+  for var Comp in AManifest.Components do RegistryDeleteValue(TRootDir.DevExpressVCLProductsRegRoot, TRootDir.DevExpressVCLProductsRegKey + Comp.Name, AIDE.PackageVersionStr);
   for var Arch in AIDE.Architectures do AIDE.EnvironmentVariablePathRemove(Arch, RootDir.OutputDir(AIDE, ArchitecturePlatforms[Arch]));
   RootDir := '';
   RootDir.WriteToIDEEnvironmentVariable(AIDE, AIDE.Architectures);

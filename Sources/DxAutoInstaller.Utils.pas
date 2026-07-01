@@ -14,7 +14,7 @@ unit DxAutoInstaller.Utils;
 interface
 
 uses
-  System.Classes, JclSysUtils;
+  Winapi.Windows, System.Classes, JclSysUtils;
 
 type
   TLog = class
@@ -43,10 +43,15 @@ function CreateResourceStream(const AResName: string): TResourceStream;
 procedure LoadResourceToStream(ALoadFromStream: TLoadFromStreamProc; const AResName: string);
 procedure ExportResourceToFile(const AFileName, AResName: string);
 
+procedure RegistryDeleteKey(const ARootKey: HKEY; const AKey: string);
+procedure RegistryDeleteValue(const ARootKey: HKEY; const AKey, AName: string);
+procedure RegistryWriteString(const ARootKey: HKEY; const AKey, AName, AValue: string);
+procedure RegistryWriteBool(const ARootKey: HKEY; const AKey, AName: string; const AValue: Boolean);
+
 implementation
 
 uses
-  System.SysUtils, System.UITypes, Winapi.Windows, Vcl.Forms, Vcl.Dialogs;
+  System.SysUtils, System.UITypes, System.Win.Registry, Vcl.Forms, Vcl.Dialogs;
 
 { TLog }
 
@@ -117,6 +122,42 @@ begin
       Free;
     end;
   end;
+end;
+
+procedure RegistryWrite(const ARootKey: HKEY; const AKey: string; AProc: TProc<TRegistry>);
+begin
+  var Registry := TRegistry.Create;
+  try
+    Registry.RootKey := ARootKey;
+    if not AKey.IsEmpty then Registry.OpenKey(AKey, True);
+    AProc(Registry);
+  finally
+    Registry.Free;
+  end;
+end;
+
+procedure RegistryDeleteKey(const ARootKey: HKEY; const AKey: string);
+begin
+  RegistryWrite(ARootKey, '', procedure(ARegistry: TRegistry) begin ARegistry.DeleteKey(AKey) end);
+end;
+
+procedure RegistryDeleteValue(const ARootKey: HKEY; const AKey, AName: string);
+begin
+  RegistryWrite(ARootKey, '', procedure(ARegistry: TRegistry) begin
+    if not ARegistry.KeyExists(AKey) then Exit;
+    ARegistry.OpenKey(AKey, False);
+    ARegistry.DeleteValue(AName);
+  end);
+end;
+
+procedure RegistryWriteString(const ARootKey: HKEY; const AKey, AName, AValue: string);
+begin
+  RegistryWrite(ARootKey, AKey, procedure(ARegistry: TRegistry) begin ARegistry.WriteString(AName, AValue) end);
+end;
+
+procedure RegistryWriteBool(const ARootKey: HKEY; const AKey, AName: string; const AValue: Boolean);
+begin
+  RegistryWrite(ARootKey, AKey, procedure(ARegistry: TRegistry) begin ARegistry.WriteBool(AName, AValue) end);
 end;
 
 end.

@@ -3,7 +3,8 @@ Changelog
 v3.13.1	Pre-release
 	Added support for DevExpress VCL online help: pressing F1 in the IDE to open topic.
 	Added support for auto-loading current dir as DevExpress root dir on startup if valid.
-	Added support for ExpressReports and ExpressDashboards.
+	Added support for ExpressReports and ExpressDashboards (v25.2+).
+	Added support for VCL Template Kit and ExpressSplashForms (v26.1+).
 	Fixed the issue where Ctrl+Click on DevExpress units in the IDE could not navigate.
 
 v3.13	2026/03/07

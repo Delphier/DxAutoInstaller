@@ -52,6 +52,7 @@ ExpressLibrary:
     - dcldxCloudServiceLibrary
     - dxAICommands
   OptionalPackages:
+    - dcldxApplicationTemplate
     - ExpressPageControl\Packages\cxPageControldxBarPopupMenu
     - ExpressPageControl\Packages\dclcxPageControldxBarPopupMenu
   OutdatedPackages:

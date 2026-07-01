@@ -14,6 +14,7 @@ unit DxAutoInstaller.DevExpress;
 interface
 
 uses
+  Winapi.Windows,
   System.Generics.Collections,
   DxAutoInstaller.Core;
 
@@ -104,7 +105,9 @@ type
   TRootDirHelper = record helper for TRootDir
   const
     DXVCL = 'DXVCL';
-    RegKeyDevExpressVCLProducts = 'Software\Developer Express VCL Products';
+    DevExpressVCLProductsRegRoot     = HKEY_CURRENT_USER;
+    DevExpressVCLProductsRegRootName = 'HKEY_CURRENT_USER';
+    DevExpressVCLProductsRegKey      = 'Software\Developer Express VCL Products\';
   strict private
     function LibraryDir: string;
     procedure DeleteLibraryDir;
@@ -180,7 +183,6 @@ uses
   System.StrUtils,
   System.Generics.Defaults,
   System.RegularExpressions,
-  System.Win.Registry,
   DxAutoInstaller.Options,
   DxAutoInstaller.Utils,
   VSoft.YAML;
@@ -554,19 +556,20 @@ begin
 
   var dxOnlineHelpViewerFileName := TPath.Combine(SourcesDir, 'dxOnlineHelpViewer.pas');
   if TFile.Exists(dxOnlineHelpViewerFileName) then begin
-    var Registry := TRegistry.Create;
-    try
-      Registry.OpenKey(RegKeyDevExpressVCLProducts, True);
-      Registry.WriteString('RootDirectory', Self);
-      Registry.CloseKey;
-    finally
-      Registry.Free;
-    end;
-
+    RegistryWriteString(DevExpressVCLProductsRegRoot, DevExpressVCLProductsRegKey, 'RootDirectory', Self);
     var dxOnlineHelpViewer := TFile.ReadAllText(dxOnlineHelpViewerFileName);
-    dxOnlineHelpViewer := dxOnlineHelpViewer.Replace('(KEY_WOW64_32KEY)', '');
-    dxOnlineHelpViewer := dxOnlineHelpViewer.Replace('HKEY_LOCAL_MACHINE', 'HKEY_CURRENT_USER');
+    dxOnlineHelpViewer := dxOnlineHelpViewer.Replace('KEY_WOW64_32KEY', '');
+    dxOnlineHelpViewer := dxOnlineHelpViewer.Replace('HKEY_LOCAL_MACHINE', DevExpressVCLProductsRegRootName);
     TFile.WriteAllText(dxOnlineHelpViewerFileName, dxOnlineHelpViewer);
+  end;
+
+  var dxCoreProductsFileName := TPath.Combine(SourcesDir, 'dxCoreProducts.pas');
+  if TFile.Exists(dxCoreProductsFileName) then begin
+    var dxCoreProducts := TFile.ReadAllText(dxCoreProductsFileName);
+    dxCoreProducts := dxCoreProducts.Replace(' or KEY_WOW64_32KEY', '');
+    dxCoreProducts := dxCoreProducts.Replace('HKEY_LOCAL_MACHINE', DevExpressVCLProductsRegRootName);
+    dxCoreProducts := dxCoreProducts.Replace('[TdxRegistryName(''Layout Control'')]', '[TdxRegistryName(''Library'')]');
+    TFile.WriteAllText(dxCoreProductsFileName, dxCoreProducts);
   end;
 end;
 
@@ -585,12 +588,7 @@ begin
   var Dirs := TDirectory.GetDirectories(LibraryDir);
   if (Length(Dirs) = 1) and SameFileName(Dirs[0], SourcesDir) then begin
     TDirectory.Delete(if Length(TDirectory.GetFiles(LibraryDir)) = 0 then LibraryDir else SourcesDir, True);
-    var Registry := TRegistry.Create;
-    try
-      Registry.DeleteKey(RegKeyDevExpressVCLProducts);
-    finally
-      Registry.Free;
-    end;
+    RegistryDeleteKey(DevExpressVCLProductsRegRoot, DevExpressVCLProductsRegKey);
   end;
 end;
 
