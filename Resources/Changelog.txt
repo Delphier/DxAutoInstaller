@@ -1,6 +1,6 @@
 Changelog
 --------------------------
-v3.13.1	Pre-release
+v3.13.1	2026/07/01
 	Added support for DevExpress VCL online help: pressing F1 in the IDE to open topic.
 	Added support for auto-loading current dir as DevExpress root dir on startup if valid.
 	Added support for ExpressReports and ExpressDashboards (v25.2+).
