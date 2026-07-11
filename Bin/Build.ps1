@@ -36,13 +36,13 @@ function Build($Platform, $FileSuffix) {
     Write-Host "Building $AppName v$Version for $Platform..." -ForegroundColor Blue
     Write-Host "============================================" -ForegroundColor Green
     BuildProject $AppName $Platform $VersionInfoGUI
-    #BuildProject $AppNameCLI $Platform $VersionInfoCLI
+    BuildProject $AppNameCLI $Platform $VersionInfoCLI
     
     tar -caf `
         (Join-Path $ReleasesDir "$AppName-$Version$FileSuffix.zip") `
         -C $PSScriptRoot `
         "$AppName.exe" `
-        #"$AppNameCLI.exe"
+        "$AppNameCLI.exe"
 }
 
 Build Win32 '-x86'
