@@ -47,12 +47,11 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <DCC_UnitSearchPath>F:\Codes\JCL\source\common;F:\Codes\JCL\source\include;F:\Codes\JCL\source\windows;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <SanitizedProjectName>DxAutoInstaller</SanitizedProjectName>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
-        <DCC_DcuOutput>$(Temp)\DxAutoInstaller</DCC_DcuOutput>
+        <DCC_DcuOutput>$(Temp)\DxAutoInstaller.GUI</DCC_DcuOutput>
         <DCC_ExeOutput>.\Bin</DCC_ExeOutput>
         <DCC_E>false</DCC_E>
         <DCC_N>false</DCC_N>
@@ -114,20 +113,8 @@
             <Form>ProgressForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <RcItem Include="Resources\DevExpress.yaml">
-            <ContainerId>ResourceItem</ContainerId>
-            <ResourceType>RCDATA</ResourceType>
-            <ResourceId>DevExpressManifest</ResourceId>
-        </RcItem>
-        <RcItem Include="Resources\Changelog.txt">
-            <ContainerId>ResourceItem</ContainerId>
-            <ResourceType>RCDATA</ResourceType>
-            <ResourceId>Changelog</ResourceId>
-        </RcItem>
-        <RcItem Include="Resources\Images\Logo-2024.svg">
-            <ResourceType>RCDATA</ResourceType>
-            <ResourceId>Logo</ResourceId>
-        </RcItem>
+        <RcCompile Include="Resources\Shared.rc"/>
+        <RcCompile Include="Resources\GUI.rc"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

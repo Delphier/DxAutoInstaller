@@ -11,8 +11,6 @@
 
 program DxAutoInstaller;
 
-{$R *.dres}
-
 uses
   Vcl.Forms,
   DxAutoInstaller.UI.MainForm in 'Sources\DxAutoInstaller.UI.MainForm.pas' {MainForm},
@@ -27,6 +25,8 @@ uses
   DxAutoInstaller.UI.ProgressForm in 'Sources\DxAutoInstaller.UI.ProgressForm.pas' {ProgressForm};
 
 {$R *.res}
+{$R Shared.res}
+{$R GUI.res}
 
 begin
   ReportMemoryLeaksOnShutdown := True;

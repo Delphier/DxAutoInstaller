@@ -5,7 +5,7 @@
 
 *.dres
 *.res
-*.rc
+/*.rc
 
 *.dcu
 *.ddp
