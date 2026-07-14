@@ -1,2 +1,2 @@
 Name    = 'DxAutoInstaller';
-Version = '3.13.1';
+Version = '3.13.2b';
