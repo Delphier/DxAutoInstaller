@@ -83,10 +83,13 @@ type
   strict private
     class var FJclIDEs: TJclIDEs;
     class var FDefault: TIDEList;
+    function Find(const AName: string): TIDE;
   public
     class constructor Create;
     class destructor Destroy;
     class property Default: TIDEList read FDefault;
+    constructor Create(const ANames: string);
+    function Names: TArray<string>;
   end;
 
   TPlatformHelper = record helper for TPlatform
@@ -142,7 +145,7 @@ const
 implementation
 
 uses
-  System.SysUtils, System.Generics.Collections, Vcl.Forms,
+  System.SysUtils, System.StrUtils, System.Generics.Collections, Vcl.Forms,
   DxAutoInstaller.Tasks, DxAutoInstaller.DevExpress;
 
 
@@ -251,6 +254,34 @@ class destructor TIDEListHelper.Destroy;
 begin
   TArray.FreeValues(FDefault);
   FJclIDEs.Free;
+end;
+
+constructor TIDEListHelper.Create(const ANames: string);
+begin
+  Self := [];
+  var Names := ANames.Split([',', ';']);
+  for var Name in Names do begin
+    if Name.Trim.IsEmpty then Continue;
+    var IDE := Default.Find(Name);
+    if Assigned(IDE) then Self := Self + [IDE] else raise Exception.CreateFmt('Invalid IDE name: %s', [Name]);
+  end;
+end;
+
+function TIDEListHelper.Find(const AName: string): TIDE;
+begin
+  Result := nil;
+  var Name := AName.Trim.Replace(' ', '');
+  for var IDE in Self do begin
+    var IDEName := IDE.Name.Replace(' ', '');
+    var Names := [IDEName, IDEName.Replace('RADStudio', 'RS')];
+    if MatchText(Name, Names) then Exit(IDE);
+  end;
+end;
+
+function TIDEListHelper.Names: TArray<string>;
+begin
+  Result := [];
+  for var IDE in Self do Result := Result + [IDE.Name];
 end;
 
 { TPlatformHelper }

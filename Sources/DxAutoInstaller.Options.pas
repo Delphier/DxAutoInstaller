@@ -11,10 +11,14 @@
 
 unit DxAutoInstaller.Options;
 
+{$I DxAutoInstaller.inc}
+
 interface
 
 uses
+  {$IFDEF GUI}
   cxEdit,
+  {$ENDIF}
   System.Generics.Collections,
   DxAutoInstaller.Core;
 
@@ -28,8 +32,10 @@ type
   private
     FIDE: TIDE;
     FValue: TOptionValue;
+    {$IFDEF GUI}
     FEditProperties: TcxCustomEditProperties;
     FOwnsEditProperties: Boolean;
+    {$ENDIF}
     FError: TError;
     procedure SetValue(const AValue: TOptionValue);
   protected
@@ -39,7 +45,9 @@ type
     destructor Destroy; override;
     class function Name: string; virtual; abstract;
     property Value: TOptionValue read FValue write SetValue;
+    {$IFDEF GUI}
     property EditProperties: TcxCustomEditProperties read FEditProperties;
+    {$ENDIF}
     property Error: TError read FError;
     function Valid: Boolean;
   end;
@@ -110,10 +118,12 @@ type
 implementation
 
 uses
+  {$IFDEF GUI}
   cxCheckComboBox,
+  DxAutoInstaller.Resources,
+  {$ENDIF}
   System.Classes,
-  System.Variants,
-  DxAutoInstaller.Resources;
+  System.Variants;
 
 { TOption }
 
@@ -125,14 +135,18 @@ end;
 
 destructor TOption.Destroy;
 begin
+  {$IFDEF GUI}
   if FOwnsEditProperties then FEditProperties.Free;
+  {$ENDIF}
   inherited;
 end;
 
 procedure TOption.Init;
 begin
   FValue := True;
+  {$IFDEF GUI}
   FEditProperties := DMResources.CheckBoxEditor.Properties;
+  {$ENDIF}
 end;
 
 function TOption.Valid: Boolean;
@@ -151,7 +165,7 @@ procedure TOptionPlatforms.DoInit(APersonalityInstalled: Boolean; const APlatfor
 begin
   if APersonalityInstalled then begin
     FValue := Byte(ADefaults * APlatforms * FIDE.Platforms);
-
+    {$IFDEF GUI}
     var Properties := TcxCheckComboBoxProperties.Create(nil);
     FEditProperties := Properties;
     FOwnsEditProperties := True;
@@ -165,9 +179,12 @@ begin
       Item.ShortDescription := PlatformNames[I];
       Item.Enabled := I in FIDE.Platforms;
     end;
+    {$ENDIF}
   end else begin
     FValue := 0;
+    {$IFDEF GUI}
     FEditProperties := DMResources.ErrorEditor.Properties;
+    {$ENDIF}
     FError := AError;
   end;
 end;

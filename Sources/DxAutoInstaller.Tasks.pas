@@ -11,18 +11,25 @@
 
 unit DxAutoInstaller.Tasks;
 
+{$I DxAutoInstaller.inc}
+
 interface
 
 uses
-  System.SysUtils, System.Threading, DxAutoInstaller.UI.ProgressForm;
+  {$IFDEF GUI}
+  DxAutoInstaller.UI.ProgressForm,
+  {$ENDIF}
+  System.SysUtils, System.Threading;
 
 type
   TTask = class
   private
     class var FInstance: ITask;
     class var FAborted: Boolean;
+    {$IFDEF GUI}
     class var FProgressForm: TProgressForm;
-    class procedure DoExecute(AProc: TProc);
+    {$ENDIF}
+    class procedure DoExecute(const ATitle: string; AProc: TProc);
   public
     class property Instance: ITask read FInstance;
     class property Aborted: Boolean read FAborted write FAborted;
@@ -46,18 +53,13 @@ class procedure TTask.Execute(const ATitle: string; const AStepCount: Cardinal; 
 begin
   FInstance := nil;
   FAborted := False;
+  {$IFDEF GUI}
   Application.MainForm.Hide;
   try
     FProgressForm := TProgressForm.Create(nil);
     try
       FProgressForm.ProgressBar.Properties.Max := AStepCount;
-
-      WriteLogSeparator;
-      WriteLog(Format('%s v%s', [TApp.Name, TApp.Version]));
-      WriteLog(ATitle);
-      WriteLog('Starts: ' + Now.ToString);
-
-      DoExecute(AProc);
+      DoExecute(ATitle, AProc);
       FProgressForm.ShowModal;
     finally
       FreeAndNil(FProgressForm);
@@ -65,11 +67,21 @@ begin
   finally
     Application.MainForm.Show;
   end;
+  {$ELSE}
+  DoExecute(ATitle, AProc);
+  {$ENDIF}
 end;
 
-class procedure TTask.DoExecute(AProc: TProc);
+class procedure TTask.DoExecute(const ATitle: string; AProc: TProc);
 begin
+  WriteLogSeparator;
+  WriteLog(Format('%s v%s', [TApp.Name, TApp.Version]));
+  WriteLog(ATitle);
+  WriteLog('Starts: ' + Now.ToString);
+
+  {$IFDEF GUI}
   FInstance := System.Threading.TTask.Run(procedure begin
+  {$ENDIF}
     var Stopwatch := TStopwatch.StartNew;
     try
       try
@@ -84,9 +96,13 @@ begin
       WriteLog(if Aborted then 'Aborted.' else 'Done!');
       WriteLog('Ends: ' + Now.ToString);
       WriteLog('Elapsed Time: ' + Stopwatch.Elapsed.ToString);
+      {$IFDEF GUI}
       TThread.Queue(nil, procedure begin FProgressForm.Done end);
+      {$ENDIF}
     end;
+  {$IFDEF GUI}
   end);
+  {$ENDIF}
 end;
 
 class function TTask.LastLog: string;
@@ -97,13 +113,17 @@ end;
 class procedure TTask.WriteLog(const AText: string);
 begin
   TApp.Log.Write(AText);
+  {$IFDEF GUI}
   TThread.Queue(nil, procedure begin FProgressForm.Log.Lines.Add(AText) end);
+  {$ENDIF}
 end;
 
 class procedure TTask.WriteLogSeparator;
 begin
   TApp.Log.WriteSeparator;
+  {$IFDEF GUI}
   TThread.Queue(nil, procedure begin FProgressForm.Log.Lines.Add(TApp.Log.Separator) end);
+  {$ENDIF}
 end;
 
 class procedure TTask.WriteLogSeparator(const AStartText, AEndText: string; AProc: TProc);
@@ -118,7 +138,9 @@ end;
 
 class procedure TTask.StepIt;
 begin
+  {$IFDEF GUI}
   TThread.Queue(nil, procedure begin FProgressForm.ProgressBar.Position := FProgressForm.ProgressBar.Position + 1 end);
+  {$ENDIF}
 end;
 
 end.

@@ -271,8 +271,7 @@ const
   MsgTaskConfirm  = 'Do you want to uninstall DevExpress VCL from the following IDEs:'#13#10;
   MsgTaskTitle     = 'Uninstall DevExpress VCL from ';
 begin
-  var IDENames: TArray<string> := [];
-  for var IDE in AIDEList do IDENames := IDENames + [IDE.Name];
+  var IDENames := AIDEList.Names;
   if Length(IDENames) = 0 then raise Exception.Create(MsgNoneSelected);
   if not TMessageBox.Confirm(MsgTaskConfirm + string.Join(sLineBreak, IDENames), ['Uninstall', 'Cancel']) then Exit;
 

@@ -11,6 +11,8 @@
 
 unit DxAutoInstaller.Utils;
 
+{$I DxAutoInstaller.inc}
+
 interface
 
 uses
@@ -33,6 +35,7 @@ type
   end;
 
   TMessageBox = record
+    class var AssumeYes: Boolean;
     class procedure Information(const AMessage: string); static;
     class function Confirm(const AMessage: string; AButtonCaptions: TArray<string> = []): Boolean; static;
   end;
@@ -51,7 +54,7 @@ procedure RegistryWriteBool(const ARootKey: HKEY; const AKey, AName: string; con
 implementation
 
 uses
-  System.SysUtils, System.UITypes, System.Win.Registry, Vcl.Forms, Vcl.Dialogs;
+  System.SysUtils, System.StrUtils, System.UITypes, System.Win.Registry, Vcl.Forms, Vcl.Dialogs;
 
 { TLog }
 
@@ -71,6 +74,9 @@ end;
 procedure TLog.DoWrite(const AText: string);
 begin
   FFile.Write(AText);
+  {$IFDEF CLI}
+  Writeln(AText);
+  {$ENDIF}
 end;
 
 procedure TLog.Write(const AText: string);
@@ -94,8 +100,17 @@ end;
 
 class function TMessageBox.Confirm(const AMessage: string; AButtonCaptions: TArray<string>): Boolean;
 begin
+  if AssumeYes then Exit(True);
+  {$IFDEF GUI}
   MsgDlgIcons[mtConfirmation] := TMsgDlgIcon.mdiInformation;
   Result := MessageDlg(AMessage, mtConfirmation, mbYesNo, 0, mbNo, AButtonCaptions) = mrYes;
+  {$ELSE}
+  Writeln(AMessage);
+  Write('[y/N] ? ');
+  var Yes := '';
+  Readln(Yes);
+  Result := MatchText(Yes.Trim, ['Y', 'Yes']);
+  {$ENDIF}
 end;
 
 function CreateResourceStream(const AResName: string): TResourceStream;

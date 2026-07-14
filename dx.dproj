@@ -114,6 +114,8 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <DCCReference Include="Sources\DxAutoInstaller.CLI.pas"/>
+        <RcCompile Include="Resources\Shared.rc"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -1,0 +1,6 @@
+{$IFDEF CONSOLE}
+  {$DEFINE CLI}
+{$ELSE}
+  {$DEFINE GUI}
+{$ENDIF}
+
