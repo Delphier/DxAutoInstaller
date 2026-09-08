@@ -10,33 +10,26 @@ $App = Invoke-Expression "@{ $AppInc }"
 $AppName = $App.Name
 $Version = $App.Version
 $AppNameCLI = 'dx'
-$VersionInfoRaw = @"
-CompanyName=https://github.com/Delphier/DxAutoInstaller;
-FileDescription={0};
-FileVersion=$Version;
-LegalCopyright=Copyright © 2014-2026 faceker@gmail.com;
-ProductName=$AppName {1};
-ProductVersion=${Version}_
-"@ -replace "\r|\n", ''
-$VersionInfoGUI = $VersionInfoRaw -f "DevExpress VCL Components Automatic Installer", "GUI"
-$VersionInfoCLI = $VersionInfoRaw -f "$AppName Command Line Interface", "CLI"
 
-function BuildProject($ProjectName, $Platform, $VersionInfo) {
-    $ProjectFileName = Join-Path $ProjectDir "$ProjectName.dproj"
-    cmd /c MSBuild $ProjectFileName `
-        /t:Build `
-        /p:config=Release `
-        /p:platform=$Platform `
-        /p:VerInfo_IncludeVerInfo=true `
-        /p:VerInfo_Keys=`"$VersionInfo$Platform`"
+# Build via RAD Studio CLI: https://github.com/Delphier/radstudio
+function BuildProject($ProjectName, $Platform, $ProductName, $FileDescription) {
+    radstudio build (Join-Path $ProjectDir "$ProjectName.dproj") `
+        --config=Release `
+        --platform=$Platform `
+        --FileVersion=$Version `
+        --ProductVersion=${Version}_$Platform `
+        --ProductName=$ProductName `
+        --FileDescription=$FileDescription `
+        --CompanyName=https://github.com/Delphier/DxAutoInstaller `
+        --LegalCopyright="Copyright © 2014-2026 faceker@gmail.com"
 }
 
 function Build($Platform, $FileSuffix) {
     Write-Host "============================================" -ForegroundColor Green
     Write-Host "Building $AppName v$Version for $Platform..." -ForegroundColor Blue
     Write-Host "============================================" -ForegroundColor Green
-    BuildProject $AppName $Platform $VersionInfoGUI
-    BuildProject $AppNameCLI $Platform $VersionInfoCLI
+    BuildProject $AppName $Platform "$AppName GUI" "DevExpress VCL Components Automatic Installer"
+    BuildProject $AppNameCLI $Platform "$AppName CLI" "$AppName Command Line Interface"
     
     tar -caf `
         (Join-Path $ReleasesDir "$AppName-$Version$FileSuffix.zip") `
